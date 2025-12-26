@@ -1,0 +1,148 @@
+<h2 mat-dialog-title class="m-b-24  b-b-1 p-b-20">{{'actions.' + action | translate}} {{'FirmMasterdialog.Firm' | translate}}</h2>
+<mat-dialog-content class="mat-typography" style="max-width: 600px" *ngIf="action !== 'Delete'; else elseTemplate">
+  <form [formGroup]="firmForm">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput required formControlName="header" placeholder="{{'FirmMasterdialog.Enterheader' | translate}}" />
+          <mat-hint *ngIf="firmForm.get('header')?.hasError('required') && firmForm.get('header')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Headerisrequired' | translate}}
+          </mat-hint>
+          <mat-hint *ngIf="firmForm.get('header')?.hasError('pattern') && firmForm.get('header')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Pleaseentervalidheader' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput required formControlName="subHeader" placeholder="{{'FirmMasterdialog.Entersubheader' | translate}}" />
+           <mat-hint *ngIf="firmForm.get('subHeader')?.hasError('required') && firmForm.get('subHeader')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Subheaderisrequired' | translate}}
+          </mat-hint>
+           <mat-hint *ngIf="firmForm.get('subHeader')?.hasError('pattern') && firmForm.get('subHeader')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Pleaseentervalidsubheader' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput required formControlName="address" placeholder="{{'FirmMasterdialog.EnterAddress' | translate}}" />
+          <mat-hint *ngIf="firmForm.get('address')?.hasError('required') && firmForm.get('address')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Addressisrequired' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput formControlName="GSTNo" placeholder="{{'FirmMasterdialog.GSTNo' | translate}}" />
+          <mat-hint *ngIf="firmForm.get('GSTNo')?.hasError('pattern') && firmForm.get('GSTNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.InvalidGstisrequired' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <!-- <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput formControlName="gstPercentage" placeholder="{{'FirmMasterdialog.GSTPercentage' | translate}}"  min="0" />
+        </mat-form-field>
+      </div> -->
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput formControlName="panNo" placeholder="{{'FirmMasterdialog.Panno' | translate}}" />
+          <mat-hint *ngIf="firmForm.get('panNo')?.hasError('pattern') && firmForm.get('panNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.InvalidpanNoisrequired' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput  required
+            formControlName="mobileNo" placeholder="{{'FirmMasterdialog.Mobileno' | translate}}"   min="0"/>
+          <mat-hint *ngIf="firmForm.get('mobileNo')?.hasError('required') && firmForm.get('mobileNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Mobilenoisrequired' | translate}}
+          </mat-hint>
+          <mat-hint *ngIf="firmForm.get('mobileNo')?.hasError('pattern') && firmForm.get('mobileNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.Invalidmobilenoisrequired' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput 
+            formControlName="personalMobileNo" placeholder="{{'FirmMasterdialog.Personalmobileno' | translate}}"   min="0"/>
+            <mat-hint *ngIf="firmForm.get('personalMobileNo')?.hasError('required') && firmForm.get('personalMobileNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.PersonalMobilenoisrequired' | translate}}
+          </mat-hint>
+          <mat-hint *ngIf="firmForm.get('personalMobileNo')?.hasError('pattern') && firmForm.get('personalMobileNo')?.touched"
+            class="error-message error-color">
+            {{'FirmMasterdialogerror.InvalidPersonalMobilenoisrequired' | translate}}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput formControlName="bankName" placeholder="{{'FirmMasterdialog.Bankname' | translate}}" />
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput formControlName="accountholdersname" placeholder="{{'FirmMasterdialog.Accountholdersname' | translate}}" />
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput formControlName="ifscCode" placeholder="{{'FirmMasterdialog.IFSCcode' | translate}}" />
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput formControlName="bankAccountNo" placeholder="{{'FirmMasterdialog.Bankaccountno' | translate}}"  />
+        </mat-form-field>
+      </div>
+      <!-- <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10" id="billbox">
+          <mat-select name="InvoiceTheme" formControlName="selectedInvoiceTheme" placeholder="Select Invoice Theme">
+            <mat-option *ngFor="let item of invoiceThemeList" [value]="item.value">
+              <div class="theme-option">
+                <span class="d-flex align-items-center">
+                  <img [src]="item.imageUrl" style="width: 17%;" class="theme-image">
+                  <div style="padding-left: 10px;">
+                    {{ item.name }}
+                  </div>
+                </span>
+              </div>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div> -->
+    </div>
+    <mat-divider></mat-divider>
+    <mat-dialog-actions class="p-24 justify-content-end" >
+      <button mat-stroked-button color="warn" mat-dialog-close>{{'FirmMasterdialog.Cancel' | translate}}</button>
+      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!firmForm.valid" color="primary" (click)="firmPayload();">
+        {{'actions.' + action | translate}}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</mat-dialog-content>
+<ng-template #elseTemplate>
+  <div class="p-x-24">
+    <p>{{'FirmMasterdialog.Suretodelete' | translate}} <span class="f-w-600">{{local_data.Name}}</span> ?</p>
+  </div>
+  <mat-divider></mat-divider>
+  <div mat-dialog-actions class="p-x-24 p-b-24 m-t-10 justify-content-end">
+    <button mat-button (click)="firmPayload()" mat-flat-button color="warn">
+      {{'actions.' + action | translate}}
+    </button>
+    <button mat-stroked-button color="warn" (click)="closeDialog()" class="m-l-8">{{'FirmMasterdialog.Cancel' | translate}}</button>
+  </div>
+</ng-template>

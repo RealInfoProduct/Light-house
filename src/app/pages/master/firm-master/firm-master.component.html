@@ -1,0 +1,157 @@
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="row justify-content-between">
+      <div class="col-lg-4">
+        <mat-form-field appearance="outline" class="w-100 hide-hint">
+          <input matInput placeholder="{{'FirmMaster.SearchFirm' | translate}}" (keyup)="applyFilter($any($event.target).value)"/>
+          <mat-icon matSuffix>
+            <i-tabler name="search" class="icon-20"></i-tabler>
+          </mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="col-lg-4 d-flex align-items-center justify-content-end">
+        <button mat-flat-button color="primary" (click)="addFirm('Add', {})">
+          {{'FirmMaster.AddFirm' | translate}}
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="table-responsive">
+      <table style="min-width: 215%;" mat-table [dataSource]="firmDataSource" class="w-100">
+        <ng-container matColumnDef="#">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
+          <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+        
+        <ng-container matColumnDef="header">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600"> {{'FirmMaster.Header' | translate}}</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="d-flex align-items-center">
+              <div class="m-l-16">
+                <p class="mat-subtitle-1 f-s-16 m-t-0">
+                  {{ element.header }}
+                </p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Subheader">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.SubHeader' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.subHeader }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="GSTMo">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.GSTNo' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            <div>
+              {{ element.gstNo }}
+            </div>
+            <div>
+              {{ element.panNo }}
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- <ng-container matColumnDef="gst">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.GST%' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.gstpercentage }}
+          </td>
+        </ng-container> -->
+
+        <ng-container matColumnDef="MobileNo">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.MobileNo' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.mobileNo}}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PersonalMobileNo">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.PersonalMobileNo' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.personalMobileNo }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="BankName">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.BankName' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            <div>
+              {{ element.bankName }}
+            </div>
+            <div>
+              {{ element.bankIfsc }}
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="accountholdersname">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.Accountholdersname' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.accountholdersname }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="BankAccountNo">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.BankAccountNo' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.bankAccountNo }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Address">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.Address' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.address }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'FirmMaster.Action' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="action-link">
+            <a class="m-r-10 cursor-pointer"><i-tabler name="edit" (click)="addFirm('Edit', element)"
+                class="icon-18"></i-tabler></a>
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="trash" (click)="addFirm('Delete', element)" class="icon-18"></i-tabler>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row" style="text-align: center;" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            No record found
+          </td>
+        </tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>

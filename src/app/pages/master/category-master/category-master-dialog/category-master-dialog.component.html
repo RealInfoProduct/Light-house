@@ -1,0 +1,64 @@
+<h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Category </h2>
+<mat-dialog-content class="mat-typography" style="max-width: 600px" *ngIf="action !== 'Delete'; else elseTemplate" >
+  <form [formGroup]="categoryForm">
+    <div class="row">
+
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <input type="text" matInput required formControlName="category" placeholder="Category" />
+          </mat-form-field>
+        </div>
+    
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput required formControlName="companyName" placeholder="Company Name" />
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="text" matInput required formControlName="mode" placeholder="Mode" />
+        </mat-form-field>
+      </div>
+
+       <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <textarea matInput required formControlName="keySpecifiCations" placeholder="Key Specifications" rows="2"></textarea>
+        </mat-form-field>
+
+      </div>
+
+       <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput required formControlName="warrantyPeriods" placeholder="Warranty Perids" min="0"/>
+        </mat-form-field>
+      </div>
+
+       <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <input type="number" matInput required formControlName="stockCount" placeholder="Stock Count" min="0"/>
+        </mat-form-field>
+      </div>
+     
+    </div>
+    <mat-divider></mat-divider>
+    <mat-dialog-actions class="p-24 justify-content-end">
+      <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!categoryForm.valid" color="primary" (click)="categoryPayload();">
+        {{'actions.' + action | translate}}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</mat-dialog-content>
+<ng-template #elseTemplate>
+  <div class="p-x-24">
+    <p>Sure to delete <span class="f-w-600">{{local_data.Name}}</span> ?</p>
+  </div>
+  <mat-divider></mat-divider>
+  <div mat-dialog-actions class="p-x-24 p-b-24 m-t-10 justify-content-end">
+    <button mat-button (click)="categoryPayload()" mat-flat-button color="warn">
+      {{'actions.' + action | translate}}
+    </button>
+    <button mat-stroked-button color="warn" (click)="closeDialog()" class="m-l-8">Cancel</button>
+  </div>
+</ng-template>

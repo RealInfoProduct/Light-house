@@ -1,0 +1,96 @@
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="row justify-content-between">
+      <div class="col-lg-4">
+        <mat-form-field appearance="outline" class="w-100 hide-hint">
+          <input matInput placeholder="{{'PartyMaster.SearchParty' | translate}}" (keyup)="applyFilter($any($event.target).value)" />
+          <mat-icon matSuffix>
+            <i-tabler name="search" class="icon-20"></i-tabler>
+          </mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="col-lg-4 d-flex align-items-center justify-content-end">
+        <button mat-flat-button color="primary" (click)="addParty('Add', {})">
+          {{'PartyMaster.AddParty' | translate}}
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="partyDataSource" class="w-100">
+       
+        <ng-container matColumnDef="srno">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
+          <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="PartyName">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">{{'PartyMaster.Name' | translate}}</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="d-flex align-items-center">
+              <div class="m-l-16">
+                <p class="mat-subtitle-1 f-s-16 m-t-0">
+                  {{ element.partyName }}<br>
+                (  {{ element.partyMobileNo }})
+                </p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PartyGSTIN">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.GSTIN' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.partyGstNo }}
+          </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="Address">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.Address' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14 wrap-address">
+            {{ element.partyAddress }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PartyPan">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.Pan' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.partyPanNo }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.Action' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="action-link">
+            <a class="m-r-10 cursor-pointer"><i-tabler name="edit" (click)="addParty('Edit', element)"
+                class="icon-18"></i-tabler></a>
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="trash" (click)="addParty('Delete', element)" class="icon-18"></i-tabler>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row" style="text-align: center;" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            No record found
+          </td>
+        </tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>

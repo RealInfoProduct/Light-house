@@ -1,0 +1,27 @@
+.font-family {
+    font-weight: 600;
+    font-family: sans-serif;
+}
+
+.w-20{
+       width: 60%;
+}
+
+.m-l-42{
+margin-left: 42px;
+}
+
+::ng-deep .status-paid {
+  color: green !important;
+  font-weight: 600;
+}
+
+::ng-deep .status-unpaid {
+  color: red !important;
+  font-weight: 600;
+}
+
+::ng-deep .status-pending {
+  color: #ffc300 !important;
+  font-weight: 600;
+}

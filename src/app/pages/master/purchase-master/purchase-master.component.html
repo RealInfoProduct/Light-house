@@ -1,0 +1,144 @@
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="row justify-content-between">
+      <div class="col-lg-3">
+        <mat-form-field appearance="outline" class="w-100 hide-hint">
+          <input matInput placeholder="Search Purchase" (keyup)="applyFilter($any($event.target).value)" />
+          <mat-icon matSuffix>
+            <i-tabler name="search" class="icon-20"></i-tabler>
+          </mat-icon>
+        </mat-form-field>
+      </div>
+        <div class="col-lg-3 invoicedate-range">
+          <mat-form-field appearance="outline" class="w-100  hide-hint">
+            <mat-label>Select Purchase Date</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [formGroup]="datePurchaseListForm">
+              <input matStartDate placeholder="Start date" formControlName="start">
+              <input matEndDate placeholder="End date" formControlName="end">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker (closed)="filterDate()"></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      <div class="col-lg-4 d-flex align-items-center justify-content-end">
+        <button mat-flat-button color="primary" class="add-download" (click)="addPurchase('Add', {})">
+          Add Purchase
+        </button>
+      </div>
+      <div class="col-lg-1 m-t-10 file-download">
+        <div class="d-flex  hide-hint align-items-center justify-content-end">
+          <button (click)="filedownload()" mat-flat-button color="primary">
+            <i-tabler name="file-download" class="icon-25"></i-tabler>
+          </button>
+        </div>
+      </div>
+      <div class="col-lg-1 m-t-10 file-download">
+        <div class="d-flex  hide-hint align-items-center justify-content-end">
+          <button (click)="fileView()" mat-flat-button color="primary">
+            <i-tabler name="eye" class="icon-25"></i-tabler>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="productDataSource" class="w-100">
+       
+        <ng-container matColumnDef="srno">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
+          <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="billNo">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Bill No</th>
+          <td mat-cell *matCellDef="let element">{{ element.billNo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="PartyName">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Party Name</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="d-flex align-items-center">
+              <div class="m-l-16">
+                <p class="mat-subtitle-1 f-s-16 m-t-0">
+                  {{ getpartyName(element.isParty) }}
+                </p>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+           Date
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.date | date:'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <!-- <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Status</th>
+          <td mat-cell *matCellDef="let element"  [ngClass]="getStatusClass(element.paymentStatus)">{{ element.paymentStatus }}</td>
+        </ng-container> -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Status</th>
+          <td mat-cell *matCellDef="let element" [ngClass]="getStatusClass(getFinalStatus(element))">
+            {{ getFinalStatus(element) }}
+          </td>
+        </ng-container>
+
+          <ng-container matColumnDef="finalAmount">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Final Amount</th>
+          <td mat-cell *matCellDef="let element">{{ element.total }}</td>
+        </ng-container>
+
+          <ng-container matColumnDef="recivedAmount">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Spent Amount</th>
+          <td mat-cell *matCellDef="let element">{{  getTotalReceived(element.paymentDetails) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="pendingAmount">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            Pending Amount
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ getPendingAmount(element) }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.Action' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="action-link">
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="eye" (click)="viewcompanyDetails(element)" class="icon-18"></i-tabler>
+            </a>
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="edit" (click)="addPurchase('Edit', element)" class="icon-18"></i-tabler>
+            </a>
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="trash" (click)="addPurchase('Delete', element)" class="icon-18"></i-tabler>
+            </a>
+            <a class="m-r-10 cursor-pointer">
+              <i-tabler name="calculator" (click)="paymentDetails(element)" class="icon-18"></i-tabler>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row" style="text-align: center;" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            No record found
+          </td>
+        </tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>

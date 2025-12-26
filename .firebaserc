@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "mystock-65739"
+  },
+  "targets": {
+    "mystock-65739": {
+      "hosting": {
+        "tr": [
+          "mystockm"
+        ]
+      }
+    }
+  }
+}

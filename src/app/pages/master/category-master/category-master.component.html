@@ -1,0 +1,113 @@
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="row justify-content-between">
+      <div class="col-lg-4">
+        <mat-form-field appearance="outline" class="w-100 hide-hint">
+          <input matInput placeholder="Search Category" (keyup)="applyFilter($any($event.target).value)" />
+          <mat-icon matSuffix>
+            <i-tabler name="search" class="icon-20"></i-tabler>
+          </mat-icon>
+        </mat-form-field>
+      </div>
+      <div class="col-lg-4 d-flex align-items-center justify-content-end">
+        <button mat-flat-button color="primary" 
+        (click)="addCategory('Add', {})"
+        >
+          Add Category
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="categoryDataSource" class="w-100">
+       
+        <ng-container matColumnDef="srno">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
+          <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            Category
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.category }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="companyName">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            Company Name
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.companyName }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="mode">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            Mode
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.mode }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="keySpecifiCations">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+           Key Specifi Cations
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.keySpecifiCations }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="warrantyPeriods">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+          Warranty Perids
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.warrantyPeriods }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="stockCount">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+           Stock Count
+          </th>
+          <td mat-cell *matCellDef="let element" class="f-s-14">
+            {{ element.stockCount }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+            {{'PartyMaster.Action' | translate}}
+          </th>
+          <td mat-cell *matCellDef="let element" class="action-link">
+            <a class="m-r-10 cursor-pointer"><i-tabler name="edit" 
+              (click)="addCategory('Edit', element)"
+                class="icon-18"></i-tabler></a>
+                <a class="m-r-10 cursor-pointer">
+              <i-tabler name="trash" 
+              (click)="addCategory('Delete', element)" 
+              class="icon-18"></i-tabler>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="mat-row" style="text-align: center;" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            No record found
+          </td>
+        </tr>
+      </table>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>
