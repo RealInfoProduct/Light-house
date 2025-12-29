@@ -38,7 +38,7 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: "${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 || secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV_64439 }}"
+          firebaseServiceAccount: "${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 || secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV }}"
           channelId: live
           projectId: "${{ github.ref == 'refs/heads/main' && 'lighthouseprod-d5f45' || 'lighthousedev-64439' }}"
           target: "${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}"
