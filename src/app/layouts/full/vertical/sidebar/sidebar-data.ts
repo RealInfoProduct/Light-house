@@ -37,9 +37,9 @@ export const navItems: NavItem[] = [
     iconName: 'file-invoice',
     route: '/master/shellmaster',
   },
-  {
-    displayName: 'Income/Expense',
-    iconName: 'presentation-analytics',
-     route: '/master/income-expense',
-  },
+  // {
+  //   displayName: 'Income/Expense',
+  //   iconName: 'presentation-analytics',
+  //    route: '/master/income-expense',
+  // },
 ]
