@@ -90,9 +90,11 @@ export interface ShellList {
     extraDiscount :number,
     grandTotal :number,
     paymentStatus :string,
+     paymentReceived:string,
     userId: any,
     shellDetails: {
-       productsName:string,
+       companyName:string,
+       category:string,
        qty: number,
        prouctPrice: number,
        discount: number,

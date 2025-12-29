@@ -6,6 +6,7 @@ import { PartyMasterComponent } from './party-master/party-master.component';
 import { CategoryMasterComponent } from './category-master/category-master.component';
 import { PurchaseMasterComponent } from './purchase-master/purchase-master.component';
 import { ShellComponent } from './shell/shell.component';
+import { IncomeExpenseComponent } from './income-expense/income-expense.component';
 
 
 
@@ -66,6 +67,17 @@ export const MasterRoutes: Routes = [
           urls: [
             { title: 'Master', url: '/master/shellmaster' },
             { title: 'Shell Master' },
+          ],
+        },
+      },
+      {
+        path: 'income-expense',
+        component: IncomeExpenseComponent,
+        data: {
+          title: 'Income Expense',
+          urls: [
+            { title: 'Master', url: '/master/income-expense' },
+            { title: 'Income Expense' },
           ],
         },
       },
