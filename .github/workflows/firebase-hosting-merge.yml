@@ -1,38 +1,45 @@
-name: Deploy to Firebase Hosting (Dev)
+name: Deploy to Firebase Hosting (Dev and Prod)
 
 on:
   push:
     branches:
-      - dev  # Trigger only on dev branch
+      - main
+      - dev
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
       - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # 4️⃣ Build Angular DEV
-      - name: Build Angular DEV
-        run: npm run build:dev
+      - name: Build Angular
+        run: |
+          if [ "${GITHUB_REF##*/}" == "main" ]; then
+            npm run build:prod
+          else
+            npm run build:dev
+          fi
 
-      # 5️⃣ Deploy to Firebase Hosting (dev target)
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV }}
+          firebaseServiceAccount: ${{ 
+            github.ref == 'refs/heads/main' && secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 || secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV 
+          }}
           channelId: live
-          projectId: lighthousedev-64439
-          target: dev
+          projectId: ${{ 
+            github.ref == 'refs/heads/main' && 'lighthouseprod-d5f45' || 'lighthousedev-64439' 
+          }}
+          target: ${{ 
+            github.ref == 'refs/heads/main' && 'prod' || 'dev' 
+          }}
