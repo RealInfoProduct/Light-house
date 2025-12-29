@@ -6,5 +6,5 @@ export const environment = {
     storageBucket: "lighthouseprod-d5f45.firebasestorage.app",
     messagingSenderId: "733792618082",
     appId: "1:733792618082:web:81e843bcab0f914a60333b",
-    measurementId: "G-N6ZGJHKNZW" 
+    measurementId: "G-N6ZGJHKNZW"
 }
