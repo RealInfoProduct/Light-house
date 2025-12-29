@@ -20,6 +20,7 @@
             <mat-date-range-picker #picker (closed)="filterDate()"></mat-date-range-picker>
           </mat-form-field>
         </div>
+        <div class="col-lg-1 m-t-10 file-download"></div>
       <div class="col-lg-4 d-flex align-items-center justify-content-end">
         <button mat-flat-button color="primary" class="add-download" (click)="addPurchase('Add', {})">
           Add Purchase
@@ -29,13 +30,6 @@
         <div class="d-flex  hide-hint align-items-center justify-content-end">
           <button (click)="filedownload()" mat-flat-button color="primary">
             <i-tabler name="file-download" class="icon-25"></i-tabler>
-          </button>
-        </div>
-      </div>
-      <div class="col-lg-1 m-t-10 file-download">
-        <div class="d-flex  hide-hint align-items-center justify-content-end">
-          <button (click)="fileView()" mat-flat-button color="primary">
-            <i-tabler name="eye" class="icon-25"></i-tabler>
           </button>
         </div>
       </div>
