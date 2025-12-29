@@ -1,41 +1,43 @@
-name: Deploy to Firebase Hosting on merge
+name: Deploy to Firebase Hosting
 
 on:
   push:
     branches:
-      - main
+      - main  # Prod deploy
+      - dev   # Dev deploy
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
+      # Checkout repo
       - uses: actions/checkout@v2
 
       # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20' # Use the Node.js version your project requires
+          node-version: '20'
 
-      # Install project dependencies
+      # Install dependencies with legacy peer deps
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
-      # Install Angular CLI globally (fixes 'ng not found')
-      - name: Install Angular CLI
-        run: npm install -g @angular/cli
+      # Build Angular based on branch
+      - name: Build Angular
+        run: |
+          if [ "${GITHUB_REF##*/}" == "main" ]; then
+            npm run build:prod
+          else
+            npm run build:dev
+          fi
 
-      # Build Angular project for production
-      - name: Build Angular PROD
-        run: ng build --configuration=production
-
-      # Deploy to Firebase Hosting
+      # Deploy to Firebase based on branch
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 }}'
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 }}
           channelId: live
-          projectId: lighthouseprod-d5f45
+          projectId: ${{ github.ref == 'refs/heads/main' && 'lighthouseprod-d5f45' || 'lighthousedev-64439' }}
