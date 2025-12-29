@@ -1,17 +1,21 @@
 {
   "projects": {
-    "default": "lighthousedev-64439",
+    "default": "lighthouseprod-d5f45",
     "LightHouseProd": "lighthouseprod-d5f45"
   },
   "targets": {
     "lighthousedev-64439": {
       "hosting": {
-        "dev": ["lighthousedev-64439"]
+        "dev": [
+          "lighthousedev-64439"
+        ]
       }
     },
     "lighthouseprod-d5f45": {
       "hosting": {
-        "prod": ["lighthouseprod"]
+        "prod": [
+          "lighthouseprod"
+        ]
       }
     }
   }
