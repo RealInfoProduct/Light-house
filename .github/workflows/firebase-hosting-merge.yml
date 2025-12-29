@@ -1,19 +1,21 @@
-name: Deploy to Firebase Hosting (Dev)
+name: Deploy to Firebase Hosting
 
 on:
   push:
     branches:
-      - dev
+      - dev          # Deploy dev on any push
   pull_request:
     branches:
-      - dev
+      - main         # Optional: preview PRs targeting main
+  push:
+    branches:
+      - main         # Deploy prod on merge to main
 
 jobs:
-  build_and_deploy_dev:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout repo
+      # Checkout the repo
       - uses: actions/checkout@v2
 
       # Setup Node.js
@@ -26,16 +28,27 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Build Angular Dev
-      - name: Build Angular DEV
-        run: npx ng build --configuration=development
+      # Build Angular project based on branch
+      - name: Build Angular
+        run: |
+          echo "Current branch: ${GITHUB_REF##*/}"
+          if [ "${GITHUB_REF##*/}" == "dev" ]; then
+            echo "Building DEV version..."
+            npm run build:dev
+          elif [ "${GITHUB_REF##*/}" == "main" ]; then
+            echo "Building PROD version..."
+            npm run build:prod
+          else
+            echo "Branch not configured for deployment, exiting..."
+            exit 0
+          fi
 
-      # Deploy to Firebase Dev
-      - name: Deploy to Firebase Dev
+      # Deploy to Firebase based on branch
+      - name: Deploy to Firebase
+        if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV }}'
-          projectId: lighthousedev-64439
-          target: dev
+          rebaseServiceAccount: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 || secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV }}
           channelId: live
+          projectId: ${{ github.ref == 'refs/heads/main' && 'lighthouseprod-d5f45' || 'lighthousedev-64439' }}
