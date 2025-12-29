@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Sale</h2>
-<mat-dialog-content class="mat-typography" style="max-width: 800px" *ngIf="action !== 'Delete'; else elseTemplate">
+<mat-dialog-content class="mat-typography" style="max-width: 1200px" *ngIf="action !== 'Delete'; else elseTemplate">
   <form [formGroup]="saleForm">
     <div class="row">
       <div class="col-12 col-md-4">
@@ -61,15 +61,24 @@
     <div formArrayName="shellDetails" class="m-t-10">
       <div class="row" *ngFor="let bankGroup of shellDetails.controls; let i = index" [formGroupName]="i">
 
-        <div class="col-md-3">
+        <div class="col-md-2">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Products Name</mat-label>
-            <mat-select formControlName="productsName" placeholder="Product Name">
+            <mat-label>Company Name</mat-label>
+            <mat-select formControlName="companyName" placeholder="Company Name"  (selectionChange)="onCompanyChange(i)">
               <!-- <mat-select formControlName="productsName" placeholder="Product Name" (selectionChange)="onRentProductChange($event,i)">
               <input matInput class="search" type="text" placeholder="Search..." (keyup)="filterRentProducts($event, i)" 
                 style="border: none; outline: none;"> -->
-              <mat-option [value]="item.id" *ngFor="let item of categoryList">{{item.companyName}} -
-                ( {{item.category}} - {{item.keySpecifiCations}})</mat-option>
+              <mat-option [value]="item" *ngFor="let item of companyList">{{item.companyName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-2">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Category Name</mat-label>
+            <mat-select formControlName="category" placeholder="Category Name">
+              <mat-option [value]="item" *ngFor="let item of filteredCategoryList[i]">
+                 {{item.category}} - {{item.keySpecifiCations}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -88,7 +97,7 @@
           </mat-form-field>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-1">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Discount %</mat-label>
             <input type="number" matInput formControlName="discount" placeholder="Prouct Discount" min="0" />
@@ -196,6 +205,7 @@
     <mat-dialog-actions class="p-24 justify-content-end">
       <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
       <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
+        [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
         (click)="shellPayload();">
         {{'actions.' + action | translate}}
       </button>

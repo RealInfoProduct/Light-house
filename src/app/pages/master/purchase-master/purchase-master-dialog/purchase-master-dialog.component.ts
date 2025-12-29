@@ -162,7 +162,7 @@ oldCompanyDetails: any[] = [];
 
   createpaymentDetailGroup(): FormGroup {
     const group = this.fb.group({
-      paymentR: [, Validators.min(0)],
+      paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()]
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {

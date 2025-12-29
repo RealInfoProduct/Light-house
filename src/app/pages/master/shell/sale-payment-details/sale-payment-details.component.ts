@@ -5,61 +5,39 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
 
 @Component({
-  selector: 'app-view-shell',
-  templateUrl: './view-shell.component.html',
-  styleUrls: ['./view-shell.component.scss']
+  selector: 'app-sale-payment-details',
+  templateUrl: './sale-payment-details.component.html',
+  styleUrls: ['./sale-payment-details.component.scss']
 })
-export class ViewShellComponent implements OnInit{
+export class SalePaymentDetailsComponent implements OnInit {
   displayedColumns: string[] = [
     'srno',
-    'companyName',
-    'category',
-    'qty',
-    'prouctPrice',
-    'discount',
-    'finalTotal',
+    'paymentR',
+    'paymentReceivedDate'
   ];
   
-  Viewcompany: any = {};
- shellList:any[] =[]
- categoryList :any []=[]
- 
+  Viewpayment: any = {};
+ categoryList:any[] =[]
 
-     shellDetailsDataSource = new MatTableDataSource<any>();
+     paymentDetailsDataSource = new MatTableDataSource<any>();
     @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
 
   constructor( 
-    public dialogRef: MatDialogRef<ViewShellComponent>, 
+    public dialogRef: MatDialogRef<SalePaymentDetailsComponent>, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
      private firebaseService: FirebaseService,
         private loaderService: LoaderService,
   ) { 
-     this.Viewcompany = { ...data };
+     this.Viewpayment = { ...data };
   }
 
   ngOnInit(): void {
-  this.getShellList();
-  this.getCategoryList()
-
-  const details = this.Viewcompany.shellDetails;
-  
-
-  this.shellDetailsDataSource = details;
-  
+  this.getCategoryList();
+  const details = this.Viewpayment.paymentDetails;
+  this.paymentDetailsDataSource = details;
 }
 
- getShellList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllShell().subscribe((res: any) => {
-        if (res) {
-          this.shellList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))   
-          this.loaderService.setLoader(false)
-        }
-      })
-    }
-
-
-     getCategoryList() {
+ getCategoryList() {
       this.loaderService.setLoader(true)
       this.firebaseService.getAllCategory().subscribe((res: any) => {
         if (res) {

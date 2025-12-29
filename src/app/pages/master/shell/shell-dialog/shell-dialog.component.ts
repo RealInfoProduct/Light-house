@@ -14,6 +14,7 @@ export class ShellDialogComponent implements OnInit {
   action: string;
   local_data: any;
   filteredRentProducts: any[] = [];
+    companyList: any[] = [];
   categoryList: any[] = [];
     StatusList: any[] = [
     { type: 'Pending' },
@@ -22,6 +23,7 @@ export class ShellDialogComponent implements OnInit {
   ];
  paymentExceeded = false;
   pendingAmount: number = 0;
+  filteredCategoryList:any [ ] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -38,14 +40,16 @@ export class ShellDialogComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm()
     this.getCategoryList();
+     this.calculatePending();
     if (this.action === 'Edit') {
      this.saleForm.patchValue(this.local_data);
-      this.local_data?.companyDetails?.forEach((detail: any, index: number) => {
+      this.local_data.shellDetails.forEach((detail: any, index: number) => {
         if (index > 0) this.addShellDetail();
         const formGroup = this.shellDetails.at(index) as FormGroup;
         if (formGroup) {
           formGroup.patchValue({
-            productsName: detail.productsName,
+            companyName: detail.companyName,
+            category: detail.category,
             qty: detail.qty,
             productPrice: detail.productPrice,
             discount: detail.discount,
@@ -53,7 +57,7 @@ export class ShellDialogComponent implements OnInit {
           });
         }
       });
-         this.local_data?.paymentDetails?.forEach((detail: any, index: number) => {
+         this.local_data.paymentDetails.forEach((detail: any, index: number) => {
         if (index > 0) this.addpaymentDetail();
 
         const formGroup = this.paymentDetails.at(index) as FormGroup;
@@ -74,6 +78,10 @@ export class ShellDialogComponent implements OnInit {
     if (this.action === 'Add') {
       this.setAutoBillNo();
     }   
+
+     this.saleForm.valueChanges.subscribe(() => {
+      this.calculatePending();
+    });
   }
 
     getStatusClass(status: string): string {
@@ -125,6 +133,24 @@ export class ShellDialogComponent implements OnInit {
   this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
 }
 
+calculatePending() {
+  const grandTotal = Number(this.saleForm.get('grandTotal')?.value) || 0;
+
+  const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
+    return sum + (Number(group.get('paymentR')?.value) || 0);
+  }, 0);
+
+  this.pendingAmount = grandTotal - paidTotal;
+
+  if (this.pendingAmount === 0 && grandTotal > 0) {
+    this.saleForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
+  } else if (paidTotal > 0 && this.pendingAmount > 0) {
+    this.saleForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
+  } else {
+    this.saleForm.get('paymentStatus')?.setValue('Unpaid', { emitEvent: false });
+  }
+}
+
 
     setAutoBillNo() {
     this.firebaseService.getAllShell().subscribe((res: any) => {
@@ -162,7 +188,8 @@ export class ShellDialogComponent implements OnInit {
 
    createSaleDetailGroup(): FormGroup {
    const group = this.fb.group({
-      productsName: ['',],
+      companyName: ['',],
+      category: ['',],
       qty: ['',],
       productPrice: [0,],
       discount: [0,],
@@ -191,11 +218,27 @@ export class ShellDialogComponent implements OnInit {
 
   createpaymentDetailGroup(): FormGroup {
     const group = this.fb.group({
-      paymentR: [, Validators.min(0)],
+      paymentR: [0 , Validators.min(0)],
       paymentReceivedDate: [new Date()]
+    });
+    group.get('paymentR')?.valueChanges.subscribe(() => {
+      this.checkPaymentLimit();
     });
     return group;
   }
+
+  getTotalPaymentReceived(): number {
+    return this.paymentDetails.controls.reduce((sum, ctrl) => {
+      return sum + (Number(ctrl.get('paymentR')?.value) || 0);
+    }, 0);
+  }
+
+  checkPaymentLimit() {
+    const totalPayment = this.getTotalPaymentReceived();
+    const grandTotal = Number(this.saleForm.get('total')?.value) || 0;
+    this.paymentExceeded = totalPayment > grandTotal;
+  }
+
 
    removepaymentDetail(index: number) {
     this.paymentDetails.removeAt(index);
@@ -221,6 +264,7 @@ export class ShellDialogComponent implements OnInit {
       date: this.saleForm.value.date,
       customerName: this.saleForm.value.customerName,
       mobileNumber: this.saleForm.value.mobileNumber,
+        paymentReceived: this.saleForm.value.paymentReceived,
       customerAddress: this.saleForm.value.customerAddress,
       total: this.saleForm.value.total,
       extraDiscount: this.saleForm.value.extraDiscount,
@@ -231,6 +275,24 @@ export class ShellDialogComponent implements OnInit {
     }
     this.dialogRef.close({ event: this.action, data: payload })    
 
+  }
+
+  onCompanyChange(index: number) {
+    const group = this.shellDetails.at(index) as FormGroup;
+    const selectedCompany = group.get('companyName')?.value;
+
+    if (selectedCompany) {
+      group.get('category')?.enable();
+      group.get('category')?.reset();
+
+      this.filteredCategoryList[index] = this.categoryList.filter(
+        (cat: any) => cat.companyName === selectedCompany.companyName
+      );
+    } else {
+      group.get('category')?.reset();
+      group.get('category')?.disable();
+      this.filteredCategoryList[index] = [];
+    }
   }
 
   closeDialog(): void {
@@ -246,8 +308,45 @@ export class ShellDialogComponent implements OnInit {
     this.firebaseService.getAllCategory().subscribe((res: any) => {
       if (res) {
         this.categoryList = res.filter((id: any) => id.userId === localStorage.getItem('userId'));
+         this.companyList = this.categoryList.filter(
+          (item: any, index: any, self: any) =>
+            index === self.findIndex((t: any) => t.companyName === item.companyName)
+        );
+
+        if (this.action === 'Edit') {
+          this.setCompanyAndCategoryEdit();
+        }
       }
       this.loaderService.setLoader(false);
     });
   }
+
+   setCompanyAndCategoryEdit() {
+    this.local_data.shellDetails.forEach((detail: any, index: number) => {
+      const formGroup = this.shellDetails.at(index) as FormGroup;
+
+      const selectedCompany = this.companyList.find(
+        (c: any) => c.id === detail.companyName || c.companyName === detail.companyName
+      );
+
+      if (selectedCompany) {
+        formGroup?.get('companyName')?.setValue(selectedCompany);
+
+        formGroup?.get('category')?.enable();
+
+        this.filteredCategoryList[index] = this.categoryList.filter(
+          (cat: any) => cat.companyName === selectedCompany.companyName
+        );
+
+        const selectedCategory = this.filteredCategoryList[index].find(
+          (cat: any) => cat.id === detail.category || cat.categoryName === detail.category
+        );
+
+        if (selectedCategory) {
+          formGroup.get('category')?.setValue(selectedCategory);
+        }
+      }
+    });
+  }
+
 }
