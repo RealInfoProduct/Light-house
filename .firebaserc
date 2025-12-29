@@ -1,13 +1,17 @@
 {
   "projects": {
-    "default": "mystock-65739"
+    "default": "lighthousedev-64439",
+    "LightHouseProd": "lighthouseprod-d5f45"
   },
   "targets": {
-    "mystock-65739": {
+    "lighthousedev-64439": {
       "hosting": {
-        "tr": [
-          "mystockm"
-        ]
+        "dev": ["lighthousedev-64439"]
+      }
+    },
+    "lighthouseprod-d5f45": {
+      "hosting": {
+        "prod": ["lighthouseprod"]
       }
     }
   }
