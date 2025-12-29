@@ -1,15 +1,15 @@
 name: Deploy to Firebase Hosting
 
+# Triggers:
+# - push to dev -> deploy DEV
+# - pull request merged to main -> deploy PROD
 on:
   push:
     branches:
-      - dev          # Deploy dev on any push
+      - dev
   pull_request:
     branches:
-      - main         # Optional: preview PRs targeting main
-  push:
-    branches:
-      - main         # Deploy prod on merge to main
+      - main
 
 jobs:
   build_and_deploy:
@@ -28,27 +28,30 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Build Angular project based on branch
-      - name: Build Angular
+      # Determine build type and Firebase project
+      - name: Set environment variables
+        id: set_env
         run: |
-          echo "Current branch: ${GITHUB_REF##*/}"
           if [ "${GITHUB_REF##*/}" == "dev" ]; then
-            echo "Building DEV version..."
-            npm run build:dev
-          elif [ "${GITHUB_REF##*/}" == "main" ]; then
-            echo "Building PROD version..."
-            npm run build:prod
+            echo "BUILD_SCRIPT=build:dev" >> $GITHUB_ENV
+            echo "FIREBASE_PROJECT_ID=lighthousedev-64439" >> $GITHUB_ENV
+            echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV" >> $GITHUB_ENV
           else
-            echo "Branch not configured for deployment, exiting..."
-            exit 0
+            # For PR merge to main
+            echo "BUILD_SCRIPT=build:prod" >> $GITHUB_ENV
+            echo "FIREBASE_PROJECT_ID=lighthouseprod-d5f45" >> $GITHUB_ENV
+            echo "FIREBASE_SERVICE_ACCOUNT_SECRET=FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45" >> $GITHUB_ENV
           fi
 
-      # Deploy to Firebase based on branch
+      # Build Angular project
+      - name: Build Angular
+        run: npm run $BUILD_SCRIPT
+
+      # Deploy to Firebase Hosting
       - name: Deploy to Firebase
-        if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          rebaseServiceAccount: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEPROD_D5F45 || secrets.FIREBASE_SERVICE_ACCOUNT_LIGHTHOUSEDEV }}
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets[env.FIREBASE_SERVICE_ACCOUNT_SECRET] }}
           channelId: live
-          projectId: ${{ github.ref == 'refs/heads/main' && 'lighthouseprod-d5f45' || 'lighthousedev-64439' }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
