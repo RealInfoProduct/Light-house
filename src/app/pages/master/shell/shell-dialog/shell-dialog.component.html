@@ -88,7 +88,7 @@
         <div class="in-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Category Name</mat-label>
-            <mat-select formControlName="category" placeholder="Category Name"  (selectionChange)="onCategoryChange($event.value, i)">
+            <mat-select formControlName="category" placeholder="Category Name" >
               <mat-option [value]="item" *ngFor="let item of filteredCategoryList[i]">
                  {{item.category}} - {{item.keySpecifiCations}}</mat-option>
             </mat-select>
