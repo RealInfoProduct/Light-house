@@ -25,6 +25,12 @@ export class PurchaseMasterDialogComponent implements OnInit {
     { type: 'Paid' },
     { type: 'Unpaid' }
   ];
+
+  paymenttype: any = [
+     'Cash',
+     'G-Pay' 
+   ]
+
 oldCompanyDetails: any[] = [];
   constructor(
     private fb: FormBuilder,
@@ -70,7 +76,8 @@ oldCompanyDetails: any[] = [];
 
           formGroup.patchValue({
             paymentR: detail.paymentR,
-            paymentReceivedDate: paymentDate
+            paymentReceivedDate: paymentDate,
+            paymentType: detail.paymentType
           });
         }
       });
@@ -136,6 +143,7 @@ oldCompanyDetails: any[] = [];
       date: [new Date()],
       total: [0],
       paymentReceived: [false],
+      type: ['Expense'],
       companyDetails: this.fb.array([this.createproductDetailGroup()]),
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
     })
@@ -163,7 +171,8 @@ oldCompanyDetails: any[] = [];
   createpaymentDetailGroup(): FormGroup {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
-      paymentReceivedDate: [new Date()]
+      paymentReceivedDate: [new Date()],
+      paymentType: [''],
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
@@ -260,6 +269,7 @@ calculatePending() {
       paymentStatus: this.productForm.value.paymentStatus,
       total: this.productForm.value.total,
       paymentReceived: this.productForm.value.paymentReceived,
+      type: this.productForm.value.type,
       companyDetails: this.productForm.value.companyDetails,
       paymentDetails: this.productForm.value.paymentDetails
     };

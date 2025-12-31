@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { addDoc, collectionData, deleteDoc, doc, Firestore,  updateDoc } from '@angular/fire/firestore';
-import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList } from '../interface/invoice';
-import { collection } from '@firebase/firestore';
+import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList, ExpensesList } from '../interface/invoice';
+import { collection, setDoc } from '@firebase/firestore';
 import { Auth } from '@angular/fire/auth';
 
 
@@ -147,6 +147,46 @@ export class FirebaseService {
     let dataRef = doc(this.fService, `shellList/${updateId}`);
     return updateDoc(dataRef, payload)
   }
+
+   /////////////////////// Expenses List Data ////////////////////////
+
+
+  // addExpenses(payload: ExpensesList) {
+  //   // payload.id = doc(collection(this.fService, 'id')).id
+  //   // return addDoc(collection(this.fService, 'ExpensesList'), payload)
+
+  //   return addDoc(collection(this.fService, 'ExpensesList'), payload)
+  //     .then((docRef) => {
+  //       return updateDoc(docRef, { id: docRef.id });
+  //     });
+  // }
+
+  addExpenses(payload: ExpensesList) {
+    const expensesCollection = collection(this.fService, 'ExpensesList');
+    const newDocRef = doc(expensesCollection);
+    payload.id = newDocRef.id;
+
+    return setDoc(newDocRef, payload)
+      .then(() => {
+        return newDocRef.id;
+      });
+  }
+
+  getAllExpenses() {
+    let dataRef = collection(this.fService, 'ExpensesList')
+    return collectionData(dataRef, { idField: 'id' })
+  }
+
+  deleteExpenses(deleteId: any) {
+    let docRef = doc(collection(this.fService, 'ExpensesList'), deleteId);
+    return deleteDoc(docRef)
+  }
+
+  updateExpenses(updateId: ExpensesList, payload: any) {
+    let dataRef = doc(this.fService, `ExpensesList/${updateId}`);
+    return updateDoc(dataRef, payload)
+  }
+
 
 
 

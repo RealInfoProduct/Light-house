@@ -125,7 +125,7 @@
           </mat-form-field>
         </div>
 
-        <div class="col-12 col-md-5">
+        <div class="col-12 col-md-3">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received Date</mat-label>
             <input matInput formControlName="paymentReceivedDate" [matDatepicker]="PaymentReceivedDate"
@@ -134,6 +134,13 @@
             <mat-datepicker #PaymentReceivedDate></mat-datepicker>
           </mat-form-field>
         </div>
+         <div class="col-12 col-md-2">
+            <mat-radio-group formControlName="paymentType" required>
+              <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
+                {{ item }}
+              </mat-radio-button>
+            </mat-radio-group>
+         </div>
 
         <div class="col-lg-2 d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
