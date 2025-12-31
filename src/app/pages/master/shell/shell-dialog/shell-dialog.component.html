@@ -42,7 +42,13 @@
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Customer Mobile No</mat-label>
-          <input type="text" matInput required formControlName="mobileNumber" placeholder="Customer Mobile No" />
+          <input type="number" matInput required formControlName="mobileNumber" placeholder="Customer Mobile No" min="0"/>
+           <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('required') && saleForm.get('mobileNumber')?.touched" class="error-message error-color">
+           Mobileno is required
+          </mat-hint>
+          <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('pattern') && saleForm.get('mobileNumber')?.touched" class="error-message error-color">
+           Invalid mobileno is required
+          </mat-hint>
         </mat-form-field>
       </div>
 
@@ -61,13 +67,84 @@
     <div formArrayName="shellDetails" class="m-t-10">
       <div class="row" *ngFor="let bankGroup of shellDetails.controls; let i = index" [formGroupName]="i">
 
-        <div class="col-md-2">
+        <div class="in-width"> 
+            <mat-form-field appearance="outline" class="w-100 m-t-10">
+              <mat-label>Date</mat-label>
+              <input matInput formControlName="saleDate" [matDatepicker]="saleDate" placeholder="Enter date">
+              <mat-datepicker-toggle matSuffix [for]="saleDate"></mat-datepicker-toggle>
+              <mat-datepicker #saleDate></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="in-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Company Name</mat-label>
             <mat-select formControlName="companyName" placeholder="Company Name"  (selectionChange)="onCompanyChange(i)">
-              <!-- <mat-select formControlName="productsName" placeholder="Product Name" (selectionChange)="onRentProductChange($event,i)">
-              <input matInput class="search" type="text" placeholder="Search..." (keyup)="filterRentProducts($event, i)" 
-                style="border: none; outline: none;"> -->
+              <mat-option [value]="item" *ngFor="let item of companyList">{{item.companyName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="in-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Category Name</mat-label>
+            <mat-select formControlName="category" placeholder="Category Name" >
+              <mat-option [value]="item" *ngFor="let item of filteredCategoryList[i]">
+                 {{item.category}} - {{item.keySpecifiCations}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="input-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Qty</mat-label>
+            <input type="number" matInput formControlName="qty" placeholder="Prouct Qty" min="0" />
+            <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('outOfStock')">
+              Stock not available (0 quantity)
+            </mat-error>
+            
+            <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('exceedStock')">
+              Qty cannot exceed available stock
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="input-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Prouct Price</mat-label>
+            <input type="number" matInput formControlName="productPrice" placeholder="Prouct Price" min="0" />
+          </mat-form-field>
+        </div>
+
+        <div class="input-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Discount %</mat-label>
+            <input type="number" matInput formControlName="discount" placeholder="Prouct Discount" min="0" />
+          </mat-form-field>
+        </div>
+
+        <div class="input-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Final Total</mat-label>
+            <input type="number" matInput formControlName="subTotal" placeholder="Final Total" min="0" />
+          </mat-form-field>
+        </div>
+
+        <div class="add-width d-flex align-items-center m-b-10">
+          <a class="m-r-10 cursor-pointer" *ngIf="shellDetails.length > 1">
+            <i-tabler name="trash" (click)="removeShellDetail(i)" class="icon-18"></i-tabler>
+          </a>
+          <a class="m-r-10 cursor-pointer">
+            <i-tabler name="plus" (click)="addShellDetail()" class="icon-18"></i-tabler>
+          </a>
+        </div>
+        <!-- <mat-select formControlName="productsName" placeholder="Product Name" (selectionChange)="onRentProductChange($event,i)">
+        <input matInput class="search" type="text" placeholder="Search..." (keyup)="filterRentProducts($event, i)" 
+          style="border: none; outline: none;"> -->
+        <!-- <div class="col-md-2">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Company Name</mat-label>
+            <mat-select formControlName="companyName" placeholder="Company Name"  (selectionChange)="onCompanyChange(i)">
               <mat-option [value]="item" *ngFor="let item of companyList">{{item.companyName}}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -118,7 +195,7 @@
           <a class="m-r-10 cursor-pointer">
             <i-tabler name="plus" (click)="addShellDetail()" class="icon-18"></i-tabler>
           </a>
-        </div>
+        </div> -->
       </div>
     </div>
      <mat-divider></mat-divider>
@@ -138,7 +215,7 @@
       <div class="col-12 col-md-6"></div>
       <div class="col-12 col-md-1"></div>
       <div class="col-12 col-sm-5">
-        <mat-label  class="f-w-600">Discount % : </mat-label>
+        <mat-label  class="f-w-600">Discount ₹ : </mat-label>
           <mat-form-field appearance="outline" class="w-20">
             <input type="number" matInput formControlName="extraDiscount" min="0" />
           </mat-form-field>
@@ -177,7 +254,7 @@
           </mat-form-field>
         </div>
 
-        <div class="col-12 col-md-5">
+        <div class="col-12 col-md-3">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received Date</mat-label>
             <input matInput formControlName="paymentReceivedDate" [matDatepicker]="PaymentReceivedDate"
@@ -186,6 +263,14 @@
             <mat-datepicker #PaymentReceivedDate></mat-datepicker>
           </mat-form-field>
         </div>
+
+        <div class="col-12 col-md-2">
+            <mat-radio-group formControlName="paymentType" >
+              <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
+                {{ item }}
+              </mat-radio-button>
+            </mat-radio-group>
+         </div>
 
         <div class="col-lg-2 d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">

@@ -35,6 +35,7 @@ export interface PurchaseList {
     total: number;
     userId: string | null;
     paymentReceived: string;
+    type: string;
     companyDetails: {
         companyName: string;
         category: string;
@@ -44,6 +45,7 @@ export interface PurchaseList {
     }[];
     paymentDetails: {
         paymentReceivedDate: string;
+        paymentType: string;
         paymentR: number;
     }[];
 }
@@ -92,7 +94,9 @@ export interface ShellList {
     paymentStatus :string,
      paymentReceived:string,
     userId: any,
+     type: string;
     shellDetails: {
+       saleDate:string,
        companyName:string,
        category:string,
        qty: number,
@@ -102,7 +106,21 @@ export interface ShellList {
     }[];
      paymentDetails: {
         paymentReceivedDate: string;
+         paymentType: string;
         paymentR: number;
     }[];
+}
+
+export interface ExpensesList {
+    id:any,
+    billno?:any,
+    amount:any,
+    bank:string,
+    notes:any,
+    paymenttype:any,
+    accounttype:any,
+    status:any,
+    date:any,
+    userId:any
 }
 

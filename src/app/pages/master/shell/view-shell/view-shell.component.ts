@@ -12,6 +12,7 @@ import { LoaderService } from 'src/app/services/loader.service';
 export class ViewShellComponent implements OnInit{
   displayedColumns: string[] = [
     'srno',
+    'Date',
     'companyName',
     'category',
     'qty',
