@@ -26,7 +26,7 @@ export class ShellComponent implements OnInit {
     'date',
     'customerName',
     'address',
-    'customerMobileNo',
+    // 'customerMobileNo',
      'status',
     'finalAmount',
     'recivedAmount',
@@ -113,10 +113,10 @@ export class ShellComponent implements OnInit {
 }
 
  getPendingAmount(element: any): number {
-  if (!element.total) return 0;
+  if (!element.grandTotal) return 0;
   return element.paymentDetails
-    ? element.total - this.getTotalReceived(element.paymentDetails)
-    : element.total;
+    ? element.grandTotal - this.getTotalReceived(element.paymentDetails)
+    : element.grandTotal;
 }
 
   getTotalReceived(paymentDetails: any[]): number {
@@ -241,7 +241,9 @@ export class ShellComponent implements OnInit {
           grandTotal: result.data.grandTotal,
           paymentStatus: result.data.paymentStatus,
             paymentReceived:result.data.paymentReceived,
+            type: result.data.type,
           shellDetails: result.data.shellDetails.map((detail: any) => ({
+            saleDate: detail.saleDate,
             companyName: detail.companyName.id,
             category: detail.category.id,
             qty: detail.qty,
@@ -251,7 +253,8 @@ export class ShellComponent implements OnInit {
           })),
            paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
-          paymentReceivedDate: detail.paymentReceivedDate
+          paymentReceivedDate: detail.paymentReceivedDate,
+          paymentType: detail.paymentType,
         })),
           userId: localStorage.getItem("userId")
         };
@@ -289,7 +292,9 @@ export class ShellComponent implements OnInit {
               grandTotal: result.data.grandTotal,
               paymentStatus: result.data.paymentStatus,
                paymentReceived:result.data.paymentReceived,
+               type: result.data.type,
               shellDetails: result.data.shellDetails.map((detail: any) => ({
+                saleDate: detail.saleDate,
                 companyName: detail.companyName.id,
                 category: detail.category.id,
                 qty: detail.qty,
@@ -299,7 +304,8 @@ export class ShellComponent implements OnInit {
               })),
               paymentDetails: result.data.paymentDetails.map((detail: any) => ({
                 paymentR: detail.paymentR,
-                paymentReceivedDate: detail.paymentReceivedDate
+                paymentReceivedDate: detail.paymentReceivedDate,
+                 paymentType: detail.paymentType,
               })),
               userId: localStorage.getItem("userId")
 

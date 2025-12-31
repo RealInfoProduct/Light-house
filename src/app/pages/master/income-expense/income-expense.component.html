@@ -1,1 +1,154 @@
-<p>income-expense works!</p>
+<mat-card class="cardWithShadow">
+    <mat-card-content class="p-24">
+        <div class="row justify-content-between">
+            <div class="col-lg-3">
+                <mat-form-field appearance="outline" class="w-100 hide-hint">
+                    <input matInput placeholder="Search  Income/Expense"
+                        (keyup)="applyFilter($any($event.target).value)" />
+                    <mat-icon matSuffix>
+                        <i-tabler name="search" class="icon-20"></i-tabler>
+                    </mat-icon>
+                </mat-form-field>
+            </div>
+            <div class="col-lg-3 invoicedate-range">
+         <mat-form-field appearance="outline" class="w-100  hide-hint">
+            <mat-label>Select Sale Date</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [formGroup]="dateIncomeexpenseListForm">
+              <input matStartDate placeholder="Start date" formControlName="start">
+              <input matEndDate placeholder="End date" formControlName="end">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker (closed)="filterDate()"></mat-date-range-picker>
+          </mat-form-field>
+       </div>
+            <div class="col-lg-1 m-t-10 file-download"></div>
+            <div class="col-lg-4 d-flex align-items-center justify-content-end">
+                <button mat-flat-button color="primary" (click)="addIncomeExpense('Add', {})">
+                    Add Income/Expense
+                </button>
+            </div>
+            <!-- <div class="col-lg-1 m-t-10 file-download">
+          <div class="d-flex  hide-hint align-items-center justify-content-end">
+            <button (click)="filedownload()" mat-flat-button color="primary">
+              <i-tabler name="file-download" class="icon-25"></i-tabler>
+            </button>
+          </div>
+        </div> -->
+        </div>
+    </mat-card-content>
+</mat-card>
+
+
+
+<mat-card class="cardWithShadow">
+    <mat-card-content class="p-24">
+        <div class="table-responsive">
+            <table mat-table [dataSource]="incomeExpenseDataSource" class="w-100">
+
+                <ng-container matColumnDef="srno">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
+                    <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="billNo">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Bill No.</th>
+                    <td mat-cell *matCellDef="let element">{{ element.billNo || element.billNumber }}</td>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="invoiceNo">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Invoice No.</th>
+                    <td mat-cell *matCellDef="let element">{{ element.invoiceNo }}</td>
+                </ng-container> -->
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Name</th>
+                    <td mat-cell *matCellDef="let element">{{ getpartyName(element.isParty) || element.customerName }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Date
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14">
+                        {{ element.date.toDate() | date:'dd/MM/yyyy' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Status
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14" [ngClass]="getStatusClass(element.paymentStatus)">
+                        {{ element.paymentStatus }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="accountType">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Account Type
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14" [ngClass]="{
+                            'income-color': element.type === 'INCOME',
+                            'expense-color': element.type === 'EXPENSE'
+                          }">
+                        {{ element.type }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="finalAmount">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Final
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14">
+                        {{ element.total  || element.grandTotal}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="receivedAmount">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Received
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14">
+                        {{getTotalReceived(element.paymentDetails) }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="pendingAmount">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        Pending
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="f-s-14">
+                        {{ getPendingAmount(element) }}
+                    </td>
+                </ng-container>
+
+
+
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
+                        {{'PartyMaster.Action' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="action-link">
+                        <a class="m-r-10 cursor-pointer">
+                            <i-tabler name="edit" (click)="addIncomeExpense('Edit', element)"
+                                class="icon-18"></i-tabler>
+                        </a>
+                        <a class="m-r-10 cursor-pointer">
+                            <i-tabler name="trash" (click)="addIncomeExpense('Delete', element)"
+                                class="icon-18"></i-tabler>
+                        </a>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                <tr class="mat-row" style="text-align: center;" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                        No record found
+                    </td>
+                </tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+    </mat-card-content>
+</mat-card>

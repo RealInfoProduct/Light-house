@@ -13,7 +13,8 @@ export class SalePaymentDetailsComponent implements OnInit {
   displayedColumns: string[] = [
     'srno',
     'paymentR',
-    'paymentReceivedDate'
+    'paymentReceivedDate',
+    'paymenttype'
   ];
   
   Viewpayment: any = {};

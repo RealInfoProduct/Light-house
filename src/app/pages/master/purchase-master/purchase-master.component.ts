@@ -250,6 +250,7 @@ addPurchase(action: string, obj: any) {
         paymentStatus: result.data.paymentStatus,
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
+        type: result.data.type,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
           category: detail.category.id,
@@ -259,7 +260,8 @@ addPurchase(action: string, obj: any) {
         })),
         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
-          paymentReceivedDate: detail.paymentReceivedDate
+          paymentReceivedDate: detail.paymentReceivedDate,
+          paymentType: detail.paymentType
         })),
          userId: localStorage.getItem("userId")
       };
@@ -293,6 +295,7 @@ addPurchase(action: string, obj: any) {
         paymentStatus:  result.data.paymentStatus, 
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
+        type: result.data.type,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
           category: detail.category.id,
@@ -302,7 +305,8 @@ addPurchase(action: string, obj: any) {
         })),
         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
-          paymentReceivedDate: detail.paymentReceivedDate
+          paymentReceivedDate: detail.paymentReceivedDate,
+          paymentType: detail.paymentType
         })),
          userId: localStorage.getItem("userId")
       };
