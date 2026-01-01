@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ExpensesList } from 'src/app/interface/invoice';
 
 @Component({
   selector: 'app-income-expense',
@@ -18,20 +19,15 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
   displayedColumns: string[] = [
     'srno',
     'billNo',
-    // 'invoiceNo',
-    'name',
     'date',
     'status',
     'accountType',
+    'notes',
     'finalAmount',
-    'receivedAmount',
-    'pendingAmount',
     'action',
   ];
   incomeExpenseList:any [] =[]
-  purchaseList:any []=[]
   partyList:any []=[]
-  shellList:any []=[]
 
   
   incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
@@ -48,11 +44,8 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
 
   ngOnInit(): void {
     this.getExpensesList()  
-    this.getpurchaseList()
-      this.getPartyList() 
-      this.getShellList() 
       this.dateform()    
-
+      this.getPartyList()
   }
 
    ngAfterViewInit() {
@@ -115,72 +108,64 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
      obj.action = action;
     const dialogRef = this.dialog.open(IncomeExpenseDialogComponent,{ data: obj})
 
-        // dialogRef.afterClosed().subscribe((result) => {
-        //   if (result?.event === 'Add') {
-        //     const payload: FirmList = {
-        //       id: '',
-        //       header: result.data.header,
-        //       subHeader: result.data.subHeader,
-        //       address: result.data.address,
-        //       gstNo: result.data.GSTNo,
-        //       // gstpercentage: Number(result.data.gstPercentage),
-        //       panNo: result.data.panNo,
-        //       mobileNo: Number(result.data.mobileNo),
-        //       personalMobileNo: Number(result.data.personalMobileNo),
-        //       bankName: result.data.bankName,
-        //       accountholdersname: result.data.accountholdersname,
-        //       bankIfsc: result.data.ifscCode,
-        //       bankAccountNo: result.data.bankAccountNo,
-        //       userId : localStorage.getItem("userId"),
-        //       isInvoiceTheme: result.data.isInvoiceTheme,
-        //     }
-        //     this.firebaseService.addFirm(payload).then((res) => {
-        //       if (res) {
-        //         this.getExpensesList()
-        //         this.openConfigSnackBar('record create successfully')
-        //       }
-        //     }, (error) => {
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result?.event === 'Add') {
+            const payload: ExpensesList = {
+              id: '',
+              date: result.data.date,
+              billNo: result.data.billNo,
+              amount: result.data.amount,
+              // bank: result.data.bank,
+              notes: result.data.notes,
+              paymentStatus: result.data.paymentStatus,
+              accounttype: result.data.accounttype,
+              status: result.data.status,
+              isActive: result.data.isActive,
+              userId : localStorage.getItem("userId"),
+            }
+            this.firebaseService.addExpenses(payload).then((res) => {
+              if (res) {
+                this.getExpensesList()
+                this.openConfigSnackBar('record create successfully')
+              }
+            }, (error) => {
             
-        //     })
-        //   }
-        //   if (result?.event === 'Edit') {
-        //     this.firmList.forEach((element: any) => {
-        //       if (element.id === result.data.id) {
-        //         const payload: FirmList = {
-        //           id: result.data.id,
-        //           header: result.data.header,
-        //           subHeader: result.data.subHeader,
-        //           address: result.data.address,
-        //           gstNo: result.data.GSTNo,
-        //           // gstpercentage: Number(result.data.gstPercentage),
-        //           panNo: result.data.panNo,
-        //           mobileNo: Number(result.data.mobileNo),
-        //           personalMobileNo: Number(result.data.personalMobileNo),
-        //           bankName: result.data.bankName,
-        //           accountholdersname: result.data.accountholdersname,
-        //           bankIfsc: result.data.ifscCode,
-        //           bankAccountNo: result.data.bankAccountNo,
-        //           userId : localStorage.getItem("userId"),
-        //           isInvoiceTheme: result.data.isInvoiceTheme ?? "",
-        //         }
-        //         this.firebaseService.updateFirm(result.data.id, payload).then((res: any) => {
-        //             this.getExpensesList()
-        //         this.openConfigSnackBar('record update successfully')
-        //         }, (error) => {
+            })
+          }
+          if (result?.event === 'Edit') {
+            this.incomeExpenseList.forEach((element: any) => {
+              if (element.id === result.data.id) {
+                const payload: ExpensesList = {
+                  id: result.data.id,
+                  date: result.data.date,
+                  billNo: result.data.billNo,
+                  amount: result.data.amount,
+                  // bank: result.data.bank,
+                  notes: result.data.notes,
+                  paymentStatus: result.data.paymentStatus,
+                  accounttype: result.data.accounttype,
+                  status: result.data.status,
+                  isActive: result.data.isActive, 
+                  userId : localStorage.getItem("userId"),
+                }
+                this.firebaseService.updateExpenses(result.data.id, payload).then((res: any) => {
+                    this.getExpensesList()
+                this.openConfigSnackBar('record update successfully')
+                }, (error) => {
                 
-        //         })
-        //       }
-        //     });
-        //   }
-        //   if (result?.event === 'Delete') {
-        //     this.firebaseService.deleteFirm(result.data.id).then((res: any) => {
-        //         this.getExpensesList()
-        //         this.openConfigSnackBar('record delete successfully')
-        //     }, (error) => {
+                })
+              }
+            });
+          }
+          if (result?.event === 'Delete') {
+            this.firebaseService.deleteExpenses(result.data.id).then((res: any) => {
+                this.getExpensesList()
+                this.openConfigSnackBar('record delete successfully')
+            }, (error) => {
             
-        //     })
-        //   }
-        // });
+            })
+          }
+        });
   }
 
 
@@ -201,56 +186,6 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
       duration: 2 * 1000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
-    });
-  }
-
-getpurchaseList() {
-  this.loaderService.setLoader(true);
-
-  this.firebaseService.getAllPurchase().subscribe((res: any) => {
-    if (res) {
-      this.purchaseList = res.filter(
-        (item: any) => item.userId === localStorage.getItem('userId')
-      );
-      const purchaseData = this.purchaseList.map((item: any) => ({
-        ...item,
-        type: 'EXPENSE'   
-      }));
-
-      this.incomeExpenseList.push(...purchaseData);
-      this.incomeExpenseDataSource.data = this.incomeExpenseList;
-    }
-
-
-
-    this.loaderService.setLoader(false);
-  });
-}
-
-
-   getShellList() {
-  this.loaderService.setLoader(true);
-
-  this.firebaseService.getAllShell().subscribe((res: any) => {
-    if (res) {
-      this.shellList = res.filter(
-        (item: any) => item.userId === localStorage.getItem('userId')
-      );
-
-      
-      const shellData = this.shellList.map((item: any) => ({
-        ...item,
-        type: 'INCOME'   
-      }));
-
-      this.incomeExpenseList.push(...shellData);
-      this.incomeExpenseDataSource.data = this.incomeExpenseList;
-    }
-
-
-    console.log(this.incomeExpenseList);
-
-    this.loaderService.setLoader(false);
   });
 }
 
@@ -267,21 +202,6 @@ getpurchaseList() {
 
   getpartyName(nameid: any) {
     return this.partyList.find((id: any) => id.id === nameid)?.partyName
-  }
-
-
-   getTotalReceived(paymentDetails: any[]): number {
-    if (!paymentDetails || paymentDetails.length === 0) {
-      return 0;
-    }
-    return paymentDetails.reduce((sum, item) => sum + (item.paymentR || 0), 0);
-  }
-
-    getPendingAmount(element: any): number {
-  if (!element.total) return 0;
-  return element.paymentDetails
-    ? element.total - this.getTotalReceived(element.paymentDetails)
-    : element.total;
 }
 
 

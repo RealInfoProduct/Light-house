@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, Optional } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
@@ -204,7 +204,7 @@ export class ShellDialogComponent implements OnInit {
       saleDate: [new Date()],
       companyName: [''],
       category: [''],
-      qty: [''],
+      qty: [],
       productPrice: [0],
       discount: [0],
       subTotal: [0],
@@ -212,6 +212,16 @@ export class ShellDialogComponent implements OnInit {
     group.valueChanges.subscribe(() => {
       this.calculateSubTotal(group);
     });
+
+     group.get('category')?.valueChanges.subscribe((selectedCategory: any) => {
+    const stockCount = selectedCategory ? selectedCategory.stockCount : 0;
+    group.get('qty')?.setValidators([
+      Validators.required,
+      Validators.min(1),
+      this.stockQtyValidator(stockCount)
+    ]);
+    group.get('qty')?.updateValueAndValidity({ emitEvent: false });
+   });
     
     return group;
   }
@@ -303,10 +313,14 @@ export class ShellDialogComponent implements OnInit {
       this.filteredCategoryList[index] = this.categoryList.filter(
         (cat: any) => cat.companyName === selectedCompany.companyName
       );
+        group.get('qty')?.setValue('');
+        group.get('qty')?.setValidators([Validators.required, Validators.min(1)]);
+        group.get('qty')?.updateValueAndValidity({ emitEvent: false });
     } else {
       group.get('category')?.reset();
       group.get('category')?.disable();
       this.filteredCategoryList[index] = [];
+      group.get('qty')?.setValue('');
     }
   }
 
@@ -361,4 +375,19 @@ export class ShellDialogComponent implements OnInit {
     });
   }
 
+  stockQtyValidator(stockCount: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const qty = Number(control.value) || 0;
+  
+      if (stockCount === 0 && qty > 0) {
+        return { outOfStock: true };
+      }
+  
+      if (qty > stockCount) {
+        return { exceedsStock: true };
+      }
+  
+      return null;
+    };
+  }
 }

@@ -38,6 +38,17 @@
         </mat-form-field>
       </div>
 
+        <div class="col-12 col-md-4">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Payment Day's</mat-label>
+            <input type="number" matInput required (ngModelChange)="paymentDaysChange()" formControlName="paymentDays"
+              placeholder="Enter Payment Day's" min="0"   (input)="limitDigits($event)" >
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-md-4 payment-date">
+          Payment due date is &nbsp;<b>{{ paymentDays | date : "dd-MM-yyyy" }}</b>
+        </div>
+
 
     </div>
     <mat-divider></mat-divider>
@@ -96,7 +107,16 @@
         </div>
       </div>
     </div>
-
+    
+  <mat-divider></mat-divider>
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Other Kharch</mat-label>
+            <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"   (input)="onOtherKharchInput($event)"/>
+          </mat-form-field>
+        </div>
+      </div>
 
     <div class="row">
       <div class="col-12 col-md-6">

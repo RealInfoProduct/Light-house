@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { PurchaseList } from 'src/app/interface/invoice';
+import { ExpensesList, PurchaseList } from 'src/app/interface/invoice';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { PurchaseMasterDialogComponent } from './purchase-master-dialog/purchase-master-dialog.component';
@@ -37,6 +37,7 @@ export class PurchaseMasterComponent implements OnInit {
   purchaseList: any = []
   partyList: any = []
   categoryList: any = []
+  incomeExpenseList:any [] =[]
 
   productDataSource = new MatTableDataSource(this.purchaseList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -55,6 +56,7 @@ export class PurchaseMasterComponent implements OnInit {
     this.getCategoryList()
     this.SearchFilter()
     this.dateform()
+    this.getExpensesList()
   }
 
   dateform() {
@@ -231,7 +233,6 @@ addPurchase(action: string, obj: any) {
     if (!result?.event) return;
 
 
-    // HELPER FUNCTION: Update stock in Firebase
     const updateStock = async (categoryId: string, countChange: number) => {
       const categoryItem = this.categoryList.find((cat:any) => cat.id === categoryId);
       if (categoryItem) {
@@ -240,7 +241,6 @@ addPurchase(action: string, obj: any) {
       }
     };
 
-    // ADD PURCHASE
     if (result.event === 'Add') {
       const payload: PurchaseList = {
         id: '',
@@ -251,6 +251,8 @@ addPurchase(action: string, obj: any) {
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
         type: result.data.type,
+        paymentDays: result.data.paymentDays,
+        otherKharch: result.data.otherKharch,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
           category: detail.category.id,
@@ -263,25 +265,82 @@ addPurchase(action: string, obj: any) {
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType
         })),
-         userId: localStorage.getItem("userId")
+        userId: localStorage.getItem("userId")
       };
 
-      // Update stock in Firebase
       for (const detail of payload.companyDetails) {
         await updateStock(detail.category, detail.itemCount);
       }
 
       await this.firebaseService.addPurchase(payload);
+
+      const expensePayload: ExpensesList = {
+        id: '',
+        date: result.data.date,
+        billNo: result.data.billNo,
+        amount: result.data.total,
+        notes: result.data.isParty.id || '',
+        paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+        accounttype: result.data.type || '',
+        status: result.data.paymentStatus,
+        userId: localStorage.getItem("userId")
+      };
+
+
+      await this.firebaseService.addExpenses(expensePayload);
+      console.log(expensePayload);
+
+
       this.getpurchaseList();
+      this.getExpensesList();
       this.openConfigSnackBar('Record created successfully');
     }
+    // if (result.event === 'Edit') {
+    //   const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
+    //   if (!oldPurchase) return;
 
-    // EDIT PURCHASE
+    //   for (const oldDetail of oldPurchase.companyDetails) {
+    //     await updateStock(oldDetail.category, -oldDetail.itemCount);
+    //   }
+
+    //   const payload: PurchaseList = {
+    //     id: result.data.id,
+    //     billNo: result.data.billNo,
+    //     isParty: result.data.isParty.id,
+    //     date: result.data.date,
+    //     // paymentStatus:  result.data.paymentStatus, 
+    //     paymentStatus:  result.data.paymentStatus, 
+    //     total: result.data.total,
+    //     paymentReceived: result.data.paymentReceived,
+    //     type: result.data.type,
+    //      paymentDays: result.data.paymentDays,
+    //      otherKharch: result.data.otherKharch,
+    //     companyDetails: result.data.companyDetails.map((detail: any) => ({
+    //       companyName: detail.companyName.id,
+    //       category: detail.category.id,
+    //       purchasePrice: detail.purchasePrice,
+    //       itemCount: detail.itemCount,
+    //       subTotal: detail.subTotal,
+    //     })),
+    //     paymentDetails: result.data.paymentDetails.map((detail: any) => ({
+    //       paymentR: detail.paymentR,
+    //       paymentReceivedDate: detail.paymentReceivedDate,
+    //       paymentType: detail.paymentType
+    //     })),
+    //      userId: localStorage.getItem("userId")
+    //   };
+
+    //   for (const detail of payload.companyDetails) {
+    //     await updateStock(detail.category, detail.itemCount);
+    //   }
+
+    //   await this.firebaseService.updatePurchase(result.data.id, payload);
+    //   this.getpurchaseList();
+    //   this.openConfigSnackBar('Record updated successfully');
+    // }
     if (result.event === 'Edit') {
       const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
       if (!oldPurchase) return;
-
-      // Subtract old itemCount
       for (const oldDetail of oldPurchase.companyDetails) {
         await updateStock(oldDetail.category, -oldDetail.itemCount);
       }
@@ -291,47 +350,89 @@ addPurchase(action: string, obj: any) {
         billNo: result.data.billNo,
         isParty: result.data.isParty.id,
         date: result.data.date,
-        // paymentStatus:  result.data.paymentStatus, 
-        paymentStatus:  result.data.paymentStatus, 
+        paymentStatus: result.data.paymentStatus,
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
         type: result.data.type,
+        paymentDays: result.data.paymentDays,
+        otherKharch: result.data.otherKharch,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
           category: detail.category.id,
           purchasePrice: detail.purchasePrice,
           itemCount: detail.itemCount,
-          subTotal: detail.subTotal,
+          subTotal: detail.subTotal
         })),
         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType
         })),
-         userId: localStorage.getItem("userId")
+          userId: localStorage.getItem('userId')
       };
 
-      // Add new itemCount
       for (const detail of payload.companyDetails) {
         await updateStock(detail.category, detail.itemCount);
       }
 
       await this.firebaseService.updatePurchase(result.data.id, payload);
+
+      const oldExpense = this.incomeExpenseList.find(
+        (el: any) => el.billNo === result.data.billNo
+      );
+
+      const expensePayload: ExpensesList = {
+        id: oldExpense ? oldExpense.id : '',
+        date: result.data.date,
+        billNo: result.data.billNo,
+        amount: result.data.total,
+        notes: result.data.isParty?.id || '',
+        paymentStatus:
+          result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+        accounttype: result.data.type || '',
+        status: result.data.paymentStatus,
+        userId: localStorage.getItem('userId')
+      };
+
+      if (oldExpense) {
+        await this.firebaseService.updateExpenses(
+          oldExpense.id,
+          expensePayload
+        );
+      } else {
+        await this.firebaseService.addExpenses(expensePayload);
+      }
+
       this.getpurchaseList();
       this.openConfigSnackBar('Record updated successfully');
     }
 
-    // DELETE PURCHASE
+    // if (result.event === 'Delete') {
+    //   const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
+    //   if (!oldPurchase) return;
+
+    //   for (const detail of oldPurchase.companyDetails) {
+    //     await updateStock(detail.category, -detail.itemCount);
+    //   }
+
+    //   await this.firebaseService.deletePurchase(result.data.id);
+    //   this.getpurchaseList();
+    //   this.openConfigSnackBar('Record deleted successfully');
+    // }
+
     if (result.event === 'Delete') {
       const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
       if (!oldPurchase) return;
-
-      // Subtract old itemCount from stock
       for (const detail of oldPurchase.companyDetails) {
         await updateStock(detail.category, -detail.itemCount);
       }
-
+      const oldExpense = this.incomeExpenseList.find(
+        (el: any) => el.billNo === oldPurchase.billNo
+      );
       await this.firebaseService.deletePurchase(result.data.id);
+      if (oldExpense) {
+        await this.firebaseService.deleteExpenses(oldExpense.id);
+      }
       this.getpurchaseList();
       this.openConfigSnackBar('Record deleted successfully');
     }
@@ -408,6 +509,16 @@ updateCategory(category: any, data: any) {
 
   getpartyName(nameid: any) {
     return this.partyList.find((id: any) => id.id === nameid)?.partyName
+  }
+
+   getExpensesList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllExpenses().subscribe((res: any) => {
+      if (res) {
+        this.incomeExpenseList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
   }
 
   getCategoryList() {
