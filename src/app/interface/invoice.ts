@@ -36,6 +36,8 @@ export interface PurchaseList {
     userId: string | null;
     paymentReceived: string;
     type: string;
+    paymentDays:number;
+    otherKharch:number;
     companyDetails: {
         companyName: string;
         category: string;
@@ -113,14 +115,15 @@ export interface ShellList {
 
 export interface ExpensesList {
     id:any,
-    billno?:any,
+    billNo?:any,
     amount:any,
-    bank:string,
+    // bank:string,
     notes:any,
-    paymenttype:any,
+    paymentStatus:any,
     accounttype:any,
     status:any,
     date:any,
-    userId:any
+    userId:any,
+    isActive?:any
 }
 

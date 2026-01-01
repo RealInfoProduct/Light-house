@@ -4,7 +4,7 @@
 </div>
 <mat-divider></mat-divider>
 <mat-dialog-content class="mat-typography" style="max-width: 850px" *ngIf="action !== 'Delete'; else elseTemplate;">
-    <form [formGroup]="ExpenseForm">
+    <form [formGroup]="expenseForm">
         <div class="row">
             <div class="col-lg-6">
                 <mat-form-field appearance="outline" class="w-100 m-t-8">
@@ -17,11 +17,11 @@
              <div class="col-lg-6">
                 <mat-form-field appearance="outline" class="w-100 m-t-10">
                     <mat-label>Bill No</mat-label>
-                    <input type="number" matInput  formControlName="billno" placeholder="Bill No" />
+                    <input type="number" matInput  formControlName="billNo" placeholder="Bill No" />
                 </mat-form-field>
             </div>
             <div class="col-lg-6  mt-10">
-                <mat-radio-group formControlName="paymenttype" class="d-block" required>
+                <mat-radio-group formControlName="paymentStatus" class="d-block" required>
                     <mat-radio-button *ngFor="let item of paymenttype" [value]="item" >
                         {{ item }}
                     </mat-radio-button>
@@ -58,7 +58,7 @@
           <mat-divider></mat-divider>
     <mat-dialog-actions class="p-24 justify-content-end" >
       <button mat-stroked-button color="warn" mat-dialog-close>{{'FirmMasterdialog.Cancel' | translate}}</button>
-      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!ExpenseForm.valid" color="primary" (click)="Expensepayload();">
+      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!expenseForm.valid" color="primary" (click)="Expensepayload();">
         {{'actions.' + action | translate}}
       </button>
     </mat-dialog-actions>

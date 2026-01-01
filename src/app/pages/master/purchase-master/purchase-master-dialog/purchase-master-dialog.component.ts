@@ -19,6 +19,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
   filteredCategoryList: any[] = [];
   paymentExceeded = false;
   pendingAmount: number = 0;
+  paymentDays = new Date()
 
   StatusList: any[] = [
     { type: 'Pending' },
@@ -31,7 +32,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
      'G-Pay' 
    ]
 
-oldCompanyDetails: any[] = [];
+  oldCompanyDetails: any[] = [];
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<PurchaseMasterDialogComponent>,
@@ -49,6 +50,7 @@ oldCompanyDetails: any[] = [];
     this.getPartyList();
     this.getCategoryList();
     this.calculatePending();
+    this.paymentDaysChange();
 
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
@@ -87,17 +89,18 @@ oldCompanyDetails: any[] = [];
     this.productForm.valueChanges.subscribe(() => {
       this.calculatePending();
     });
-  //    this.paymentDetails.controls.forEach((group: any) => {
-  //   group.get('paymentR')?.valueChanges.subscribe((value: number) => {
-  //     if (value > 0) {
-  //       this.productForm.get('paymentStatus')?.setValue('Pending');
-  //     }
-  //     if (value <= 0) {
-  //       this.productForm.get('paymentStatus')?.setValue('Unpaid');
-  //     }
-     
-  //   });
-  // });
+
+    //    this.paymentDetails.controls.forEach((group: any) => {
+    //   group.get('paymentR')?.valueChanges.subscribe((value: number) => {
+    //     if (value > 0) {
+    //       this.productForm.get('paymentStatus')?.setValue('Pending');
+    //     }
+    //     if (value <= 0) {
+    //       this.productForm.get('paymentStatus')?.setValue('Unpaid');
+    //     }
+
+    //   });
+    // });
 
   }
 
@@ -144,12 +147,41 @@ oldCompanyDetails: any[] = [];
       total: [0],
       paymentReceived: [false],
       type: ['Expense'],
+      paymentDays: [0],
+      otherKharch: [0],
       companyDetails: this.fb.array([this.createproductDetailGroup()]),
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
     })
+    this.paymentDaysChange()
 
-    
   }
+
+  limitDigits(event: any) {
+    let value = event.target.value;
+    value = value.replace(/\D/g, '');
+    if (value.length > 3) {
+      value = value.slice(0, 3);
+    }
+    event.target.value = value;
+    this.productForm.get('paymentDays')?.setValue(value, { emitEvent: false });
+  }
+
+  paymentDaysChange() {
+    this.productForm.get('paymentDays')?.valueChanges.subscribe((days: any) => {
+      let numDays = parseInt(days, 10);
+      if (isNaN(numDays) || numDays < 0) {
+        numDays = 0;
+      }
+
+      const date = this.productForm.get('date')?.value;
+      if (date) {
+        const dueDate = new Date(date);
+        dueDate.setDate(dueDate.getDate() + numDays);
+        this.paymentDays = dueDate;
+      }
+    });
+  }
+
 
   createproductDetailGroup(): FormGroup {
     const group = this.fb.group({
@@ -209,27 +241,28 @@ oldCompanyDetails: any[] = [];
       const subTotal = Number((ctrl as FormGroup).get('subTotal')?.value) || 0;
       return sum + subTotal;
     }, 0);
-
-    this.productForm.get('total')?.setValue(total, { emitEvent: false });
+      const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
+        const grandTotal = total + otherKharch;
+    this.productForm.get('total')?.setValue(grandTotal, { emitEvent: false });
   }
 
-calculatePending() {
-  const grandTotal = Number(this.productForm.get('total')?.value) || 0;
+  calculatePending() {
+    const grandTotal = Number(this.productForm.get('total')?.value) || 0;
 
-  const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
-    return sum + (Number(group.get('paymentR')?.value) || 0);
-  }, 0);
+    const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
+      return sum + (Number(group.get('paymentR')?.value) || 0);
+    }, 0);
 
-  this.pendingAmount = grandTotal - paidTotal;
+    this.pendingAmount = grandTotal - paidTotal;
 
-  if (this.pendingAmount === 0 && grandTotal > 0) {
-    this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
-  } else if (paidTotal > 0 && this.pendingAmount > 0) {
-    this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
-  } else {
-    this.productForm.get('paymentStatus')?.setValue('Unpaid', { emitEvent: false });
+    if (this.pendingAmount === 0 && grandTotal > 0) {
+      this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
+    } else if (paidTotal > 0 && this.pendingAmount > 0) {
+      this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
+    } else {
+      this.productForm.get('paymentStatus')?.setValue('Unpaid', { emitEvent: false });
+    }
   }
-}
 
 
   removeproductDetail(index: number) {
@@ -270,6 +303,8 @@ calculatePending() {
       total: this.productForm.value.total,
       paymentReceived: this.productForm.value.paymentReceived,
       type: this.productForm.value.type,
+      paymentDays: this.productForm.value.paymentDays,
+      otherKharch: this.productForm.value.otherKharch,
       companyDetails: this.productForm.value.companyDetails,
       paymentDetails: this.productForm.value.paymentDetails
     };
@@ -280,7 +315,6 @@ calculatePending() {
     this.dialogRef.close({ event: 'Cancel' });
   }
 
- 
   getCategoryList() {
     this.loaderService.setLoader(true);
 
@@ -303,7 +337,7 @@ calculatePending() {
     });
   }
 
-   getPartyList() {
+  getPartyList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllParty().subscribe((res: any) => {
       if (res) {
@@ -347,6 +381,16 @@ calculatePending() {
       }
     });
   }
+
+  onOtherKharchInput(event: any) {
+  let value = event.target.value;
+
+  if (value.length > 1 && value.startsWith('0')) {
+    event.target.value = value.replace(/^0+/, '');
+    this.productForm.get('otherKharch')?.setValue(event.target.value);
+  }
+    this.calculateGrandTotal();
+}
 
 
 }
