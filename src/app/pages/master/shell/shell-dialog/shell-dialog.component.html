@@ -99,14 +99,13 @@
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Qty</mat-label>
             <input type="number" matInput formControlName="qty" placeholder="Prouct Qty" min="0" />
-            <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('outOfStock')">
-              Stock not available (0 quantity)
-            </mat-error>
-            
-            <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('exceedStock')">
-              Qty cannot exceed available stock
-            </mat-error>
-          </mat-form-field>
+          </mat-form-field>          
+          <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('outOfStock')">
+            This product is out of stock
+          </mat-error>
+          <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('exceedsStock')">
+            Quantity cannot exceed available stock {{ shellDetails.at(i).get('category')?.value.stockCount }}
+          </mat-error>
         </div>
 
         <div class="input-width">

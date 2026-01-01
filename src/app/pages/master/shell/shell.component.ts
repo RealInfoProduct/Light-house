@@ -217,7 +217,6 @@ export class ShellComponent implements OnInit {
   
       const userId = localStorage.getItem("userId");
   
-      // HELPER FUNCTION: Update stock in Firebase
       const updateStock = async (categoryId: string, countChange: number) => {
         const categoryItem = this.categoryList.find((cat:any) => cat.id === categoryId);
         if (categoryItem) {
@@ -226,7 +225,6 @@ export class ShellComponent implements OnInit {
         }
       };
   
-      // ADD PURCHASE
       if (result.event === 'Add') {
         const payload: ShellList = {
          id: '',
@@ -240,8 +238,8 @@ export class ShellComponent implements OnInit {
           mobileNumber: result.data.mobileNumber,
           grandTotal: result.data.grandTotal,
           paymentStatus: result.data.paymentStatus,
-            paymentReceived:result.data.paymentReceived,
-            type: result.data.type,
+          paymentReceived:result.data.paymentReceived,
+          type: result.data.type,
           shellDetails: result.data.shellDetails.map((detail: any) => ({
             saleDate: detail.saleDate,
             companyName: detail.companyName.id,
@@ -259,7 +257,6 @@ export class ShellComponent implements OnInit {
           userId: localStorage.getItem("userId")
         };
   
-        // Update stock in Firebase
         for (const detail of payload.shellDetails) {
           await updateStock(detail.companyName, detail.qty);
         }
@@ -269,12 +266,10 @@ export class ShellComponent implements OnInit {
         this.openConfigSnackBar('Record created successfully');
       }
   
-      // EDIT PURCHASE
       if (result.event === 'Edit') {
         const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
         if (!oldPurchase) return;
   
-        // Subtract old itemCount
         for (const oldDetail of oldPurchase.shellDetails) {
           await updateStock(oldDetail.companyName, -oldDetail.qty);
         }
@@ -312,7 +307,6 @@ export class ShellComponent implements OnInit {
             };
         
   
-        // Add new itemCount
         for (const detail of payload.shellDetails) {
           await updateStock(detail.companyName, detail.qty);
         }
@@ -322,12 +316,10 @@ export class ShellComponent implements OnInit {
         this.openConfigSnackBar('Record updated successfully');
       }
   
-      // DELETE PURCHASE
       if (result.event === 'Delete') {
         const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
         if (!oldPurchase) return;
   
-        // Subtract old itemCount from stock
         for (const detail of oldPurchase.shellDetails) {
           await updateStock(detail.companyName, -detail.qty);
         }
