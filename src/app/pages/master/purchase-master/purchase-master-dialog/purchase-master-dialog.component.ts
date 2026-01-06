@@ -20,6 +20,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
   paymentExceeded = false;
   pendingAmount: number = 0;
   paymentDays = new Date()
+  balanceList: any = []
 
   StatusList: any[] = [
     { type: 'Pending' },
@@ -51,6 +52,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
     this.getCategoryList();
     this.calculatePending();
     this.paymentDaysChange();
+    this.getBalanceList();
 
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
@@ -67,24 +69,6 @@ export class PurchaseMasterDialogComponent implements OnInit {
           });
         }
       });
-      this.local_data.paymentDetails.forEach((detail: any, index: number) => {
-        if (index > 0) this.addpaymentDetail();
-
-        const formGroup = this.paymentDetails.at(index) as FormGroup;
-        if (formGroup) {
-          const paymentDate = detail.paymentReceivedDate
-            ? new Date(detail.paymentReceivedDate.seconds * 1000)
-            : null;
-
-          formGroup.patchValue({
-            paymentR: detail.paymentR,
-            paymentReceivedDate: paymentDate,
-            paymentType: detail.paymentType
-          });
-        }
-      });
-
-
     }
     this.productForm.valueChanges.subscribe(() => {
       this.calculatePending();
@@ -205,6 +189,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
       paymentType: [''],
+      bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
@@ -244,18 +229,19 @@ export class PurchaseMasterDialogComponent implements OnInit {
       const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
         const grandTotal = total + otherKharch;
     this.productForm.get('total')?.setValue(grandTotal, { emitEvent: false });
+    this.calculatePending(grandTotal);
   }
 
-  calculatePending() {
-    const grandTotal = Number(this.productForm.get('total')?.value) || 0;
+  calculatePending(grandTotal?: number) {
+    const totalAmount = (grandTotal ?? Number(this.productForm.get('total')?.value)) || 0;
 
     const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
       return sum + (Number(group.get('paymentR')?.value) || 0);
     }, 0);
 
-    this.pendingAmount = grandTotal - paidTotal;
+    this.pendingAmount = totalAmount - paidTotal;
 
-    if (this.pendingAmount === 0 && grandTotal > 0) {
+    if (this.pendingAmount === 0 && totalAmount > 0) {
       this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
     } else if (paidTotal > 0 && this.pendingAmount > 0) {
       this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
@@ -353,6 +339,46 @@ export class PurchaseMasterDialogComponent implements OnInit {
       this.loaderService.setLoader(false);
     });
   }
+
+getBalanceList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      this.balanceList = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+
+      if (this.action === 'Edit') {
+        this.setBankNameEdit(this.balanceList);
+      }
+    }
+    this.loaderService.setLoader(false);
+  });
+}
+
+setBankNameEdit(databalanceList: any) {
+  this.local_data.paymentDetails.forEach((detail: any, index: number) => {
+
+    const formGroup = this.paymentDetails.at(index) as FormGroup;
+    if (!formGroup) return;
+
+    const paymentDate = detail.paymentReceivedDate
+      ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      : null;
+
+    const selectedBank = databalanceList?.bankDetails?.find(
+      (bank: any) => bank.id === detail.bankName   
+    );
+
+    formGroup.patchValue({
+      paymentR: detail.paymentR,
+      paymentReceivedDate: paymentDate,
+      paymentType: detail.paymentType,
+      bankName: selectedBank || null
+    });
+  });
+}
 
   setCompanyAndCategoryEdit() {
     this.local_data.companyDetails.forEach((detail: any, index: number) => {
