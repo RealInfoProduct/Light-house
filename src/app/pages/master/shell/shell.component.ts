@@ -130,88 +130,6 @@ export class ShellComponent implements OnInit {
     return paymentDetails.reduce((sum, item) => sum + (item.paymentR || 0), 0);
   }
 
-  // addShell(action: string, obj: any) {
-  //   obj.action = action;
-  //   const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
-
-  //   dialogRef.afterClosed().subscribe((result) => {
-  //     if (result?.event === 'Add') {
-  //       const payload: ShellList = {
-  //         id: '',
-  //         invoiceNo: result.data.invoiceNo,
-  //         billNumber: result.data.billNumber,
-  //         date: result.data.date,
-  //         customerName: result.data.customerName,
-  //         customerAddress: result.data.customerAddress,
-  //         total: result.data.total,
-  //         extraDiscount: result.data.extraDiscount,
-  //         mobileNumber: result.data.mobileNumber,
-  //         grandTotal: result.data.grandTotal,
-  //         shellDetails: result.data.shellDetails.map((detail: any) => ({
-  //           productsName: detail.productsName,
-  //           qty: detail.qty,
-  //           productPrice: detail.productPrice,
-  //           discount: detail.discount,
-  //           subTotal: detail.subTotal,
-  //         })),
-  //         userId: localStorage.getItem("userId")
-  //       };
-
-
-  //       this.firebaseService.addShell(payload).then((res) => {
-  //         if (res) {
-  //           this.getShellList()
-  //           this.openConfigSnackBar('record create successfully')
-  //         }
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //     if (result?.event === 'Edit') {
-  //       this.shellList.forEach((element: any) => {
-  //         if (element.id === result.data.id) {
-  //           const payload: ShellList = {
-  //             id: result.data.id,
-  //             invoiceNo: result.data.invoiceNo,
-  //             billNumber: result.data.billNumber,
-  //             date: result.data.date,
-  //             customerName: result.data.customerName,
-  //             customerAddress: result.data.customerAddress,
-  //             mobileNumber: result.data.mobileNumber,
-  //             total: result.data.total,
-  //             extraDiscount: result.data.extraDiscount,
-  //             grandTotal: result.data.grandTotal,
-  //             userId: localStorage.getItem("userId"),
-  //             shellDetails: result.data.shellDetails.map((detail: any) => ({
-  //               productsName: detail.productsName,
-  //               qty: detail.qty,
-  //               productPrice: detail.productPrice,
-  //                discount: detail.discount,
-  //               subTotal: detail.subTotal,
-  //             })),
-
-  //           };
-
-  //           this.firebaseService.updateShell(result.data.id, payload).then((res: any) => {
-  //             this.getShellList()
-  //             this.openConfigSnackBar('record update successfully')
-  //           }, (error) => {
-
-  //           })
-  //         }
-  //       });
-  //     }
-  //     if (result?.event === 'Delete') {
-  //       this.firebaseService.deleteShell(result.data.id).then((res: any) => {
-  //         this.getShellList()
-  //         this.openConfigSnackBar('record delete successfully')
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //   });
-  // }
-
   addShell(action: string, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
@@ -257,7 +175,7 @@ export class ShellComponent implements OnInit {
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType,
-          bankName: detail.bankName.id
+          bankName: detail.bankName?.id || ''
         })),
           userId: localStorage.getItem("userId")
         };
@@ -321,7 +239,7 @@ export class ShellComponent implements OnInit {
                 paymentR: detail.paymentR,
                 paymentReceivedDate: detail.paymentReceivedDate,
                  paymentType: detail.paymentType,
-                  bankName: detail.bankName.id
+                  bankName: detail.bankName?.id || ''
               })),
               userId: localStorage.getItem("userId")
 

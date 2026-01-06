@@ -185,7 +185,7 @@ addPurchase(action: string, obj: any) {
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType,
-          bankName: detail.bankName.id
+          bankName: detail.bankName?.id || ''
         })),
         userId: localStorage.getItem("userId")
       };
@@ -246,7 +246,7 @@ addPurchase(action: string, obj: any) {
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType,
-          bankName: detail.bankName.id
+          bankName: detail.bankName?.id || ''
         })),
           userId: localStorage.getItem('userId')
       };
