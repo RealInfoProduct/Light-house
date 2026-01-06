@@ -50,6 +50,7 @@ export class ShellDialogComponent implements OnInit {
     this.getCategoryList();
     this.calculatePending();
     this.getBalanceList();
+    
     if (this.action === 'Edit') {
       this.saleForm.patchValue(this.local_data);
       this.local_data.shellDetails.forEach((detail: any, index: number) => {
@@ -86,7 +87,6 @@ export class ShellDialogComponent implements OnInit {
       //     });
       //   }
       // });
-
     }
 
     if (this.action === 'Add') {
@@ -245,7 +245,7 @@ export class ShellDialogComponent implements OnInit {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
-      paymentType: [''],
+      paymentType: ['Cash'],
       bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
@@ -399,17 +399,18 @@ export class ShellDialogComponent implements OnInit {
       this.balanceList = res.find(
         item => item.userId === localStorage.getItem('userId')
       );
-
       if (this.action === 'Edit') {
-        this.setBankNameEdit(this.balanceList);
+        this.patchPaymentDetails();
       }
     }
     this.loaderService.setLoader(false);
   });
 }
 
-setBankNameEdit(databalanceList: any) {
-  this.local_data.paymentDetails.forEach((detail: any, index: number) => {
+
+patchPaymentDetails() {
+  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+    if (index > 0) this.addpaymentDetail();
 
     const formGroup = this.paymentDetails.at(index) as FormGroup;
     if (!formGroup) return;
@@ -418,15 +419,17 @@ setBankNameEdit(databalanceList: any) {
       ? new Date(detail.paymentReceivedDate.seconds * 1000)
       : null;
 
-    const selectedBank = databalanceList?.bankDetails?.find(
-      (bank: any) => bank.id === detail.bankName   
-    );
-
+    let selectedBank = null;
+    if (this.balanceList?.bankDetails?.length) {
+      selectedBank = this.balanceList.bankDetails.find(
+        (bank: any) => bank.id === detail.bankName
+      );
+    }
     formGroup.patchValue({
       paymentR: detail.paymentR,
       paymentReceivedDate: paymentDate,
       paymentType: detail.paymentType,
-      bankName: selectedBank || null
+      bankName: selectedBank ,
     });
   });
 }

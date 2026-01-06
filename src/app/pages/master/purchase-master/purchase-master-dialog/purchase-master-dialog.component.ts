@@ -29,9 +29,9 @@ export class PurchaseMasterDialogComponent implements OnInit {
   ];
 
   paymenttype: any = [
-     'Cash',
-     'G-Pay' 
-   ]
+    'Cash',
+    'G-Pay'
+  ]
 
   oldCompanyDetails: any[] = [];
   constructor(
@@ -56,7 +56,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
 
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
-      this.local_data.companyDetails.forEach((detail: any, index: number) => {
+      this.local_data.companyDetails?.forEach((detail: any, index: number) => {
         if (index > 0) this.addproductDetail();
         const formGroup = this.companyDetails.at(index) as FormGroup;
         if (formGroup) {
@@ -69,24 +69,29 @@ export class PurchaseMasterDialogComponent implements OnInit {
           });
         }
       });
+      // this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+      //   if (index > 0) this.addpaymentDetail();
+
+      //   const formGroup = this.paymentDetails.at(index) as FormGroup;
+      //   if (formGroup) {
+      //     const paymentDate = detail.paymentReceivedDate
+      //       ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      //       : null;
+      //     formGroup.patchValue({
+      //       paymentR: detail.paymentR,
+      //       paymentReceivedDate: paymentDate,
+      //       paymentType: detail.paymentType,
+      //       bankName:  detail.bankName
+      //     });
+      //   }
+      // });
     }
     this.productForm.valueChanges.subscribe(() => {
       this.calculatePending();
     });
-
-    //    this.paymentDetails.controls.forEach((group: any) => {
-    //   group.get('paymentR')?.valueChanges.subscribe((value: number) => {
-    //     if (value > 0) {
-    //       this.productForm.get('paymentStatus')?.setValue('Pending');
-    //     }
-    //     if (value <= 0) {
-    //       this.productForm.get('paymentStatus')?.setValue('Unpaid');
-    //     }
-
-    //   });
-    // });
-
   }
+
+
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -188,7 +193,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
-      paymentType: [''],
+      paymentType: ['Cash'],
       bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
@@ -226,8 +231,8 @@ export class PurchaseMasterDialogComponent implements OnInit {
       const subTotal = Number((ctrl as FormGroup).get('subTotal')?.value) || 0;
       return sum + subTotal;
     }, 0);
-      const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
-        const grandTotal = total + otherKharch;
+    const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
+    const grandTotal = total + otherKharch;
     this.productForm.get('total')?.setValue(grandTotal, { emitEvent: false });
     this.calculatePending(grandTotal);
   }
@@ -294,7 +299,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
       companyDetails: this.productForm.value.companyDetails,
       paymentDetails: this.productForm.value.paymentDetails
     };
-  this.dialogRef.close({ event: this.action, data: payload });
+    this.dialogRef.close({ event: this.action, data: payload });
   }
 
   closeDialog(): void {
@@ -340,25 +345,25 @@ export class PurchaseMasterDialogComponent implements OnInit {
     });
   }
 
-getBalanceList() {
-  this.loaderService.setLoader(true);
+  getBalanceList() {
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
-    if (res) {
-      this.balanceList = res.find(
-        item => item.userId === localStorage.getItem('userId')
-      );
-
-      if (this.action === 'Edit') {
-        this.setBankNameEdit(this.balanceList);
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+        if (this.action === 'Edit') {
+        this.patchPaymentDetails();
       }
-    }
-    this.loaderService.setLoader(false);
-  });
-}
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
 
-setBankNameEdit(databalanceList: any) {
-  this.local_data.paymentDetails.forEach((detail: any, index: number) => {
+  patchPaymentDetails() {
+  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+    if (index > 0) this.addpaymentDetail();
 
     const formGroup = this.paymentDetails.at(index) as FormGroup;
     if (!formGroup) return;
@@ -367,15 +372,17 @@ setBankNameEdit(databalanceList: any) {
       ? new Date(detail.paymentReceivedDate.seconds * 1000)
       : null;
 
-    const selectedBank = databalanceList?.bankDetails?.find(
-      (bank: any) => bank.id === detail.bankName   
-    );
-
+    let selectedBank = null;
+    if (this.balanceList?.bankDetails?.length) {
+      selectedBank = this.balanceList.bankDetails.find(
+        (bank: any) => bank.id === detail.bankName
+      );
+    }
     formGroup.patchValue({
       paymentR: detail.paymentR,
       paymentReceivedDate: paymentDate,
       paymentType: detail.paymentType,
-      bankName: selectedBank || null
+      bankName: selectedBank ,
     });
   });
 }
@@ -409,14 +416,14 @@ setBankNameEdit(databalanceList: any) {
   }
 
   onOtherKharchInput(event: any) {
-  let value = event.target.value;
+    let value = event.target.value;
 
-  if (value.length > 1 && value.startsWith('0')) {
-    event.target.value = value.replace(/^0+/, '');
-    this.productForm.get('otherKharch')?.setValue(event.target.value);
-  }
+    if (value.length > 1 && value.startsWith('0')) {
+      event.target.value = value.replace(/^0+/, '');
+      this.productForm.get('otherKharch')?.setValue(event.target.value);
+    }
     this.calculateGrandTotal();
-}
+  }
 
 
 }
