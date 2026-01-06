@@ -27,6 +27,7 @@ import { PaymentDetailsComponent } from './purchase-master/payment-details/payme
 import { SalePaymentDetailsComponent } from './shell/sale-payment-details/sale-payment-details.component';
 import { IncomeExpenseComponent } from './income-expense/income-expense.component';
 import { IncomeExpenseDialogComponent } from './income-expense/income-expense-dialog/income-expense-dialog.component';
+import { BalanceComponent } from './balance/balance.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { IncomeExpenseDialogComponent } from './income-expense/income-expense-di
     SalePaymentDetailsComponent,
     IncomeExpenseComponent,
     IncomeExpenseDialogComponent,
+    BalanceComponent,
   ],
   imports: [
     CommonModule,

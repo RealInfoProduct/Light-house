@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ShellDialogComponent } from './shell-dialog/shell-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { ShellList } from 'src/app/interface/invoice';
+import { ExpensesList, ShellList } from 'src/app/interface/invoice';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
@@ -36,6 +36,8 @@ export class ShellComponent implements OnInit {
 
   shellList: any[] = []
   categoryList:any []=[]
+  incomeExpenseList:any []=[]
+   balanceList:any =[]
 
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -51,9 +53,11 @@ export class ShellComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getShellList()
-    this.getCategoryList()
-   this.dateform()
+      this.getShellList();
+      this.getCategoryList();
+      this.dateform();
+      this.getExpensesList();
+       this.getBalanceList()
   }
 
    dateform() {
@@ -253,16 +257,32 @@ export class ShellComponent implements OnInit {
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType,
+          bankName: detail.bankName.id
         })),
           userId: localStorage.getItem("userId")
         };
   
         for (const detail of payload.shellDetails) {
-          await updateStock(detail.companyName, detail.qty);
+          await updateStock(detail.category, detail.qty);
         }
-  
+
         await this.firebaseService.addShell(payload);
+        const expensePayload: ExpensesList = {
+          id: '',
+          date: result.data.date,
+          billNo: result.data.billNumber,
+          amount: result.data.grandTotal,
+          notes: result.data.customerName || '',
+          paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+          accounttype: result.data.type || '',
+          status: result.data.paymentStatus,
+          userId: localStorage.getItem("userId")
+        };
+
+        await this.firebaseService.addExpenses(expensePayload);
+        console.log(expensePayload);
         this.getShellList()
+        this.getExpensesList();
         this.openConfigSnackBar('Record created successfully');
       }
   
@@ -271,7 +291,7 @@ export class ShellComponent implements OnInit {
         if (!oldPurchase) return;
   
         for (const oldDetail of oldPurchase.shellDetails) {
-          await updateStock(oldDetail.companyName, -oldDetail.qty);
+          await updateStock(oldDetail.category, -oldDetail.qty);
         }
   
         const payload: ShellList = {
@@ -301,6 +321,7 @@ export class ShellComponent implements OnInit {
                 paymentR: detail.paymentR,
                 paymentReceivedDate: detail.paymentReceivedDate,
                  paymentType: detail.paymentType,
+                  bankName: detail.bankName.id
               })),
               userId: localStorage.getItem("userId")
 
@@ -308,10 +329,35 @@ export class ShellComponent implements OnInit {
         
   
         for (const detail of payload.shellDetails) {
-          await updateStock(detail.companyName, detail.qty);
+          await updateStock(detail.category, detail.qty);
         }
   
         await this.firebaseService.updateShell(result.data.id, payload);
+          const oldExpense = this.incomeExpenseList.find(
+        (el: any) => el.billNo === result.data.billNumber && el.notes === result.data.customerName
+      );
+
+      const expensePayload: ExpensesList = {
+        id: oldExpense ? oldExpense.id : '',
+        date: result.data.date,
+          billNo: result.data.billNumber,
+          amount: result.data.grandTotal,
+          notes: result.data.customerName || '',
+          paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+          accounttype: result.data.type || '',
+          status: result.data.paymentStatus,
+        userId: localStorage.getItem('userId')
+      };
+
+      if (oldExpense) {
+        await this.firebaseService.updateExpenses(
+          oldExpense.id,
+          expensePayload
+        );
+      } else {
+        await this.firebaseService.addExpenses(expensePayload);
+      }
+
         this.getShellList()
         this.openConfigSnackBar('Record updated successfully');
       }
@@ -321,10 +367,16 @@ export class ShellComponent implements OnInit {
         if (!oldPurchase) return;
   
         for (const detail of oldPurchase.shellDetails) {
-          await updateStock(detail.companyName, -detail.qty);
+          await updateStock(detail.category, -detail.qty);
         }
+        const oldExpense = this.incomeExpenseList.find(
+        (el: any) =>  el.billNo === oldPurchase.billNumber
+      );
+      await this.firebaseService.deleteShell(result.data.id);
+      if (oldExpense) {
+        await this.firebaseService.deleteExpenses(oldExpense.id);
+      }
   
-        await this.firebaseService.deleteShell(result.data.id);
         this.getShellList()
         this.openConfigSnackBar('Record deleted successfully');
       }
@@ -352,6 +404,16 @@ export class ShellComponent implements OnInit {
       this.shellDataSource.paginator = this.paginator;
       this.loaderService.setLoader(false)
 
+    })
+  }
+
+    getExpensesList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllExpenses().subscribe((res: any) => {
+      if (res) {
+        this.incomeExpenseList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
     })
   }
 
@@ -399,6 +461,20 @@ export class ShellComponent implements OnInit {
       }
     })
   }
+
+  getBalanceList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      this.balanceList = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+
+    }
+    this.loaderService.setLoader(false);
+  });
+}
 
    filedownload() {
      const doc: any = new jsPDF();

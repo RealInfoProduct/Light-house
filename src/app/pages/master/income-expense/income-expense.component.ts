@@ -204,5 +204,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     return this.partyList.find((id: any) => id.id === nameid)?.partyName
 }
 
+filedownload() {}
+
 
 }

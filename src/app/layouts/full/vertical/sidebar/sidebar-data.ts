@@ -42,4 +42,9 @@ export const navItems: NavItem[] = [
     iconName: 'presentation-analytics',
      route: '/master/income-expense',
   },
+  {
+    displayName: 'Balance',
+    iconName: 'wallet',
+     route: '/master/balance',
+  },
 ]

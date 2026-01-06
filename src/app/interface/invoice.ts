@@ -49,6 +49,7 @@ export interface PurchaseList {
         paymentReceivedDate: string;
         paymentType: string;
         paymentR: number;
+        bankName: string;
     }[];
 }
 
@@ -110,6 +111,7 @@ export interface ShellList {
         paymentReceivedDate: string;
          paymentType: string;
         paymentR: number;
+        bankName: string;
     }[];
 }
 
@@ -125,5 +127,13 @@ export interface ExpensesList {
     date:any,
     userId:any,
     isActive?:any
+}
+
+export interface BalanceList {
+    id:any,
+    cashBalance:any,
+    bankDetails:any,
+    userId:any,
+    cashFlow?:any
 }
 
