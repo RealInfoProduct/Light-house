@@ -48,3 +48,24 @@ margin-left: 42px;
 .add-width{
   width: 50px;
 }
+
+.payment-width{
+      width: 260px;
+    margin-right: 10px;
+}
+.paymenttype-width{
+      width: 190px;
+      margin-right: 10px;
+       display: flex;
+      align-items: center;
+}
+.bank-width{
+  margin-right: 10px;
+}
+
+@media (max-width: 750px) {
+.discount-align,.total-align{
+  display: flex;
+  align-items: baseline;
+}
+}

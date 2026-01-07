@@ -16,6 +16,7 @@ export class ShellDialogComponent implements OnInit {
   filteredRentProducts: any[] = [];
   companyList: any[] = [];
   categoryList: any[] = [];
+   balanceList: any = [];
   StatusList: any[] = [
     { type: 'Pending' },
     { type: 'Paid' },
@@ -48,6 +49,8 @@ export class ShellDialogComponent implements OnInit {
     this.buildForm()
     this.getCategoryList();
     this.calculatePending();
+    this.getBalanceList();
+    
     if (this.action === 'Edit') {
       this.saleForm.patchValue(this.local_data);
       this.local_data.shellDetails.forEach((detail: any, index: number) => {
@@ -68,23 +71,22 @@ export class ShellDialogComponent implements OnInit {
           });
         }
       });
-      this.local_data.paymentDetails.forEach((detail: any, index: number) => {
-        if (index > 0) this.addpaymentDetail();
+      // this.local_data.paymentDetails.forEach((detail: any, index: number) => {
+      //   if (index > 0) this.addpaymentDetail();
 
-        const formGroup = this.paymentDetails.at(index) as FormGroup;
-        if (formGroup) {
-          const paymentDate = detail.paymentReceivedDate
-            ? new Date(detail.paymentReceivedDate.seconds * 1000)
-            : null;
+      //   const formGroup = this.paymentDetails.at(index) as FormGroup;
+      //   if (formGroup) {
+      //     const paymentDate = detail.paymentReceivedDate
+      //       ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      //       : null;
 
-          formGroup.patchValue({
-            paymentR: detail.paymentR,
-            paymentReceivedDate: paymentDate,
-            paymentType: detail.paymentType
-          });
-        }
-      });
-
+      //     formGroup.patchValue({
+      //       paymentR: detail.paymentR,
+      //       paymentReceivedDate: paymentDate,
+      //       paymentType: detail.paymentType
+      //     });
+      //   }
+      // });
     }
 
     if (this.action === 'Add') {
@@ -243,7 +245,8 @@ export class ShellDialogComponent implements OnInit {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
-      paymentType: [''],
+      paymentType: ['Cash'],
+      bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
@@ -276,9 +279,6 @@ export class ShellDialogComponent implements OnInit {
   get paymentDetails(): FormArray {
     return this.saleForm.get('paymentDetails') as FormArray;
   }
-
-
-
 
   shellPayload(): void {
     const payload = {
@@ -369,7 +369,7 @@ export class ShellDialogComponent implements OnInit {
         );
 
         if (selectedCategory) {
-          formGroup.get('category')?.setValue(selectedCategory);
+          formGroup?.get('category')?.setValue(selectedCategory);
         }
       }
     });
@@ -390,4 +390,48 @@ export class ShellDialogComponent implements OnInit {
       return null;
     };
   }
+
+  getBalanceList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      this.balanceList = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+      if (this.action === 'Edit') {
+        this.patchPaymentDetails();
+      }
+    }
+    this.loaderService.setLoader(false);
+  });
+}
+
+
+patchPaymentDetails() {
+  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+    if (index > 0) this.addpaymentDetail();
+
+    const formGroup = this.paymentDetails.at(index) as FormGroup;
+    if (!formGroup) return;
+
+    const paymentDate = detail.paymentReceivedDate
+      ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      : null;
+
+    let selectedBank = null;
+    if (this.balanceList?.bankDetails?.length) {
+      selectedBank = this.balanceList.bankDetails.find(
+        (bank: any) => bank.id === detail.bankName
+      );
+    }
+    formGroup.patchValue({
+      paymentR: detail.paymentR,
+      paymentReceivedDate: paymentDate,
+      paymentType: detail.paymentType,
+      bankName: selectedBank ,
+    });
+  });
+}
+
 }

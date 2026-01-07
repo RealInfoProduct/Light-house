@@ -20,6 +20,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
   paymentExceeded = false;
   pendingAmount: number = 0;
   paymentDays = new Date()
+  balanceList: any = []
 
   StatusList: any[] = [
     { type: 'Pending' },
@@ -28,9 +29,9 @@ export class PurchaseMasterDialogComponent implements OnInit {
   ];
 
   paymenttype: any = [
-     'Cash',
-     'G-Pay' 
-   ]
+    'Cash',
+    'G-Pay'
+  ]
 
   oldCompanyDetails: any[] = [];
   constructor(
@@ -51,10 +52,11 @@ export class PurchaseMasterDialogComponent implements OnInit {
     this.getCategoryList();
     this.calculatePending();
     this.paymentDaysChange();
+    this.getBalanceList();
 
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
-      this.local_data.companyDetails.forEach((detail: any, index: number) => {
+      this.local_data.companyDetails?.forEach((detail: any, index: number) => {
         if (index > 0) this.addproductDetail();
         const formGroup = this.companyDetails.at(index) as FormGroup;
         if (formGroup) {
@@ -67,42 +69,29 @@ export class PurchaseMasterDialogComponent implements OnInit {
           });
         }
       });
-      this.local_data.paymentDetails.forEach((detail: any, index: number) => {
-        if (index > 0) this.addpaymentDetail();
+      // this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+      //   if (index > 0) this.addpaymentDetail();
 
-        const formGroup = this.paymentDetails.at(index) as FormGroup;
-        if (formGroup) {
-          const paymentDate = detail.paymentReceivedDate
-            ? new Date(detail.paymentReceivedDate.seconds * 1000)
-            : null;
-
-          formGroup.patchValue({
-            paymentR: detail.paymentR,
-            paymentReceivedDate: paymentDate,
-            paymentType: detail.paymentType
-          });
-        }
-      });
-
-
+      //   const formGroup = this.paymentDetails.at(index) as FormGroup;
+      //   if (formGroup) {
+      //     const paymentDate = detail.paymentReceivedDate
+      //       ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      //       : null;
+      //     formGroup.patchValue({
+      //       paymentR: detail.paymentR,
+      //       paymentReceivedDate: paymentDate,
+      //       paymentType: detail.paymentType,
+      //       bankName:  detail.bankName
+      //     });
+      //   }
+      // });
     }
     this.productForm.valueChanges.subscribe(() => {
       this.calculatePending();
     });
-
-    //    this.paymentDetails.controls.forEach((group: any) => {
-    //   group.get('paymentR')?.valueChanges.subscribe((value: number) => {
-    //     if (value > 0) {
-    //       this.productForm.get('paymentStatus')?.setValue('Pending');
-    //     }
-    //     if (value <= 0) {
-    //       this.productForm.get('paymentStatus')?.setValue('Unpaid');
-    //     }
-
-    //   });
-    // });
-
   }
+
+
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -204,7 +193,8 @@ export class PurchaseMasterDialogComponent implements OnInit {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
-      paymentType: [''],
+      paymentType: ['Cash'],
+      bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
@@ -241,21 +231,22 @@ export class PurchaseMasterDialogComponent implements OnInit {
       const subTotal = Number((ctrl as FormGroup).get('subTotal')?.value) || 0;
       return sum + subTotal;
     }, 0);
-      const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
-        const grandTotal = total + otherKharch;
+    const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
+    const grandTotal = total + otherKharch;
     this.productForm.get('total')?.setValue(grandTotal, { emitEvent: false });
+    this.calculatePending(grandTotal);
   }
 
-  calculatePending() {
-    const grandTotal = Number(this.productForm.get('total')?.value) || 0;
+  calculatePending(grandTotal?: number) {
+    const totalAmount = (grandTotal ?? Number(this.productForm.get('total')?.value)) || 0;
 
     const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
       return sum + (Number(group.get('paymentR')?.value) || 0);
     }, 0);
 
-    this.pendingAmount = grandTotal - paidTotal;
+    this.pendingAmount = totalAmount - paidTotal;
 
-    if (this.pendingAmount === 0 && grandTotal > 0) {
+    if (this.pendingAmount === 0 && totalAmount > 0) {
       this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
     } else if (paidTotal > 0 && this.pendingAmount > 0) {
       this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
@@ -308,7 +299,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
       companyDetails: this.productForm.value.companyDetails,
       paymentDetails: this.productForm.value.paymentDetails
     };
-  this.dialogRef.close({ event: this.action, data: payload });
+    this.dialogRef.close({ event: this.action, data: payload });
   }
 
   closeDialog(): void {
@@ -354,6 +345,48 @@ export class PurchaseMasterDialogComponent implements OnInit {
     });
   }
 
+  getBalanceList() {
+    this.loaderService.setLoader(true);
+
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+        if (this.action === 'Edit') {
+        this.patchPaymentDetails();
+      }
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
+
+  patchPaymentDetails() {
+  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+    if (index > 0) this.addpaymentDetail();
+
+    const formGroup = this.paymentDetails.at(index) as FormGroup;
+    if (!formGroup) return;
+
+    const paymentDate = detail.paymentReceivedDate
+      ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      : null;
+
+    let selectedBank = null;
+    if (this.balanceList?.bankDetails?.length) {
+      selectedBank = this.balanceList.bankDetails.find(
+        (bank: any) => bank.id === detail.bankName
+      );
+    }
+    formGroup.patchValue({
+      paymentR: detail.paymentR,
+      paymentReceivedDate: paymentDate,
+      paymentType: detail.paymentType,
+      bankName: selectedBank ,
+    });
+  });
+}
+
   setCompanyAndCategoryEdit() {
     this.local_data.companyDetails.forEach((detail: any, index: number) => {
       const formGroup = this.companyDetails.at(index) as FormGroup;
@@ -383,14 +416,14 @@ export class PurchaseMasterDialogComponent implements OnInit {
   }
 
   onOtherKharchInput(event: any) {
-  let value = event.target.value;
+    let value = event.target.value;
 
-  if (value.length > 1 && value.startsWith('0')) {
-    event.target.value = value.replace(/^0+/, '');
-    this.productForm.get('otherKharch')?.setValue(event.target.value);
-  }
+    if (value.length > 1 && value.startsWith('0')) {
+      event.target.value = value.replace(/^0+/, '');
+      this.productForm.get('otherKharch')?.setValue(event.target.value);
+    }
     this.calculateGrandTotal();
-}
+  }
 
 
 }

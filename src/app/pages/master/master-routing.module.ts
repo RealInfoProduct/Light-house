@@ -7,6 +7,7 @@ import { CategoryMasterComponent } from './category-master/category-master.compo
 import { PurchaseMasterComponent } from './purchase-master/purchase-master.component';
 import { ShellComponent } from './shell/shell.component';
 import { IncomeExpenseComponent } from './income-expense/income-expense.component';
+import { BalanceComponent } from './balance/balance.component';
 
 
 
@@ -78,6 +79,17 @@ export const MasterRoutes: Routes = [
           urls: [
             { title: 'Master', url: '/master/income-expense' },
             { title: 'Income Expense' },
+          ],
+        },
+      },
+      {
+        path: 'balance',
+        component: BalanceComponent,
+        data: {
+          title: 'Balance',
+          urls: [
+            { title: 'Master', url: '/master/balance' },
+            { title: 'Balance' },
           ],
         },
       },

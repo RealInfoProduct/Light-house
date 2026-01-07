@@ -38,6 +38,7 @@ export class PurchaseMasterComponent implements OnInit {
   partyList: any = []
   categoryList: any = []
   incomeExpenseList:any [] =[]
+  balanceList:any =[]
 
   productDataSource = new MatTableDataSource(this.purchaseList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -57,6 +58,7 @@ export class PurchaseMasterComponent implements OnInit {
     this.SearchFilter()
     this.dateform()
     this.getExpensesList()
+    this.getBalanceList()
   }
 
   dateform() {
@@ -143,87 +145,6 @@ getFinalStatus(element: any): string {
     };
   }
 
-  // addPurchase(action: string, obj: any) {
-  //   obj.action = action;
-  //   const dialogRef = this.dialog.open(PurchaseMasterDialogComponent, { data: obj });
-  //   dialogRef.afterClosed().subscribe((result) => {
-  //     if (result?.event === 'Add') {
-  //       const payload: PurchaseList = {
-  //         id: '',
-  //         billNo: result.data.billNo,
-  //         isParty: result.data.isParty.id,
-  //         date: result.data.date,
-  //         paymentStatus: result.data.paymentStatus,
-  //         total: result.data.total,
-  //         paymentReceived: result.data.paymentReceived,
-  //         companyDetails: result.data.companyDetails.map((detail: any) => ({
-  //           companyName: detail.companyName.id,
-  //           category: detail.category.id,
-  //           purchasePrice: detail.purchasePrice,
-  //           itemCount: detail.itemCount,
-  //           subTotal: detail.subTotal,
-  //         })),
-  //         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
-  //           paymentR: detail.paymentR,
-  //           paymentReceivedDate: detail.paymentReceivedDate
-  //         })),
-  //         userId: localStorage.getItem("userId")
-  //       };
-
-
-  //       this.firebaseService.addPurchase(payload).then((res) => {
-  //         if (res) {
-  //           this.getpurchaseList()
-  //           this.openConfigSnackBar('record create successfully')
-  //         }
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //     if (result?.event === 'Edit') {
-  //       this.purchaseList.forEach((element: any) => {
-  //         if (element.id === result.data.id) {
-  //           const payload: PurchaseList = {
-  //             id: result.data.id,
-  //             billNo: result.data.billNo,
-  //             isParty: result.data.isParty.id,
-  //             date: result.data.date,
-  //             paymentStatus: result.data.paymentStatus,
-  //             total: result.data.total,
-  //             paymentReceived: result.data.paymentReceived,
-  //             companyDetails: result.data.companyDetails.map((detail: any) => ({
-  //               companyName: detail.companyName.id,
-  //               category: detail.category.id,
-  //               purchasePrice: detail.purchasePrice,
-  //               itemCount: detail.itemCount,
-  //               subTotal: detail.subTotal,
-  //             })),
-  //             paymentDetails: result.data.paymentDetails.map((detail: any) => ({
-  //               paymentR: detail.paymentR,
-  //               paymentReceivedDate: detail.paymentReceivedDate
-  //             })),
-  //             userId: localStorage.getItem("userId")
-  //           };
-
-  //           this.firebaseService.updatePurchase(result.data.id, payload).then((res: any) => {
-  //             this.getpurchaseList()
-  //             this.openConfigSnackBar('record update successfully')
-  //           }, (error) => {
-
-  //           })
-  //         }
-  //       });
-  //     }
-  //     if (result?.event === 'Delete') {
-  //       this.firebaseService.deletePurchase(result.data.id).then((res: any) => {
-  //         this.getpurchaseList()
-  //         this.openConfigSnackBar('record delete successfully')
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //   });
-  // }
 
 addPurchase(action: string, obj: any) {
   obj.action = action;
@@ -251,7 +172,7 @@ addPurchase(action: string, obj: any) {
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
         type: result.data.type,
-        paymentDays: result.data.paymentDays,
+       paymentDays:Number(result.data.paymentDays),
         otherKharch: result.data.otherKharch,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
@@ -263,7 +184,8 @@ addPurchase(action: string, obj: any) {
         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
-          paymentType: detail.paymentType
+          paymentType: detail.paymentType,
+          bankName: detail.bankName?.id || ''
         })),
         userId: localStorage.getItem("userId")
       };
@@ -295,49 +217,6 @@ addPurchase(action: string, obj: any) {
       this.getExpensesList();
       this.openConfigSnackBar('Record created successfully');
     }
-    // if (result.event === 'Edit') {
-    //   const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
-    //   if (!oldPurchase) return;
-
-    //   for (const oldDetail of oldPurchase.companyDetails) {
-    //     await updateStock(oldDetail.category, -oldDetail.itemCount);
-    //   }
-
-    //   const payload: PurchaseList = {
-    //     id: result.data.id,
-    //     billNo: result.data.billNo,
-    //     isParty: result.data.isParty.id,
-    //     date: result.data.date,
-    //     // paymentStatus:  result.data.paymentStatus, 
-    //     paymentStatus:  result.data.paymentStatus, 
-    //     total: result.data.total,
-    //     paymentReceived: result.data.paymentReceived,
-    //     type: result.data.type,
-    //      paymentDays: result.data.paymentDays,
-    //      otherKharch: result.data.otherKharch,
-    //     companyDetails: result.data.companyDetails.map((detail: any) => ({
-    //       companyName: detail.companyName.id,
-    //       category: detail.category.id,
-    //       purchasePrice: detail.purchasePrice,
-    //       itemCount: detail.itemCount,
-    //       subTotal: detail.subTotal,
-    //     })),
-    //     paymentDetails: result.data.paymentDetails.map((detail: any) => ({
-    //       paymentR: detail.paymentR,
-    //       paymentReceivedDate: detail.paymentReceivedDate,
-    //       paymentType: detail.paymentType
-    //     })),
-    //      userId: localStorage.getItem("userId")
-    //   };
-
-    //   for (const detail of payload.companyDetails) {
-    //     await updateStock(detail.category, detail.itemCount);
-    //   }
-
-    //   await this.firebaseService.updatePurchase(result.data.id, payload);
-    //   this.getpurchaseList();
-    //   this.openConfigSnackBar('Record updated successfully');
-    // }
     if (result.event === 'Edit') {
       const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
       if (!oldPurchase) return;
@@ -354,7 +233,7 @@ addPurchase(action: string, obj: any) {
         total: result.data.total,
         paymentReceived: result.data.paymentReceived,
         type: result.data.type,
-        paymentDays: result.data.paymentDays,
+        paymentDays:Number(result.data.paymentDays),
         otherKharch: result.data.otherKharch,
         companyDetails: result.data.companyDetails.map((detail: any) => ({
           companyName: detail.companyName.id,
@@ -366,7 +245,8 @@ addPurchase(action: string, obj: any) {
         paymentDetails: result.data.paymentDetails.map((detail: any) => ({
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
-          paymentType: detail.paymentType
+          paymentType: detail.paymentType,
+          bankName: detail.bankName?.id || ''
         })),
           userId: localStorage.getItem('userId')
       };
@@ -378,7 +258,7 @@ addPurchase(action: string, obj: any) {
       await this.firebaseService.updatePurchase(result.data.id, payload);
 
       const oldExpense = this.incomeExpenseList.find(
-        (el: any) => el.billNo === result.data.billNo
+        (el: any) => el.billNo === result.data.billNo && el.notes === result.data.isParty.id
       );
 
       const expensePayload: ExpensesList = {
@@ -406,20 +286,6 @@ addPurchase(action: string, obj: any) {
       this.getpurchaseList();
       this.openConfigSnackBar('Record updated successfully');
     }
-
-    // if (result.event === 'Delete') {
-    //   const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
-    //   if (!oldPurchase) return;
-
-    //   for (const detail of oldPurchase.companyDetails) {
-    //     await updateStock(detail.category, -detail.itemCount);
-    //   }
-
-    //   await this.firebaseService.deletePurchase(result.data.id);
-    //   this.getpurchaseList();
-    //   this.openConfigSnackBar('Record deleted successfully');
-    // }
-
     if (result.event === 'Delete') {
       const oldPurchase = this.purchaseList.find((el:any) => el.id === result.data.id);
       if (!oldPurchase) return;
@@ -427,7 +293,7 @@ addPurchase(action: string, obj: any) {
         await updateStock(detail.category, -detail.itemCount);
       }
       const oldExpense = this.incomeExpenseList.find(
-        (el: any) => el.billNo === oldPurchase.billNo
+        (el: any) => el.billNo === oldPurchase.billNo 
       );
       await this.firebaseService.deletePurchase(result.data.id);
       if (oldExpense) {
@@ -496,6 +362,19 @@ updateCategory(category: any, data: any) {
     return new Date(dateValue);
   }
 
+getBalanceList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      this.balanceList = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+
+    }
+    this.loaderService.setLoader(false);
+  });
+}
 
   getPartyList() {
     this.loaderService.setLoader(true)

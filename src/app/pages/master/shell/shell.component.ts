@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ShellDialogComponent } from './shell-dialog/shell-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { ShellList } from 'src/app/interface/invoice';
+import { ExpensesList, ShellList } from 'src/app/interface/invoice';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
@@ -36,6 +36,8 @@ export class ShellComponent implements OnInit {
 
   shellList: any[] = []
   categoryList:any []=[]
+  incomeExpenseList:any []=[]
+   balanceList:any =[]
 
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -51,9 +53,11 @@ export class ShellComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getShellList()
-    this.getCategoryList()
-   this.dateform()
+      this.getShellList();
+      this.getCategoryList();
+      this.dateform();
+      this.getExpensesList();
+       this.getBalanceList()
   }
 
    dateform() {
@@ -126,88 +130,6 @@ export class ShellComponent implements OnInit {
     return paymentDetails.reduce((sum, item) => sum + (item.paymentR || 0), 0);
   }
 
-  // addShell(action: string, obj: any) {
-  //   obj.action = action;
-  //   const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
-
-  //   dialogRef.afterClosed().subscribe((result) => {
-  //     if (result?.event === 'Add') {
-  //       const payload: ShellList = {
-  //         id: '',
-  //         invoiceNo: result.data.invoiceNo,
-  //         billNumber: result.data.billNumber,
-  //         date: result.data.date,
-  //         customerName: result.data.customerName,
-  //         customerAddress: result.data.customerAddress,
-  //         total: result.data.total,
-  //         extraDiscount: result.data.extraDiscount,
-  //         mobileNumber: result.data.mobileNumber,
-  //         grandTotal: result.data.grandTotal,
-  //         shellDetails: result.data.shellDetails.map((detail: any) => ({
-  //           productsName: detail.productsName,
-  //           qty: detail.qty,
-  //           productPrice: detail.productPrice,
-  //           discount: detail.discount,
-  //           subTotal: detail.subTotal,
-  //         })),
-  //         userId: localStorage.getItem("userId")
-  //       };
-
-
-  //       this.firebaseService.addShell(payload).then((res) => {
-  //         if (res) {
-  //           this.getShellList()
-  //           this.openConfigSnackBar('record create successfully')
-  //         }
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //     if (result?.event === 'Edit') {
-  //       this.shellList.forEach((element: any) => {
-  //         if (element.id === result.data.id) {
-  //           const payload: ShellList = {
-  //             id: result.data.id,
-  //             invoiceNo: result.data.invoiceNo,
-  //             billNumber: result.data.billNumber,
-  //             date: result.data.date,
-  //             customerName: result.data.customerName,
-  //             customerAddress: result.data.customerAddress,
-  //             mobileNumber: result.data.mobileNumber,
-  //             total: result.data.total,
-  //             extraDiscount: result.data.extraDiscount,
-  //             grandTotal: result.data.grandTotal,
-  //             userId: localStorage.getItem("userId"),
-  //             shellDetails: result.data.shellDetails.map((detail: any) => ({
-  //               productsName: detail.productsName,
-  //               qty: detail.qty,
-  //               productPrice: detail.productPrice,
-  //                discount: detail.discount,
-  //               subTotal: detail.subTotal,
-  //             })),
-
-  //           };
-
-  //           this.firebaseService.updateShell(result.data.id, payload).then((res: any) => {
-  //             this.getShellList()
-  //             this.openConfigSnackBar('record update successfully')
-  //           }, (error) => {
-
-  //           })
-  //         }
-  //       });
-  //     }
-  //     if (result?.event === 'Delete') {
-  //       this.firebaseService.deleteShell(result.data.id).then((res: any) => {
-  //         this.getShellList()
-  //         this.openConfigSnackBar('record delete successfully')
-  //       }, (error) => {
-
-  //       })
-  //     }
-  //   });
-  // }
-
   addShell(action: string, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
@@ -253,16 +175,32 @@ export class ShellComponent implements OnInit {
           paymentR: detail.paymentR,
           paymentReceivedDate: detail.paymentReceivedDate,
           paymentType: detail.paymentType,
+          bankName: detail.bankName?.id || ''
         })),
           userId: localStorage.getItem("userId")
         };
   
         for (const detail of payload.shellDetails) {
-          await updateStock(detail.companyName, detail.qty);
+          await updateStock(detail.category, detail.qty);
         }
-  
+
         await this.firebaseService.addShell(payload);
+        const expensePayload: ExpensesList = {
+          id: '',
+          date: result.data.date,
+          billNo: result.data.billNumber,
+          amount: result.data.grandTotal,
+          notes: result.data.customerName || '',
+          paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+          accounttype: result.data.type || '',
+          status: result.data.paymentStatus,
+          userId: localStorage.getItem("userId")
+        };
+
+        await this.firebaseService.addExpenses(expensePayload);
+        console.log(expensePayload);
         this.getShellList()
+        this.getExpensesList();
         this.openConfigSnackBar('Record created successfully');
       }
   
@@ -271,7 +209,7 @@ export class ShellComponent implements OnInit {
         if (!oldPurchase) return;
   
         for (const oldDetail of oldPurchase.shellDetails) {
-          await updateStock(oldDetail.companyName, -oldDetail.qty);
+          await updateStock(oldDetail.category, -oldDetail.qty);
         }
   
         const payload: ShellList = {
@@ -301,6 +239,7 @@ export class ShellComponent implements OnInit {
                 paymentR: detail.paymentR,
                 paymentReceivedDate: detail.paymentReceivedDate,
                  paymentType: detail.paymentType,
+                  bankName: detail.bankName?.id || ''
               })),
               userId: localStorage.getItem("userId")
 
@@ -308,10 +247,35 @@ export class ShellComponent implements OnInit {
         
   
         for (const detail of payload.shellDetails) {
-          await updateStock(detail.companyName, detail.qty);
+          await updateStock(detail.category, detail.qty);
         }
   
         await this.firebaseService.updateShell(result.data.id, payload);
+          const oldExpense = this.incomeExpenseList.find(
+        (el: any) => el.billNo === result.data.billNumber && el.notes === result.data.customerName
+      );
+
+      const expensePayload: ExpensesList = {
+        id: oldExpense ? oldExpense.id : '',
+        date: result.data.date,
+          billNo: result.data.billNumber,
+          amount: result.data.grandTotal,
+          notes: result.data.customerName || '',
+          paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
+          accounttype: result.data.type || '',
+          status: result.data.paymentStatus,
+        userId: localStorage.getItem('userId')
+      };
+
+      if (oldExpense) {
+        await this.firebaseService.updateExpenses(
+          oldExpense.id,
+          expensePayload
+        );
+      } else {
+        await this.firebaseService.addExpenses(expensePayload);
+      }
+
         this.getShellList()
         this.openConfigSnackBar('Record updated successfully');
       }
@@ -321,10 +285,16 @@ export class ShellComponent implements OnInit {
         if (!oldPurchase) return;
   
         for (const detail of oldPurchase.shellDetails) {
-          await updateStock(detail.companyName, -detail.qty);
+          await updateStock(detail.category, -detail.qty);
         }
+        const oldExpense = this.incomeExpenseList.find(
+        (el: any) =>  el.billNo === oldPurchase.billNumber
+      );
+      await this.firebaseService.deleteShell(result.data.id);
+      if (oldExpense) {
+        await this.firebaseService.deleteExpenses(oldExpense.id);
+      }
   
-        await this.firebaseService.deleteShell(result.data.id);
         this.getShellList()
         this.openConfigSnackBar('Record deleted successfully');
       }
@@ -352,6 +322,16 @@ export class ShellComponent implements OnInit {
       this.shellDataSource.paginator = this.paginator;
       this.loaderService.setLoader(false)
 
+    })
+  }
+
+    getExpensesList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllExpenses().subscribe((res: any) => {
+      if (res) {
+        this.incomeExpenseList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
     })
   }
 
@@ -399,6 +379,20 @@ export class ShellComponent implements OnInit {
       }
     })
   }
+
+  getBalanceList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      this.balanceList = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+
+    }
+    this.loaderService.setLoader(false);
+  });
+}
 
    filedownload() {
      const doc: any = new jsPDF();

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { addDoc, collectionData, deleteDoc, doc, Firestore,  updateDoc } from '@angular/fire/firestore';
-import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList, ExpensesList } from '../interface/invoice';
+import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList, ExpensesList, BalanceList } from '../interface/invoice';
 import { collection, setDoc } from '@firebase/firestore';
 import { Auth } from '@angular/fire/auth';
 
@@ -150,17 +150,6 @@ export class FirebaseService {
 
    /////////////////////// Expenses List Data ////////////////////////
 
-
-  // addExpenses(payload: ExpensesList) {
-  //   // payload.id = doc(collection(this.fService, 'id')).id
-  //   // return addDoc(collection(this.fService, 'ExpensesList'), payload)
-
-  //   return addDoc(collection(this.fService, 'ExpensesList'), payload)
-  //     .then((docRef) => {
-  //       return updateDoc(docRef, { id: docRef.id });
-  //     });
-  // }
-
   addExpenses(payload: ExpensesList) {
     const expensesCollection = collection(this.fService, 'ExpensesList');
     const newDocRef = doc(expensesCollection);
@@ -187,7 +176,30 @@ export class FirebaseService {
     return updateDoc(dataRef, payload)
   }
 
+////////////////////// Balance List Data ////////////////////////
 
+
+  addBalance(payload: BalanceList) {
+    payload.id = doc(collection(this.fService, 'id')).id
+    return addDoc(collection(this.fService, 'BalanceList'), payload)
+  }
+
+
+  getAllBalance() {
+    let dataRef = collection(this.fService, 'BalanceList')
+    return collectionData(dataRef, { idField: 'id' })
+  }
+
+  updateBalance(updateId: BalanceList, payload: any) {
+    let dataRef = doc(this.fService, `BalanceList/${updateId}`);
+    return updateDoc(dataRef, payload)
+  }
+
+
+  deleteBalance(deleteId: any) {
+    let docRef = doc(collection(this.fService, 'BalanceList'), deleteId);
+    return deleteDoc(docRef)
+  }
 
 
    
