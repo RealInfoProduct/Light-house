@@ -7,7 +7,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ExpensesList } from 'src/app/interface/invoice';
+import moment from 'moment';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-income-expense',
@@ -28,6 +29,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
   ];
   incomeExpenseList:any [] =[]
   partyList:any []=[]
+  balanceList: any = [];
 
   
   incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
@@ -43,14 +45,23 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     ){}
 
   ngOnInit(): void {
-    this.getExpensesList()  
-      this.dateform()    
-      this.getPartyList()
+    this.getExpensesList();
+    this.dateform();
+    this.getPartyList();
+    this.getBalanceList();
   }
 
    ngAfterViewInit() {
     this.incomeExpenseDataSource.paginator = this.paginator;
   }
+
+  getBillNo(element: any): string {
+  if (element?.accounttype === 'Income') {
+    return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNo) ? `(${element.billNo})` : element?.billNo ?? ''}`;
+  }
+  return element?.billNo ?? '';
+}
+
 
   dateform() {
     const today = new Date();
@@ -110,17 +121,17 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
 
         dialogRef.afterClosed().subscribe((result) => {
           if (result?.event === 'Add') {
-            const payload: ExpensesList = {
+            const payload = {
               id: '',
               date: result.data.date,
               billNo: result.data.billNo,
               amount: result.data.amount,
-              // bank: result.data.bank,
               notes: result.data.notes,
               paymentStatus: result.data.paymentStatus,
               accounttype: result.data.accounttype,
               status: result.data.status,
               isActive: result.data.isActive,
+              bankName: result.data.bankName,
               userId : localStorage.getItem("userId"),
             }
             this.firebaseService.addExpenses(payload).then((res) => {
@@ -135,17 +146,17 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
           if (result?.event === 'Edit') {
             this.incomeExpenseList.forEach((element: any) => {
               if (element.id === result.data.id) {
-                const payload: ExpensesList = {
+                const payload = {
                   id: result.data.id,
                   date: result.data.date,
                   billNo: result.data.billNo,
                   amount: result.data.amount,
-                  // bank: result.data.bank,
                   notes: result.data.notes,
                   paymentStatus: result.data.paymentStatus,
                   accounttype: result.data.accounttype,
                   status: result.data.status,
                   isActive: result.data.isActive, 
+                  bankName: result.data.bankName,
                   userId : localStorage.getItem("userId"),
                 }
                 this.firebaseService.updateExpenses(result.data.id, payload).then((res: any) => {
@@ -168,7 +179,19 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
         });
   }
 
+getBalanceList() {
+  this.loaderService.setLoader(true);
 
+  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+    if (res) {
+      const found = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+      this.balanceList = found ? found : { cashBalance: 0, bankDetails: [], id: '', userId: localStorage.getItem('userId') };
+    }
+    this.loaderService.setLoader(false);
+  });
+}
     getExpensesList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllExpenses().subscribe((res: any) => {
@@ -204,7 +227,125 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     return this.partyList.find((id: any) => id.id === nameid)?.partyName
 }
 
-filedownload() {}
+filedownload() {
+    const doc: any = new jsPDF();
+    doc.setFontSize(13);
+    const filteredData: any[] = this.incomeExpenseDataSource.data;
+
+    if (!filteredData || filteredData.length === 0) {
+      window.alert("No Income/Expense data available for the selected filters.");
+      return;
+    }
+
+    const startDate = this.dateIncomeexpenseListForm.value.start;
+    const endDate = this.dateIncomeexpenseListForm.value.end;
+
+    const formattedStart = new Date(startDate).toLocaleDateString('en-GB');
+    const formattedEnd = new Date(endDate).toLocaleDateString('en-GB');
+
+    doc.text(`Report Date: ${formattedStart} To ${formattedEnd}`, 14, 15);
+
+    const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+    const FinalTotalAmount = Math.round(TotalAmounttotal).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    doc.text(`Final Total: ${(FinalTotalAmount)}`, 135, 11);
+
+          const IncomeTotalAmount = filteredData.reduce((sum: number, item: any) => {
+          if (item.accounttype === "Income") {
+            return sum + (Number(item.amount) || 0);
+          }
+          return sum;
+        }, 0);
+
+        const IncomeAmountFormatted = Math.round(IncomeTotalAmount).toLocaleString('en-IN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+
+        doc.text(`Income Total: ${IncomeAmountFormatted}`, 135, 19);
+
+          const ExpenseTotalAmount = filteredData.reduce((sum: number, item: any) => {
+          if (item.accounttype === "Expense") {
+            return sum + (Number(item.amount) || 0);
+          }
+          return sum;
+        }, 0);
+
+        const ExpenseAmountFormatted = Math.round(ExpenseTotalAmount).toLocaleString('en-IN', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+
+            doc.text(`Expense Total: ${ExpenseAmountFormatted}`, 135, 27);
+
+
+    
+    const headers = [
+      "Sr.No",
+      "Bill No",
+      "Date",
+      "Status",
+      "Account Type",
+      "Notes",
+      "Amount"
+    ];
+
+    const data = filteredData.map((item, i) => {
+      debugger
+    
+  const dateStr = moment.unix(item.date.seconds).format('DD/MM/YYYY');
+ const notes = this.partyList.find((prod: any) => prod.id === item.notes)?.partyName || item.notes;
+      return [
+        i + 1,
+        item.billNo,
+        dateStr,
+        item.status,
+        item.accounttype,
+        notes,
+        parseFloat(item.amount).toLocaleString('en-IN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
+      ];
+    });
+
+    const MIN_ROWS = 35;
+    if (data.length < MIN_ROWS) {
+      for (let idx = data.length; idx < MIN_ROWS; idx++) {
+        data.push([
+          idx + 1,
+          '',
+          '',
+          '',
+          '',
+          ''
+        ]);
+      }
+    }
+
+    doc.setFontSize(10);
+    (doc as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 32,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [255, 187, 0],
+        textColor: [8, 8, 8],
+        fontStyle: 'bold'
+      },
+      styles: {
+        textColor: [8, 8, 8],
+        fontSize: 8,
+        valign: 'middle',
+        halign: 'center'
+      }
+    });
+
+    doc.save(`Income/Expense Report.pdf`);
+  }
 
 
 }
