@@ -118,8 +118,9 @@ export interface ShellList {
 export interface ExpensesList {
     id:any,
     billNo?:any,
+    invoiceNo?:any,
     amount:any,
-    // bank:string,
+    // bankName:string,
     notes:any,
     paymentStatus:any,
     accounttype:any,

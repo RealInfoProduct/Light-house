@@ -1,4 +1,4 @@
-import { Component, OnInit,  ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit,  ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ShellDialogComponent } from './shell-dialog/shell-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,13 +12,14 @@ import { SalePaymentDetailsComponent } from './sale-payment-details/sale-payment
 import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import jsPDF from 'jspdf';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-shell',
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit ,AfterViewInit {
  dateSaleListForm: FormGroup;
   displayedColumns: string[] = [
     'billNo',
@@ -42,7 +43,7 @@ export class ShellComponent implements OnInit {
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
-
+ @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private dialog: MatDialog,
@@ -58,6 +59,10 @@ export class ShellComponent implements OnInit {
       this.dateform();
       this.getExpensesList();
        this.getBalanceList()
+  }
+
+  ngAfterViewInit() {
+    this.shellDataSource.sort = this.sort; 
   }
 
    dateform() {
@@ -130,6 +135,35 @@ export class ShellComponent implements OnInit {
     return paymentDetails.reduce((sum, item) => sum + (item.paymentR || 0), 0);
   }
 
+  async updateBalance(paymentDetails: any[], reverse: boolean = false) {
+  if (!this.balanceList || !paymentDetails?.length) return;
+
+  for (const payment of paymentDetails) {
+    const amount = Number(payment.paymentR) || 0;
+    const finalAmount = reverse ? -amount :  amount;
+
+    if (payment.paymentType === 'Cash') {
+      this.balanceList.cashBalance =
+        (this.balanceList.cashBalance || 0) + finalAmount;
+    }
+
+    else if (payment.bankName) {
+      const bank = this.balanceList.bankDetails?.find(
+        (b: any) => b.id === payment.bankName
+      );
+
+      if (bank) {
+        bank.balance = (bank.balance || 0) + finalAmount;
+      }
+    }
+  }
+
+  await this.firebaseService.updateBalance(
+    this.balanceList.id,
+    this.balanceList
+  );
+}
+
   addShell(action: string, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
@@ -185,10 +219,13 @@ export class ShellComponent implements OnInit {
         }
 
         await this.firebaseService.addShell(payload);
+          await this.updateBalance(payload.paymentDetails);
+
         const expensePayload: ExpensesList = {
           id: '',
           date: result.data.date,
-          billNo: result.data.billNumber,
+          billNo: result.data.billNumber || '',
+          invoiceNo:  result.data.invoiceNo ||'',
           amount: result.data.grandTotal,
           notes: result.data.customerName || '',
           paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
@@ -200,6 +237,7 @@ export class ShellComponent implements OnInit {
         await this.firebaseService.addExpenses(expensePayload);
         console.log(expensePayload);
         this.getShellList()
+         this.getBalanceList();
         this.getExpensesList();
         this.openConfigSnackBar('Record created successfully');
       }
@@ -207,7 +245,7 @@ export class ShellComponent implements OnInit {
       if (result.event === 'Edit') {
         const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
         if (!oldPurchase) return;
-  
+         await this.updateBalance(oldPurchase.paymentDetails, true);
         for (const oldDetail of oldPurchase.shellDetails) {
           await updateStock(oldDetail.category, -oldDetail.qty);
         }
@@ -244,13 +282,8 @@ export class ShellComponent implements OnInit {
               userId: localStorage.getItem("userId")
 
             };
-        
-  
-        for (const detail of payload.shellDetails) {
-          await updateStock(detail.category, detail.qty);
-        }
-  
-        await this.firebaseService.updateShell(result.data.id, payload);
+       
+
           const oldExpense = this.incomeExpenseList.find(
         (el: any) => el.billNo === result.data.billNumber && el.notes === result.data.customerName
       );
@@ -258,7 +291,8 @@ export class ShellComponent implements OnInit {
       const expensePayload: ExpensesList = {
         id: oldExpense ? oldExpense.id : '',
         date: result.data.date,
-          billNo: result.data.billNumber,
+          billNo: result.data.billNumber || '',
+           invoiceNo:  result.data.invoiceNo ||'',
           amount: result.data.grandTotal,
           notes: result.data.customerName || '',
           paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
@@ -275,27 +309,39 @@ export class ShellComponent implements OnInit {
       } else {
         await this.firebaseService.addExpenses(expensePayload);
       }
+ 
+        for (const detail of payload.shellDetails) {
+          await updateStock(detail.category, detail.qty);
+        }
+         await this.updateBalance(payload.paymentDetails);
 
-        this.getShellList()
+        await this.firebaseService.updateShell(result.data.id, payload);
+
+        this.getShellList();
+        this.getBalanceList();
         this.openConfigSnackBar('Record updated successfully');
       }
   
       if (result.event === 'Delete') {
         const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
         if (!oldPurchase) return;
-  
+
+        await this.updateBalance(oldPurchase.paymentDetails, true);
+
         for (const detail of oldPurchase.shellDetails) {
           await updateStock(detail.category, -detail.qty);
         }
         const oldExpense = this.incomeExpenseList.find(
-        (el: any) =>  el.billNo === oldPurchase.billNumber
+        (el: any) =>  el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
       );
+
       await this.firebaseService.deleteShell(result.data.id);
       if (oldExpense) {
         await this.firebaseService.deleteExpenses(oldExpense.id);
       }
   
-        this.getShellList()
+        this.getShellList();
+        this.getBalanceList();
         this.openConfigSnackBar('Record deleted successfully');
       }
     });
@@ -315,11 +361,15 @@ export class ShellComponent implements OnInit {
             ...item,
             date: this.parseDate(item.date)
           }));
-
-      }
-
+      this.shellList.sort((a, b) => {
+        const numA = parseInt(a.invoiceNo.replace(/\D/g, ''), 10);
+        const numB = parseInt(b.invoiceNo.replace(/\D/g, ''), 10);
+        return numB - numA;
+      });
+    }
       this.shellDataSource = new MatTableDataSource(this.shellList);
       this.shellDataSource.paginator = this.paginator;
+      this.shellDataSource.sort = this.sort;
       this.loaderService.setLoader(false)
 
     })
