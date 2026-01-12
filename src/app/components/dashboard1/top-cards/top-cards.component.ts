@@ -46,14 +46,14 @@ export class AppTopCardsComponent implements OnInit{
       id: 4,
       color: 'error',
       img: '/assets/images/svgs/icon-favorites.svg',
-      title: 'Pending Bills',
+      title: 'Ava.Bank Balance',
       subtitle: 0,
     },
     {
       id: 5,
       color: 'success',
       img: '/assets/images/svgs/icon-speech-bubble.svg',
-      title: 'Ava. Balance',
+      title: 'Ava.Cash Balance',
       subtitle: 0,
     },
     {
@@ -77,7 +77,7 @@ export class AppTopCardsComponent implements OnInit{
       this.topcards[1].title = res[1].TotalParty
       this.topcards[5].title = res[4].TotalProduct
       this.topcards[2].title = res[2].TotalInvoice
-      this.topcards[3].title = res[3].PendingBills
+      this.topcards[3].title = res[3].Ava.BankBalance
     })
     this.loaderService.setLoader(false)
 
@@ -87,6 +87,7 @@ export class AppTopCardsComponent implements OnInit{
       this.getFirmList();
       this.getPartyList();
       this. getShellList(); 
+      this.getBalanceList() ;
   }
 
     getFirmList() {
@@ -124,4 +125,25 @@ export class AppTopCardsComponent implements OnInit{
       
           })
         }
+
+  getBalanceList() {
+    this.loaderService.setLoader(true);
+
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      const userData = res.find(
+        item => item.userId === localStorage.getItem('userId')
+      );
+      if (userData) {
+        let totalBankBalance = 0;
+        userData.bankDetails?.forEach((bank: any) => {
+          totalBankBalance += parseFloat(bank.balance) || 0;
+        }
+        );
+        this.topcards[3].subtitle = totalBankBalance;
+
+        this.topcards[4].subtitle = userData.cashBalance || 0;
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
 }

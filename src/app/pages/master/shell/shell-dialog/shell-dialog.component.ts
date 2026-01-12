@@ -167,15 +167,19 @@ export class ShellDialogComponent implements OnInit {
 
 
   setAutoBillNo() {
-    this.firebaseService.getAllShell().subscribe((res: any) => {
-      const userId = localStorage.getItem("userId");
-      if (res && res.length > 0) {
-        const userData = res.filter((item: any) => item.userId === userId);
-        this.saleForm.get('invoiceNo')?.setValue(userData.length + 1);
-      } else {
-        this.saleForm.get('invoiceNo')?.setValue(1);
-      }
-    });
+  this.firebaseService.getAllShell().subscribe((res: any) => {
+  const userId = localStorage.getItem("userId");
+  let invoiceNumber = 1;
+
+  if (res && res.length > 0) {
+    const userData = res.filter((item: any) => item.userId === userId);
+    invoiceNumber = userData.length + 1;
+  }
+
+  const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
+
+  this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
+});
   }
 
   buildForm() {

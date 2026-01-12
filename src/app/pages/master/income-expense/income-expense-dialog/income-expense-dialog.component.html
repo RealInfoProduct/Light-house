@@ -34,8 +34,17 @@
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
-    
-                <div class="col-lg-6">
+
+            <div class="col-lg-6" *ngIf="expenseForm.get('paymentStatus')?.value === 'G-Pay'">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Bank</mat-label>
+                    <mat-select value="text" formControlName="bankName" placeholder="Selecta Bank Name">
+                        <mat-option *ngFor="let item of balanceList" [value]="item.id">{{item.bankName}} ({{item.mobileNumber}})</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            
+            <div class="col-lg-6">
                     <mat-form-field appearance="outline" class="w-100 m-t-10">
                         <mat-label>Notes</mat-label>
                         <input type="text" matInput formControlName="notes" placeholder="Notes" />

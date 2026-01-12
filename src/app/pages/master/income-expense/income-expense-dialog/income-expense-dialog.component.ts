@@ -29,6 +29,7 @@ export class IncomeExpenseDialogComponent  implements OnInit{
      'Unpaid' 
    ]
    partyList:any []=[]
+   balanceList:any []=[]
 
   constructor(
       private fb: FormBuilder,
@@ -44,9 +45,11 @@ export class IncomeExpenseDialogComponent  implements OnInit{
   ngOnInit(): void {
       this.expenseFormlist() 
       this.getPartyList()
+      this.getBalanceList()
         if (this.action === 'Edit') {
           this.expenseForm.patchValue(this.local_data);
           this.expenseForm.get('date')?.setValue(new Date(this.local_data.date.toDate()));
+           this.expenseForm.get('bankName')?.setValue(this.local_data.bankName );
         }
   }
 
@@ -60,7 +63,8 @@ export class IncomeExpenseDialogComponent  implements OnInit{
        status:['Paid'],
        isActive:['other'],
        notes:[''],
-       amount:['']
+       amount:[''],
+       bankName:[''],
      })
    }
 
@@ -75,9 +79,9 @@ export class IncomeExpenseDialogComponent  implements OnInit{
       notes: this.expenseForm.value.notes,
       isActive: this.expenseForm.value.isActive,
       amount: this.expenseForm.value.amount,
-
+      bankName: this.expenseForm.value.bankName
     }
-    this.dialogRef.close({ event: this.action, data: payload });    
+    this.dialogRef.close({ event: this.action, data: payload });        
   }
 
   closeDialog() {
@@ -93,6 +97,20 @@ export class IncomeExpenseDialogComponent  implements OnInit{
         this.loaderService.setLoader(false)
       }
     })
+  }
+
+    getBalanceList() {
+    this.loaderService.setLoader(true);
+
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+       const userBalance  = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+            this.balanceList = userBalance ? userBalance.bankDetails : [];               
+      }
+      this.loaderService.setLoader(false);
+    });
   }
 
   getpartyName(nameid: any) {
