@@ -25,7 +25,6 @@ export class IncomeExpenseDialogComponent  implements OnInit{
 
    statustype: any = [
      'Paid',
-     'Pending',
      'Unpaid' 
    ]
    partyList:any []=[]

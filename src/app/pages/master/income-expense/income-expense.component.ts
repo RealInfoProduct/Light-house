@@ -115,68 +115,193 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     this.incomeExpenseDataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  addIncomeExpense(action: string, obj: any){
-     obj.action = action;
-    const dialogRef = this.dialog.open(IncomeExpenseDialogComponent,{ data: obj})
+   async updateBalance( amount: number, accounttype: 'Income' | 'Expense',  paymentStatus: string, bankId?: string) {
+    if (!this.balanceList?.id) {
+      await this.getBalanceList();
+    }
 
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result?.event === 'Add') {
-            const payload = {
-              id: '',
-              date: result.data.date,
-              billNo: result.data.billNo,
-              amount: result.data.amount,
-              notes: result.data.notes,
-              paymentStatus: result.data.paymentStatus,
-              accounttype: result.data.accounttype,
-              status: result.data.status,
-              isActive: result.data.isActive,
-              bankName: result.data.bankName,
-              userId : localStorage.getItem("userId"),
-            }
-            this.firebaseService.addExpenses(payload).then((res) => {
-              if (res) {
-                this.getExpensesList()
-                this.openConfigSnackBar('record create successfully')
-              }
-            }, (error) => {
+    const amt = Number(amount);
+    if (!amt) return;
+
+    const finalAmount = accounttype === 'Income' ? amt : -amt;
+
+    // CASH
+    if (paymentStatus === 'Cash') {
+      this.balanceList.cashBalance =
+        Number(this.balanceList.cashBalance || 0) + finalAmount;
+    }
+
+    // BANK
+    if (paymentStatus !== 'Cash' && bankId) {
+      const bank = this.balanceList.bankDetails.find(
+        (b: any) => b.id === bankId
+      );
+      if (bank) {
+        bank.balance = Number(bank.balance || 0) + finalAmount;
+      }
+    }
+
+    await this.firebaseService.updateBalance(
+      this.balanceList.id,
+      {
+        cashBalance: this.balanceList.cashBalance,
+        bankDetails: this.balanceList.bankDetails
+      }
+    );
+  }
+
+  reverseEntry(entry: any) {
+    return this.updateBalance(
+      entry.amount,
+      entry.accounttype === 'Income' ? 'Expense' : 'Income',
+      entry.paymentStatus,
+      entry.bankName
+    );
+  }
+
+  // addIncomeExpense(action: string, obj: any){
+  //    obj.action = action;
+  //   const dialogRef = this.dialog.open(IncomeExpenseDialogComponent,{ data: obj})
+
+  //       dialogRef.afterClosed().subscribe((result) => {
+  //         if (result?.event === 'Add') {
+  //           const payload = {
+  //             id: '',
+  //             date: result.data.date,
+  //             billNo: result.data.billNo,
+  //             amount: result.data.amount,
+  //             notes: result.data.notes,
+  //             paymentStatus: result.data.paymentStatus,
+  //             accounttype: result.data.accounttype,
+  //             status: result.data.status,
+  //             isActive: result.data.isActive,
+  //             bankName: result.data.bankName,
+  //             userId : localStorage.getItem("userId"),
+  //           }
+  //           this.firebaseService.addExpenses(payload).then((res) => {
+  //             if (res) {
+  //               this.getExpensesList()
+  //               this.openConfigSnackBar('record create successfully')
+  //             }
+  //           }, (error) => {
             
-            })
-          }
-          if (result?.event === 'Edit') {
-            this.incomeExpenseList.forEach((element: any) => {
-              if (element.id === result.data.id) {
-                const payload = {
-                  id: result.data.id,
-                  date: result.data.date,
-                  billNo: result.data.billNo,
-                  amount: result.data.amount,
-                  notes: result.data.notes,
-                  paymentStatus: result.data.paymentStatus,
-                  accounttype: result.data.accounttype,
-                  status: result.data.status,
-                  isActive: result.data.isActive, 
-                  bankName: result.data.bankName,
-                  userId : localStorage.getItem("userId"),
-                }
-                this.firebaseService.updateExpenses(result.data.id, payload).then((res: any) => {
-                    this.getExpensesList()
-                this.openConfigSnackBar('record update successfully')
-                }, (error) => {
+  //           })
+  //         }
+  //         if (result?.event === 'Edit') {
+  //           this.incomeExpenseList.forEach((element: any) => {
+  //             if (element.id === result.data.id) {
+  //               const payload = {
+  //                 id: result.data.id,
+  //                 date: result.data.date,
+  //                 billNo: result.data.billNo,
+  //                 amount: result.data.amount,
+  //                 notes: result.data.notes,
+  //                 paymentStatus: result.data.paymentStatus,
+  //                 accounttype: result.data.accounttype,
+  //                 status: result.data.status,
+  //                 isActive: result.data.isActive, 
+  //                 bankName: result.data.bankName,
+  //                 userId : localStorage.getItem("userId"),
+  //               }
+  //               this.firebaseService.updateExpenses(result.data.id, payload).then((res: any) => {
+  //                   this.getExpensesList()
+  //               this.openConfigSnackBar('record update successfully')
+  //               }, (error) => {
                 
-                })
-              }
-            });
-          }
-          if (result?.event === 'Delete') {
-            this.firebaseService.deleteExpenses(result.data.id).then((res: any) => {
-                this.getExpensesList()
-                this.openConfigSnackBar('record delete successfully')
-            }, (error) => {
+  //               })
+  //             }
+  //           });
+  //         }
+  //         if (result?.event === 'Delete') {
+  //           this.firebaseService.deleteExpenses(result.data.id).then((res: any) => {
+  //               this.getExpensesList()
+  //               this.openConfigSnackBar('record delete successfully')
+  //           }, (error) => {
             
-            })
-          }
-        });
+  //           })
+  //         }
+  //       });
+  // }
+
+  addIncomeExpense(action: string, row: any) {
+    row.action = action;
+
+    const dialogRef = this.dialog.open(IncomeExpenseDialogComponent, {
+      data: row
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (!result) return;
+
+      if (result.event === 'Add') {
+        const payload = {
+          ...result.data,
+          userId: localStorage.getItem('userId')
+        };
+
+        await this.firebaseService.addExpenses(payload);
+
+        if (payload.status === 'Paid') {
+          await this.updateBalance(
+            payload.amount,
+            payload.accounttype,
+            payload.paymentStatus,
+            payload.bankName
+          );
+        }
+
+        this.getExpensesList();
+        this.openConfigSnackBar('record create successfully');
+      }
+
+      if (result.event === 'Edit') {
+        const oldData = this.incomeExpenseList.find(
+          e => e.id === result.data.id
+        );
+
+        if (oldData?.status === 'Paid') {
+          await this.reverseEntry(oldData);
+        }
+
+        if (result.data.status === 'Paid') {
+          await this.updateBalance(
+            result.data.amount,
+            result.data.accounttype,
+            result.data.paymentStatus,
+            result.data.bankName
+          );
+        }
+
+        await this.firebaseService.updateExpenses(
+          result.data.id,
+          result.data
+        );
+
+        this.getExpensesList();
+         this.openConfigSnackBar('record update successfully');
+      }
+
+      if (result.event === 'Delete') {
+
+        const oldData = this.incomeExpenseList.find(
+          e => e.id === result.data.id
+        );
+
+        if (!oldData) {
+          console.error('Old data not found for delete');
+          return;
+        }
+
+        if (oldData.status === 'Paid') {
+          await this.reverseEntry(oldData);
+        }
+
+        await this.firebaseService.deleteExpenses(oldData.id);
+
+        this.getExpensesList();
+          this.openConfigSnackBar('record delete successfully');
+      }
+    });
   }
 
 getBalanceList() {
