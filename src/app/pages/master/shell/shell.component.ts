@@ -462,7 +462,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
  
      doc.text(`Report Date: ${formattedStart} To ${formattedEnd}`, 14, 15);
  
-     const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.total), 0);
+     const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
      const FinalTotalAmount = Math.round(TotalAmounttotal).toLocaleString('en-IN', {
        minimumFractionDigits: 2,
        maximumFractionDigits: 2
@@ -486,7 +486,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
           (innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0),
           0
         ) || 0;
-        const totalAmount = item.total || 0;
+        const totalAmount = item.grandTotal || 0;
         return sum + (totalAmount - paymentReceived);
       }, 0);
  
@@ -519,7 +519,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
      0
    );
  
-   const totalAmount = item.total || 0;
+   const totalAmount = item.grandTotal || 0;
  
    const pendingAmount = totalAmount - paymentReceived;
        return [

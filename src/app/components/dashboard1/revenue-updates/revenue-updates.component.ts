@@ -50,11 +50,22 @@ export class AppRevenueUpdatesComponent {
 
   public revenueChart!: Partial<revenueChart> | any;
 
-  months: month[] = [
-    { value: 'mar', viewValue: 'March 2023' },
-    { value: 'apr', viewValue: 'April 2023' },
-    { value: 'june', viewValue: 'June 2023' },
-  ];
+currentYear: number = new Date().getFullYear();
+
+months: month[] = [
+  { value: 'jan', viewValue: `January ${this.currentYear}` },
+  { value: 'feb', viewValue: `February ${this.currentYear}` },
+  { value: 'mar', viewValue: `March ${this.currentYear}` },
+  { value: 'apr', viewValue: `April ${this.currentYear}` },
+  { value: 'may', viewValue: `May ${this.currentYear}` },
+  { value: 'jun', viewValue: `June ${this.currentYear}` },
+  { value: 'jul', viewValue: `July ${this.currentYear}` },
+  { value: 'aug', viewValue: `August ${this.currentYear}` },
+  { value: 'sep', viewValue: `September ${this.currentYear}` },
+  { value: 'oct', viewValue: `October ${this.currentYear}` },
+  { value: 'nov', viewValue: `November ${this.currentYear}` },
+  { value: 'dec', viewValue: `December ${this.currentYear}` },
+];
 
   constructor() {
     this.revenueChart = {
