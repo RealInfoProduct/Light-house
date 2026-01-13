@@ -45,15 +45,15 @@ export class AppTopCardsComponent implements OnInit{
     {
       id: 4,
       color: 'error',
-      img: '/assets/images/svgs/icon-favorites.svg',
-      title: 'Ava.Bank Balance',
+      img: '/assets/images/svgs/mobile-phone-766.svg',
+      title: 'Ava.Bank ',
       subtitle: 0,
     },
     {
       id: 5,
       color: 'success',
-      img: '/assets/images/svgs/icon-speech-bubble.svg',
-      title: 'Ava.Cash Balance',
+      img: '/assets/images/svgs/cash-payment-6401.svg',
+      title: 'Ava.Cash ',
       subtitle: 0,
     },
     {
@@ -73,11 +73,12 @@ export class AppTopCardsComponent implements OnInit{
     
     this.loaderService.setLoader(true)
     this.translate.get('dashboard').subscribe((res: any) => {
-      this.topcards[0].title = res[0].TotalFirm
-      this.topcards[1].title = res[1].TotalParty
-      this.topcards[5].title = res[4].TotalProduct
-      this.topcards[2].title = res[2].TotalInvoice
-      this.topcards[3].title = res[3].Ava.BankBalance
+      this.topcards[0].title = res[0].TotalFirm ;
+      this.topcards[1].title = res[1].TotalParty ;
+      this.topcards[2].title = res[2].TotalInvoice ;
+      this.topcards[3].title = res[3]?.Ava?.BankBalance ?? 'Ava.Bank';
+      this.topcards[5].title = res[4].TotalProduct;
+
     })
     this.loaderService.setLoader(false)
 
