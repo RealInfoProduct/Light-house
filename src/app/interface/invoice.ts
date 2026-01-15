@@ -93,6 +93,7 @@ export interface ShellList {
     customerAddress: string,
     total:number,
     extraDiscount :number,
+    otherKharch :number,
     grandTotal :number,
     paymentStatus :string,
      paymentReceived:string,
