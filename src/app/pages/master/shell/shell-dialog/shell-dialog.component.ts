@@ -138,14 +138,25 @@ export class ShellDialogComponent implements OnInit {
     this.calculateGrandTotalWithExtra();
   }
 
+  // calculateGrandTotalWithExtra() {
+  //   const total = Number(this.saleForm.get('total')?.value) || 0;
+  //   const extraDiscounts = Number(this.saleForm.get('extraDiscount')?.value) || 0;
+
+  //   const grandTotal = total - extraDiscounts;
+
+  //   this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
+  // }
   calculateGrandTotalWithExtra() {
-    const total = Number(this.saleForm.get('total')?.value) || 0;
-    const extraDiscounts = Number(this.saleForm.get('extraDiscount')?.value) || 0;
+  const total = Number(this.saleForm.get('total')?.value) || 0;
+  const extraDiscounts = Number(this.saleForm.get('extraDiscount')?.value) || 0;
+  const otherKharch = Number(this.saleForm.get('otherKharch')?.value) || 0;
 
-    const grandTotal = total - extraDiscounts;
+  // grandTotal = total - discount + otherKharch
+  const grandTotal = total - extraDiscounts + otherKharch;
 
-    this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
-  }
+  this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
+}
+
 
   calculatePending() {
     const grandTotal = Number(this.saleForm.get('grandTotal')?.value) || 0;
@@ -165,6 +176,16 @@ export class ShellDialogComponent implements OnInit {
     }
   }
 
+  onOtherKharchInput(event: any) {
+  let value = event.target.value;
+
+  if (value.length > 1 && value.startsWith('0')) {
+    event.target.value = value.replace(/^0+/, '');
+    this.saleForm.get('otherKharch')?.setValue(event.target.value);
+  }
+
+  this.calculateGrandTotalWithExtra();
+}
 
   setAutoBillNo() {
   this.firebaseService.getAllShell().subscribe((res: any) => {
@@ -195,6 +216,7 @@ export class ShellDialogComponent implements OnInit {
       grandTotal: [''],
       paymentReceived: [false],
       type: ['Income'],
+      otherKharch: [0],
       paymentStatus: ['Unpaid', Validators.required],
       shellDetails: this.fb.array([this.createSaleDetailGroup()]),
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
@@ -266,7 +288,8 @@ export class ShellDialogComponent implements OnInit {
 
   checkPaymentLimit() {
     const totalPayment = this.getTotalPaymentReceived();
-    const grandTotal = Number(this.saleForm.get('total')?.value) || 0;
+    // const grandTotal = Number(this.saleForm.get('total')?.value) || 0;
+    const grandTotal = Number(this.saleForm.get('grandTotal')?.value) || 0;
     this.paymentExceeded = totalPayment > grandTotal;
   }
 
@@ -299,6 +322,7 @@ export class ShellDialogComponent implements OnInit {
       extraDiscount: this.saleForm.value.extraDiscount,
       grandTotal: this.saleForm.value.grandTotal,
       paymentStatus: this.saleForm.value.paymentStatus,
+      otherKharch: this.saleForm.value.otherKharch,
       shellDetails: this.saleForm.value.shellDetails,
       paymentDetails: this.saleForm.value.paymentDetails
     }
