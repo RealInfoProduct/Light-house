@@ -193,6 +193,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
           extraDiscount: result.data.extraDiscount,
           mobileNumber: result.data.mobileNumber,
           grandTotal: result.data.grandTotal,
+          otherKharch: result.data.otherKharch,
           paymentStatus: result.data.paymentStatus,
           paymentReceived:result.data.paymentReceived,
           type: result.data.type,
@@ -262,6 +263,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
               extraDiscount: result.data.extraDiscount,
               grandTotal: result.data.grandTotal,
               paymentStatus: result.data.paymentStatus,
+              otherKharch: result.data.otherKharch,
                paymentReceived:result.data.paymentReceived,
                type: result.data.type,
               shellDetails: result.data.shellDetails.map((detail: any) => ({

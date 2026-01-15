@@ -173,6 +173,15 @@
       </div>
     </div>
 
+     <div class="row">
+        <div class="col-12 col-md-3">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Other Kharch</mat-label>
+            <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"   (input)="onOtherKharchInput($event)"/>
+          </mat-form-field>
+        </div>
+      </div>
+
      <div>
       <section class="example-section">
         <mat-checkbox formControlName="paymentReceived">
