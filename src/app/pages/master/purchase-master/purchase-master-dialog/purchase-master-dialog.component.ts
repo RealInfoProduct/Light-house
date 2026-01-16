@@ -21,6 +21,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
   pendingAmount: number = 0;
   paymentDays = new Date()
   balanceList: any = []
+  bank: any =[];
 
   StatusList: any[] = [
     { type: 'Pending' },
@@ -193,16 +194,40 @@ export class PurchaseMasterDialogComponent implements OnInit {
     const group = this.fb.group({
       paymentR: [0, Validators.min(0)],
       paymentReceivedDate: [new Date()],
-      paymentType: ['Cash'],
+      paymentType: [''],
       bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
     });
+      group.valueChanges.subscribe(() => {
+    this.checkPaymentError(group);
+  });
 
 
     return group;
   }
+
+checkPaymentError(group: FormGroup) {
+  const paymentType = group.get('paymentType')?.value;
+  const amount = Number(group.get('paymentR')?.value) || 0;
+  this.bank = group.get('bankName')?.value;
+
+  group.get('paymentR')?.setErrors(null);
+  if (paymentType === 'Cash') {
+    if (amount > this.balanceList?.cashBalance) {
+      group.get('paymentR')?.setErrors({ cashExceeded: true });
+    }
+  }
+
+  if (paymentType === 'G-Pay' && this.bank?.balance !== undefined) {
+    if (amount > this.bank.balance) {
+      group.get('paymentR')?.setErrors({ insufficientBalance: true });
+    }
+  }
+}
+
+
 
   getTotalPaymentReceived(): number {
     return this.paymentDetails.controls.reduce((sum, ctrl) => {
@@ -424,6 +449,9 @@ export class PurchaseMasterDialogComponent implements OnInit {
     }
     this.calculateGrandTotal();
   }
+
+
+
 
 
 }

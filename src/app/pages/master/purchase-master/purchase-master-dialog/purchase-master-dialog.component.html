@@ -142,6 +142,9 @@
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received </mat-label>
             <input type="number" matInput required formControlName="paymentR" placeholder="Total" min="0" />
+              <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('cashExceeded')">
+               Cash Amount {{ balanceList?.cashBalance | number:'1.2-2' }}
+          </mat-error>
           </mat-form-field>
         </div>
 
@@ -170,7 +173,10 @@
               <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br> ({{item.mobileNumber}})</mat-option>
             </mat-select>
           </mat-form-field>
-         </div>
+          <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('insufficientBalance')">
+            Selected bank Amount {{ bank?.balance | number:'1.2-2' }}
+          </mat-error>
+          </div>
 
         <div class=" d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
