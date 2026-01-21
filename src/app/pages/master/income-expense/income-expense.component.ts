@@ -424,7 +424,7 @@ filedownload() {
  const notes = this.partyList.find((prod: any) => prod.id === item.notes)?.partyName || item.notes;
       return [
         i + 1,
-        item.billNo,
+        item.billNo && item.invoiceNo ? `${item.invoiceNo}(${item.billNo})` : item.billNo || item.invoiceNo || '',
         dateStr,
         item.status,
         item.accounttype,

@@ -155,6 +155,7 @@ export class ShellDialogComponent implements OnInit {
   const grandTotal = total - extraDiscounts + otherKharch;
 
   this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
+  this.calculatePending();
 }
 
 

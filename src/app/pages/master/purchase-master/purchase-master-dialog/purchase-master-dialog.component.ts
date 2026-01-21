@@ -434,7 +434,7 @@ checkPaymentError(group: FormGroup) {
         );
 
         if (selectedCategory) {
-          formGroup.get('category')?.setValue(selectedCategory);
+          formGroup?.get('category')?.setValue(selectedCategory);
         }
       }
     });
