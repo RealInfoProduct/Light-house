@@ -68,6 +68,7 @@ export class AppTopCardsComponent implements OnInit{
   firmList:any [] =[];
   partyList :any [] =[];
   shellList :any [] =[];
+  categoryList :any [] =[];
 
   constructor(private firebaseService : FirebaseService, private loaderService : LoaderService , private translate : TranslateService){
     
@@ -87,8 +88,9 @@ export class AppTopCardsComponent implements OnInit{
   ngOnInit(): void {
       this.getFirmList();
       this.getPartyList();
-      this. getShellList(); 
-      this.getBalanceList() ;
+      this.getShellList(); 
+      this.getBalanceList();
+      this.getCategoryList();
   }
 
     getFirmList() {
@@ -115,7 +117,7 @@ export class AppTopCardsComponent implements OnInit{
       }
 
 
-        getShellList() {
+     getShellList() {
           this.loaderService.setLoader(true)
           this.firebaseService.getAllShell().subscribe((res: any) => {
             if (res) {
@@ -125,26 +127,37 @@ export class AppTopCardsComponent implements OnInit{
             this.loaderService.setLoader(false)
       
           })
-        }
+       }
 
-  getBalanceList() {
-    this.loaderService.setLoader(true);
+      getBalanceList() {
+        this.loaderService.setLoader(true);
 
-    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
-      const userData = res.find(
-        item => item.userId === localStorage.getItem('userId')
-      );
-      if (userData) {
-        let totalBankBalance = 0;
-        userData.bankDetails?.forEach((bank: any) => {
-          totalBankBalance += parseFloat(bank.balance) || 0;
-        }
-        );
-        this.topcards[3].subtitle = totalBankBalance;
+        this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+          const userData = res.find(
+            item => item.userId === localStorage.getItem('userId')
+          );
+          if (userData) {
+            let totalBankBalance = 0;
+            userData.bankDetails?.forEach((bank: any) => {
+              totalBankBalance += parseFloat(bank.balance) || 0;
+            }
+            );
+            this.topcards[3].subtitle = totalBankBalance;
 
-        this.topcards[4].subtitle = userData.cashBalance || 0;
+            this.topcards[4].subtitle = userData.cashBalance || 0;
+          }
+          this.loaderService.setLoader(false);
+        });
       }
-      this.loaderService.setLoader(false);
-    });
-  }
+
+        getCategoryList() {
+          this.loaderService.setLoader(true)
+          this.firebaseService.getAllCategory().subscribe((res: any) => {
+            if (res) {
+              this.categoryList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+               this.topcards[5].subtitle = this.categoryList.length;
+              this.loaderService.setLoader(false)
+            }
+          })
+        }
 }
