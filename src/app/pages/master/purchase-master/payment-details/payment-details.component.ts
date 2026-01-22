@@ -14,7 +14,8 @@ export class PaymentDetailsComponent implements OnInit {
     'srno',
     'paymentR',
     'paymentReceivedDate',
-    'paymenttype'
+    'paymenttype',
+      'bank'
   ];
 
   Viewpayment: any = {};
