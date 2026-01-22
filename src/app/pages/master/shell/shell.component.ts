@@ -287,7 +287,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
        
 
           const oldExpense = this.incomeExpenseList.find(
-        (el: any) => el.billNo === result.data.billNumber && el.notes === result.data.customerName
+        (el: any) => el.invoiceNo === result.data.invoiceNo
       );
 
       const expensePayload: ExpensesList = {
