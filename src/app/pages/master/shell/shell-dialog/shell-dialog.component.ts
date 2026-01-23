@@ -65,6 +65,7 @@ export class ShellDialogComponent implements OnInit {
             companyName: detail.companyName,
             category: detail.category,
             qty: detail.qty,
+            warranty:detail.warranty,
             productPrice: detail.productPrice,
             discount: detail.discount,
             subTotal: detail.subTotal,
@@ -234,6 +235,7 @@ export class ShellDialogComponent implements OnInit {
       companyName: [''],
       category: [''],
       qty: [],
+      warranty: [],
       productPrice: [0],
       discount: [0],
       subTotal: [0],
@@ -352,6 +354,18 @@ export class ShellDialogComponent implements OnInit {
       group.get('qty')?.setValue('');
     }
   }
+
+  onCategoryChange(event: any, index: number) {
+     const group = this.shellDetails.at(index) as FormGroup;
+  const selectedCategory = event.value;
+
+  if (selectedCategory && selectedCategory.warrantyPeriods != null) {
+   group.get('warranty')?.setValue(selectedCategory.warrantyPeriods);
+  } else {
+   group.get('warranty')?.setValue(null);
+  }
+}
+
 
   closeDialog(): void {
     this.dialogRef.close({ event: 'Cancel' });
