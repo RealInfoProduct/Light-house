@@ -38,6 +38,11 @@ export const navItems: NavItem[] = [
     route: '/master/shellmaster',
   },
   {
+    displayName: 'Warranty Master',
+    iconName: 'file-invoice',
+    route: '/master/warrantymaster',
+  },
+  {
     displayName: 'Income/Expense',
     iconName: 'presentation-analytics',
      route: '/master/income-expense',
