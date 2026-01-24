@@ -8,6 +8,7 @@ import { PurchaseMasterComponent } from './purchase-master/purchase-master.compo
 import { ShellComponent } from './shell/shell.component';
 import { IncomeExpenseComponent } from './income-expense/income-expense.component';
 import { BalanceComponent } from './balance/balance.component';
+import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
 
 
 
@@ -68,6 +69,17 @@ export const MasterRoutes: Routes = [
           urls: [
             { title: 'Master', url: '/master/shellmaster' },
             { title: 'Shell Master' },
+          ],
+        },
+      },
+      {
+        path: 'warrantymaster',
+        component: WarrantyMasterComponent,
+        data: {
+          title: 'Warranty Master',
+          urls: [
+            { title: 'Master', url: '/master/warrantymaster' },
+            { title: 'Warranty Master' },
           ],
         },
       },

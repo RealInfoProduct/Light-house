@@ -28,6 +28,8 @@ import { SalePaymentDetailsComponent } from './shell/sale-payment-details/sale-p
 import { IncomeExpenseComponent } from './income-expense/income-expense.component';
 import { IncomeExpenseDialogComponent } from './income-expense/income-expense-dialog/income-expense-dialog.component';
 import { BalanceComponent } from './balance/balance.component';
+import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
+import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warranty-dialog.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +50,8 @@ import { BalanceComponent } from './balance/balance.component';
     IncomeExpenseComponent,
     IncomeExpenseDialogComponent,
     BalanceComponent,
+    WarrantyMasterComponent,
+    WarrantyDialogComponent,
   ],
   imports: [
     CommonModule,

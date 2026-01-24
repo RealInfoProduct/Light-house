@@ -1,0 +1,31 @@
+<mat-card class="cardWithShadow">
+  <mat-card-content class="p-24">
+    <div class="row justify-content-between">
+      <div class="col-lg-3">
+        <mat-form-field appearance="outline" class="w-100 hide-hint">
+          <input matInput placeholder="Search Warranty" (keyup)="applyFilter($any($event.target).value)"  />
+          <mat-icon matSuffix>
+            <i-tabler name="search" class="icon-20"></i-tabler>
+          </mat-icon>
+        </mat-form-field>
+      </div>
+       <div class="col-lg-3 invoicedate-range">
+         <mat-form-field appearance="outline" class="w-100  hide-hint">
+            <mat-label>Select Warranty Date</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [formGroup]="dateWarrantyListForm">
+              <input matStartDate placeholder="Start date" formControlName="start">
+              <input matEndDate placeholder="End date" formControlName="end">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker (closed)="filterDate()"></mat-date-range-picker>
+          </mat-form-field>
+       </div>
+       <div class="col-lg-2 m-t-10 file-download"></div>
+      <div class="col-lg-4 d-flex align-items-center justify-content-end">
+        <button mat-flat-button color="primary" (click)="addWarranty('Add', {})">
+          Add  Warranty
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
