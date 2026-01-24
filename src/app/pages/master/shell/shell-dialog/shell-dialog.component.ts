@@ -70,7 +70,16 @@ export class ShellDialogComponent implements OnInit {
             discount: detail.discount,
             subTotal: detail.subTotal,
           });
+          const stockCount = detail.category?.stockCount || 0;
+          const oldQty = Number(detail.qty || 0);
+          formGroup.get('qty')?.setValidators([
+            Validators.required,
+            Validators.min(1),
+            this.stockQtyValidator(stockCount, oldQty)
+          ]);
+          formGroup.get('qty')?.updateValueAndValidity();
         }
+        
       });
       // this.local_data.paymentDetails.forEach((detail: any, index: number) => {
       //   if (index > 0) this.addpaymentDetail();
@@ -234,7 +243,7 @@ export class ShellDialogComponent implements OnInit {
       saleDate: [new Date()],
       companyName: [''],
       category: [''],
-      qty: [],
+      qty: [null, [Validators.required, Validators.min(1)]],
       warranty: [],
       productPrice: [0],
       discount: [0],
@@ -244,15 +253,15 @@ export class ShellDialogComponent implements OnInit {
       this.calculateSubTotal(group);
     });
 
-     group.get('category')?.valueChanges.subscribe((selectedCategory: any) => {
-    const stockCount = selectedCategory ? selectedCategory.stockCount : 0;
-    group.get('qty')?.setValidators([
-      Validators.required,
-      Validators.min(1),
-      this.stockQtyValidator(stockCount)
-    ]);
-    group.get('qty')?.updateValueAndValidity({ emitEvent: false });
-   });
+  //    group.get('category')?.valueChanges.subscribe((selectedCategory: any) => {
+  //   const stockCount = selectedCategory ? selectedCategory.stockCount : 0;
+  //   group.get('qty')?.setValidators([
+  //     Validators.required,
+  //     Validators.min(1),
+  //     this.stockQtyValidator(stockCount)
+  //   ]);
+  //   group.get('qty')?.updateValueAndValidity({ emitEvent: false });
+  //  });
     
     return group;
   }
@@ -355,15 +364,30 @@ export class ShellDialogComponent implements OnInit {
     }
   }
 
-  onCategoryChange(event: any, index: number) {
-     const group = this.shellDetails.at(index) as FormGroup;
+onCategoryChange(event: any, index: number) {
+  const group = this.shellDetails.at(index) as FormGroup;
   const selectedCategory = event.value;
-
-  if (selectedCategory && selectedCategory.warrantyPeriods != null) {
+if (selectedCategory && selectedCategory.warrantyPeriods != null) {
    group.get('warranty')?.setValue(selectedCategory.warrantyPeriods);
   } else {
    group.get('warranty')?.setValue(null);
   }
+  if (!selectedCategory) return;
+
+  const stockCount = selectedCategory.stockCount || 0;
+
+  let oldQty = 0;
+  if (this.action === 'Edit' && this.local_data?.shellDetails?.[index]) {
+    oldQty = Number(this.local_data.shellDetails[index]?.qty || 0);
+  }
+
+  group.get('qty')?.setValidators([
+    Validators.required,
+    Validators.min(1),
+    this.stockQtyValidator(stockCount, oldQty)
+  ]);
+
+  group.get('qty')?.updateValueAndValidity();
 }
 
 
@@ -418,18 +442,17 @@ export class ShellDialogComponent implements OnInit {
     });
   }
 
-  stockQtyValidator(stockCount: number): ValidatorFn {
+
+   stockQtyValidator(stockCount: number, oldQty: number = 0): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const qty = Number(control.value) || 0;
-  
-      if (stockCount === 0 && qty > 0) {
-        return { outOfStock: true };
-      }
-  
-      if (qty > stockCount) {
+
+      const availableStock = stockCount + oldQty;
+
+      if (qty > availableStock) {
         return { exceedsStock: true };
       }
-  
+
       return null;
     };
   }
