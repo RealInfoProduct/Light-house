@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { addDoc, collectionData, deleteDoc, doc, Firestore,  updateDoc } from '@angular/fire/firestore';
-import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList, ExpensesList, BalanceList } from '../interface/invoice';
+import {  RegisterUser, PartyList, FirmList, PurchaseList, CategoryList, ShellList, ExpensesList, BalanceList, WarrantyList } from '../interface/invoice';
 import { collection, setDoc } from '@firebase/firestore';
 import { Auth } from '@angular/fire/auth';
 
@@ -198,6 +198,31 @@ export class FirebaseService {
 
   deleteBalance(deleteId: any) {
     let docRef = doc(collection(this.fService, 'BalanceList'), deleteId);
+    return deleteDoc(docRef)
+  }
+
+////////////////////// warranty List Data ////////////////////////
+
+
+  addWarranty(payload: WarrantyList) {
+    payload.id = doc(collection(this.fService, 'id')).id
+    return addDoc(collection(this.fService, 'WarrantyList'), payload)
+  }
+
+
+  getAllWarranty() {
+    let dataRef = collection(this.fService, 'WarrantyList')
+    return collectionData(dataRef, { idField: 'id' })
+  }
+
+  updateWarranty(updateId: WarrantyList, payload: any) {
+    let dataRef = doc(this.fService, `WarrantyList/${updateId}`);
+    return updateDoc(dataRef, payload)
+  }
+
+
+  deleteWarranty(deleteId: any) {
+    let docRef = doc(collection(this.fService, 'WarrantyList'), deleteId);
     return deleteDoc(docRef)
   }
 

@@ -116,6 +116,27 @@ export interface ShellList {
     }[];
 }
 
+export interface WarrantyList {
+    id: string,
+    billNumber: number,
+    invoiceNo: number,
+    date: string,
+    customerName: string,
+    mobileNumber: string,
+    customerAddress: string,
+    userId: any,
+    shellDetails: {
+       saleDate:string,
+       warrantyDate:string,
+       companyName:string,
+       category:string,
+       qty: number,
+       warranty: number,
+       warrantyType:string,
+    }[];
+     
+}
+
 export interface ExpensesList {
     id:any,
     billNo?:any,
