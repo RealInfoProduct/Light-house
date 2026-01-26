@@ -56,11 +56,32 @@ export class WarrantyMasterComponent  implements OnInit{
 
   
   applyFilter(filterValue: string): void {
-    // this.shellDataSource.filter = filterValue.trim().toLowerCase();
+    this.warrantyDataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  filterDate (){
-    
+  filterDate() {
+    if (!this.warrantyList) return;
+    const startDate = this.dateWarrantyListForm.value.start ? new Date(this.dateWarrantyListForm.value.start) : null;
+    const endDate = this.dateWarrantyListForm.value.end ? new Date(this.dateWarrantyListForm.value.end) : null;
+
+    if (startDate && endDate) {
+      this.warrantyDataSource.data = this.warrantyList.filter((invoice: any) => {
+        if (!invoice.date) return false;
+
+        let invoiceDate;
+        if (invoice.date.toDate) {
+          invoiceDate = invoice.date.toDate();
+        } else if (invoice.date instanceof Date) {
+          invoiceDate = invoice.date;
+        } else {
+          return false;
+        }
+
+        return invoiceDate >= startDate && invoiceDate <= endDate;
+      });
+    } else {
+      this.warrantyDataSource.data = this.warrantyList;
+    }
   }
 
   addWarranty(action:any, obj:any){
@@ -106,10 +127,11 @@ export class WarrantyMasterComponent  implements OnInit{
     this.firebaseService.getAllWarranty().subscribe((res: any) => {
       if (res) {
         this.warrantyList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
-         this.warrantyDataSource = new MatTableDataSource(this.warrantyList);
-        this.warrantyDataSource.paginator = this.paginator;
-        this.loaderService.setLoader(false)
       }
+      this.filterDate()
+       this.warrantyDataSource = new MatTableDataSource(this.warrantyList);
+      this.warrantyDataSource.paginator = this.paginator;
+      this.loaderService.setLoader(false)
     })
   }
 
