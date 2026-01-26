@@ -18,7 +18,12 @@ export class WarrantyDialogComponent implements OnInit {
   companyList: any[] = [];
   shellList: any[] = [];
 
-  filteredWarrantyProducts: any = []
+  filteredWarrantyProducts: any  = []
+  warrantyTypeList : any [] =[
+   'Pending',
+   'in Progress',
+   'Completed'
+  ]
 
   constructor(
     private fb: FormBuilder,
@@ -35,6 +40,31 @@ export class WarrantyDialogComponent implements OnInit {
     this.buildForm();
     this.getCategoryList();
     this.getShellList();
+     if (this.action === 'Edit') {
+      this.warrantyForm.patchValue(this.local_data);
+        this.warrantyForm.get('date')?.setValue(new Date(this.local_data.date.toDate()));
+      this.local_data.shellDetails?.forEach((detail: any, index: number) => {
+        if (index > 0) this.addShellDetail();
+        const formGroup = this.shellDetails.at(index) as FormGroup;
+        if (formGroup) {
+           const SaleDate = detail.saleDate
+            ? new Date(detail.saleDate.seconds * 1000)
+            : null;
+           const WarrantyDate = detail.warrantyDate
+            ? new Date(detail.warrantyDate.seconds * 1000)
+            : null;
+          formGroup.patchValue({
+            saleDate:SaleDate,
+            warrantyDate: WarrantyDate,
+            companyName: detail.companyName,
+            category: detail.category,
+            qty: detail.qty,
+            warranty: detail.warranty,
+            warrantyType: detail.warrantyType,
+          });
+        }
+      });
+    }
   }
 
   getShellList() {
@@ -70,9 +100,7 @@ export class WarrantyDialogComponent implements OnInit {
       category: [''],
       qty: [],
       warranty: [],
-      productPrice: [0],
-      discount: [0],
-      subTotal: [0],
+      warrantyType:['']
     });
     group.get('saleDate')?.valueChanges.subscribe(() => this.updateWarrantyDate(group));
     group.get('warranty')?.valueChanges.subscribe(() => this.updateWarrantyDate(group));
@@ -106,9 +134,9 @@ export class WarrantyDialogComponent implements OnInit {
             index === self.findIndex((t: any) => t.companyName === item.companyName)
         );
 
-        if (this.action === 'Edit') {
-          this.setCompanyAndCategoryEdit();
-        }
+        // if (this.action === 'Edit') {
+        //   this.setCompanyAndCategoryEdit();
+        // }
       }
       this.loaderService.setLoader(false);
     });
@@ -124,15 +152,15 @@ export class WarrantyDialogComponent implements OnInit {
 
       if (selectedCompany) {
         formGroup?.get('companyName')?.setValue(selectedCompany);
-
+        
         formGroup?.get('category')?.enable();
-
+        
         this.filteredCategoryList[index] = this.categoryList.filter(
           (cat: any) => cat.companyName === selectedCompany.companyName
         );
-
+        
         const selectedCategory = this.filteredCategoryList[index].find(
-          (cat: any) => cat.id === detail.category || cat.categoryName === detail.category
+          (cat: any) => cat.id === detail.category || cat.category === detail.category
         );
 
         if (selectedCategory) {
@@ -197,28 +225,33 @@ export class WarrantyDialogComponent implements OnInit {
     selectedInvoice.shellDetails?.forEach((item: any, index: number) => {
       const group = this.createSaleDetailGroup();
 
+      const companyid = this.categoryList.find((cat: any) => cat.id === item.companyName).companyName;
+      const categoryid = this.categoryList.find((cat: any) => cat.id === item.category).category;
+      const keySpecifiCationsid = this.categoryList.find((cat: any) => cat.id === item.category).keySpecifiCations;
+
       group.patchValue({
         saleDate: this.convertToDate(item.saleDate),
-        companyName: item.companyName,
-        category: item.category,
+        companyName:companyid,
+        category: categoryid + ' ' + keySpecifiCationsid,
         qty: item.qty,
-        warranty: item.warranty
+        warranty: item.warranty,
+        warrantyDate: item.warrantyDate,
+        warrantyType: item.warrantyType || ''
       });
 
       this.shellDetails.push(group);
 
-      if (item.companyName) {
-        this.filteredCategoryList[index] = this.categoryList.filter(
-          (cat: any) => cat.companyName === item.companyName
-        );
-      }
+      // if (item.companyName) {
+      //   this.filteredCategoryList[index] = this.categoryList.find(
+      //     (cat: any) => cat.id === item.companyName
+      //   );
+      // }
 
-      if (item.category) {
-        this.filteredCategoryList[index] = this.categoryList.filter(
-          (cat: any) => cat.id === item.category
-        );
-
-      }
+      // if (item.category) {
+      //   this.filteredCategoryList[index] = this.categoryList.find(
+      //     (cat: any) => cat.id === item.category
+      //   );
+      // }
       this.updateWarrantyDate(group, item.saleDate, item.warranty);
     });
   }
@@ -249,7 +282,26 @@ export class WarrantyDialogComponent implements OnInit {
     warrantyDate.setFullYear(warrantyDate.getFullYear() + wholeYears);
     warrantyDate.setMonth(warrantyDate.getMonth() + monthsToAdd);
 
-    group.get('warrantyDate')?.setValue(warrantyDate);
+    group?.get('warrantyDate')?.setValue(warrantyDate);
   }
 
+  warrantyPayload(){
+     const payload = {
+      id: this.local_data.id ? this.local_data.id : '',
+      invoiceNo: this.warrantyForm.value.invoiceNo,
+      billNumber: this.warrantyForm.value.billNumber,
+      date: this.warrantyForm.value.date,
+      customerName: this.warrantyForm.value.customerName,
+      mobileNumber: this.warrantyForm.value.mobileNumber,
+      customerAddress: this.warrantyForm.value.customerAddress,
+      shellDetails: this.warrantyForm.value.shellDetails
+    }
+    this.dialogRef.close({ event: this.action, data: payload })
+    console.log(payload);
+    
+  }
+
+  closeDialog(){
+     this.dialogRef.close({ event: 'Cancel' });
+  }
 }

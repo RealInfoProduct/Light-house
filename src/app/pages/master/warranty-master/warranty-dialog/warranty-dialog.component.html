@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Warranty</h2>
-<mat-dialog-content class="mat-typography" style="max-width: 1200px">
+<mat-dialog-content class="mat-typography" style="max-width: 1200px" *ngIf="action !== 'Delete'; else elseTemplate" >
     <form [formGroup]="warrantyForm">
         <div class="row">
             <div class="col-12 col-md-4">
@@ -77,7 +77,7 @@
                     </mat-form-field>
                 </div>
 
-                <div class="in-width">
+                <!-- <div class="in-width">
                     <mat-form-field appearance="outline" class="w-100 m-t-10">
                         <mat-label>Company Name</mat-label>
                         <mat-select formControlName="companyName" placeholder="Company Name"
@@ -95,6 +95,21 @@
                             <mat-option [value]="item.id" *ngFor="let item of filteredCategoryList[i]">
                                 {{item.category}} - {{item.keySpecifiCations}}</mat-option>
                         </mat-select>
+                    </mat-form-field>
+                </div> -->
+
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Company Name</mat-label>
+                        <input type="text" matInput formControlName="companyName" placeholder="Company Name" />
+                    </mat-form-field>
+                </div>
+
+                <div class="in-widths">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Category Name</mat-label>
+                        <input type="text" matInput formControlName="category" placeholder="Category Name" />
                     </mat-form-field>
                 </div>
 
@@ -123,7 +138,14 @@
                     </mat-form-field>
                 </div>
 
-
+                  <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Warranty Type</mat-label>
+                        <mat-select formControlName="warrantyType" placeholder="Warranty Type">
+                            <mat-option [value]="item" *ngFor="let item of warrantyTypeList">{{item}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
 
                 <div class="add-width d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="shellDetails.length > 1">
@@ -135,5 +157,25 @@
         </div>
             </div>
         </div>
-    </form>
+   <mat-divider></mat-divider>
+    <mat-dialog-actions class="p-24 justify-content-end">
+      <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!warrantyForm.valid" color="primary"
+        (click)="warrantyPayload();">
+        {{'actions.' + action | translate}}
+      </button>
+    </mat-dialog-actions>
+  </form>
 </mat-dialog-content>
+<ng-template #elseTemplate>
+  <div class="p-x-24">
+    <p>Sure to delete <span class="f-w-600">{{local_data.Name}}</span> ?</p>
+  </div>
+  <mat-divider></mat-divider>
+  <div mat-dialog-actions class="p-x-24 p-b-24 m-t-10 justify-content-end">
+    <button mat-button (click)="warrantyPayload()" mat-flat-button color="warn">
+      {{'actions.' + action | translate}}
+    </button>
+    <button mat-stroked-button color="warn" (click)="closeDialog()" class="m-l-8">Cancel</button>
+  </div>
+</ng-template>
