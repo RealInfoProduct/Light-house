@@ -3,26 +3,27 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
+import { ViewShellComponent } from '../../shell/view-shell/view-shell.component';
 
 @Component({
-  selector: 'app-view-shell',
-  templateUrl: './view-shell.component.html',
-  styleUrls: ['./view-shell.component.scss']
+  selector: 'app-view-warranty',
+  templateUrl: './view-warranty.component.html',
+  styleUrls: ['./view-warranty.component.scss']
 })
-export class ViewShellComponent implements OnInit {
+export class ViewWarrantyComponent implements OnInit {
   displayedColumns: string[] = [
     'srno',
     'Date',
     'companyName',
     'category',
     'qty',
-    'prouctPrice',
-    'discount',
-    'finalTotal',
+    'warranty',
+    'warrantyDate',
+    'warrantyType',
   ];
 
   Viewcompany: any = {};
-  shellList: any[] = []
+  warrantyList: any[] = []
   categoryList: any[] = []
 
 
@@ -39,7 +40,7 @@ export class ViewShellComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getShellList();
+    this.getWarrantyList()
     this.getCategoryList()
 
     const details = this.Viewcompany.shellDetails;
@@ -49,16 +50,28 @@ export class ViewShellComponent implements OnInit {
 
   }
 
-  getShellList() {
-    this.loaderService.setLoader(true)
-    this.firebaseService.getAllShell().subscribe((res: any) => {
-      if (res) {
-        this.shellList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
-        this.loaderService.setLoader(false)
-      }
-    })
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'Completed':
+        return 'status-Completed';
+      case 'in Progress':
+        return 'status-inProgress';
+      case 'Pending':
+        return 'status-Pending';
+      default:
+        return '';
+    }
   }
 
+  getWarrantyList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllWarranty().subscribe((res: any) => {
+      if (res) {
+        this.warrantyList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+      }
+      this.loaderService.setLoader(false)
+    })
+  }
 
   getCategoryList() {
     this.loaderService.setLoader(true)

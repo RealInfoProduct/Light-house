@@ -18,11 +18,11 @@ export class WarrantyDialogComponent implements OnInit {
   companyList: any[] = [];
   shellList: any[] = [];
 
-  filteredWarrantyProducts: any  = []
-  warrantyTypeList : any [] =[
-   'Pending',
-   'in Progress',
-   'Completed'
+  filteredWarrantyProducts: any = []
+  warrantyTypeList: any[] = [
+    'Pending',
+    'in Progress',
+    'Completed'
   ]
 
   constructor(
@@ -40,21 +40,21 @@ export class WarrantyDialogComponent implements OnInit {
     this.buildForm();
     this.getCategoryList();
     this.getShellList();
-     if (this.action === 'Edit') {
+    if (this.action === 'Edit') {
       this.warrantyForm.patchValue(this.local_data);
-        this.warrantyForm.get('date')?.setValue(new Date(this.local_data.date.toDate()));
+      this.warrantyForm.get('date')?.setValue(new Date(this.local_data.date.toDate()));
       this.local_data.shellDetails?.forEach((detail: any, index: number) => {
         if (index > 0) this.addShellDetail();
         const formGroup = this.shellDetails.at(index) as FormGroup;
         if (formGroup) {
-           const SaleDate = detail.saleDate
+          const SaleDate = detail.saleDate
             ? new Date(detail.saleDate.seconds * 1000)
             : null;
-           const WarrantyDate = detail.warrantyDate
+          const WarrantyDate = detail.warrantyDate
             ? new Date(detail.warrantyDate.seconds * 1000)
             : null;
           formGroup.patchValue({
-            saleDate:SaleDate,
+            saleDate: SaleDate,
             warrantyDate: WarrantyDate,
             companyName: detail.companyName,
             category: detail.category,
@@ -100,7 +100,7 @@ export class WarrantyDialogComponent implements OnInit {
       category: [''],
       qty: [],
       warranty: [],
-      warrantyType:['']
+      warrantyType: ['']
     });
     group.get('saleDate')?.valueChanges.subscribe(() => this.updateWarrantyDate(group));
     group.get('warranty')?.valueChanges.subscribe(() => this.updateWarrantyDate(group));
@@ -152,13 +152,13 @@ export class WarrantyDialogComponent implements OnInit {
 
       if (selectedCompany) {
         formGroup?.get('companyName')?.setValue(selectedCompany);
-        
+
         formGroup?.get('category')?.enable();
-        
+
         this.filteredCategoryList[index] = this.categoryList.filter(
           (cat: any) => cat.companyName === selectedCompany.companyName
         );
-        
+
         const selectedCategory = this.filteredCategoryList[index].find(
           (cat: any) => cat.id === detail.category || cat.category === detail.category
         );
@@ -231,7 +231,7 @@ export class WarrantyDialogComponent implements OnInit {
 
       group.patchValue({
         saleDate: this.convertToDate(item.saleDate),
-        companyName:companyid,
+        companyName: companyid,
         category: categoryid + ' ' + keySpecifiCationsid,
         qty: item.qty,
         warranty: item.warranty,
@@ -285,8 +285,8 @@ export class WarrantyDialogComponent implements OnInit {
     group?.get('warrantyDate')?.setValue(warrantyDate);
   }
 
-  warrantyPayload(){
-     const payload = {
+  warrantyPayload() {
+    const payload = {
       id: this.local_data.id ? this.local_data.id : '',
       invoiceNo: this.warrantyForm.value.invoiceNo,
       billNumber: this.warrantyForm.value.billNumber,
@@ -298,10 +298,10 @@ export class WarrantyDialogComponent implements OnInit {
     }
     this.dialogRef.close({ event: this.action, data: payload })
     console.log(payload);
-    
+
   }
 
-  closeDialog(){
-     this.dialogRef.close({ event: 'Cancel' });
+  closeDialog() {
+    this.dialogRef.close({ event: 'Cancel' });
   }
 }

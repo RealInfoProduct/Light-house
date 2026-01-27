@@ -14,32 +14,32 @@ import { LoaderService } from 'src/app/services/loader.service';
   styleUrls: ['./balance.component.scss']
 })
 export class BalanceComponent implements OnInit, AfterViewInit {
-  balanceForm:FormGroup
-  totalBalance:any = 0
+  balanceForm: FormGroup
+  totalBalance: any = 0
   selectedBankIndex: number | null = null;
-  balanceList:any =[]
+  balanceList: any = []
 
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
-   @ViewChild(MatPaginator) paginator: MatPaginator
+  @ViewChild(MatPaginator) paginator: MatPaginator
 
-  constructor( private fb: FormBuilder,
-    private firebaseService : FirebaseService,
-            private loaderService : LoaderService, private _snackBar: MatSnackBar,
-           @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
+  constructor(private fb: FormBuilder,
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService, private _snackBar: MatSnackBar,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
   ngOnInit(): void {
-  this.balanceFormList()
-  } 
-
-  ngAfterViewInit(): void {
-      this.getBalanceList()
+    this.balanceFormList()
   }
 
-   balanceFormList() {
+  ngAfterViewInit(): void {
+    this.getBalanceList()
+  }
+
+  balanceFormList() {
     this.balanceForm = this.fb.group({
       cashBalance: [0],
-       bankDetails: this.fb.array([this.createBankDetailGroup()])
+      bankDetails: this.fb.array([this.createBankDetailGroup()])
     })
   }
 
@@ -49,16 +49,16 @@ export class BalanceComponent implements OnInit, AfterViewInit {
       // selected: [data?.selected || false],
       bankName: [data?.bankName || ''],
       accountHolderName: [data?.accountHolderName || ''],
-      mobileNumber: [data?.mobileNumber || '',[Validators.required,Validators.pattern(/^\d{10}$/)]],
-      balance: [data?.balance || 0 ]
+      mobileNumber: [data?.mobileNumber || '', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      balance: [data?.balance || 0]
     });
   }
 
-   generateUniqueId(): string {
+  generateUniqueId(): string {
     return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
   }
 
-    get bankDetails(): FormArray {
+  get bankDetails(): FormArray {
     return this.balanceForm.get('bankDetails') as FormArray;
   }
 
@@ -67,9 +67,9 @@ export class BalanceComponent implements OnInit, AfterViewInit {
     this.bankDetails.push(this.createBankDetailGroup());
   }
 
- removeBankDetail(index: number) {
+  removeBankDetail(index: number) {
     this.bankDetails.removeAt(index);
-    const selectedBank = this.balanceList?.bankDetails?.find((id:any) => id.selected);
+    const selectedBank = this.balanceList?.bankDetails?.find((id: any) => id.selected);
     if (!selectedBank) return;
     this.firebaseService.deleteBalance(selectedBank.id).then((res: any) => {
       this.saveBalance();
@@ -81,7 +81,7 @@ export class BalanceComponent implements OnInit, AfterViewInit {
 
 
   saveBalance() {
-     const payload = {
+    const payload = {
       id: this.balanceList?.id || '',
       cashBalance: this.balanceForm.value.cashBalance,
       bankDetails: this.balanceForm.value.bankDetails,
@@ -89,24 +89,24 @@ export class BalanceComponent implements OnInit, AfterViewInit {
     }
 
     if (this.balanceList?.id) {
-        this.firebaseService.updateBalance(payload.id, payload).then(() => {
-                this.getBalanceList();
-                this.openConfigSnackBar('record update successfully');
-              }, (error) => {
-              
-              });
+      this.firebaseService.updateBalance(payload.id, payload).then(() => {
+        this.getBalanceList();
+        this.openConfigSnackBar('record update successfully');
+      }, (error) => {
+
+      });
     } else {
       this.firebaseService.addBalance(payload).then(() => {
-              this.getBalanceList();
-              this.openConfigSnackBar('record create successfully');
-            }, (error) => {
-            
-            });
+        this.getBalanceList();
+        this.openConfigSnackBar('record create successfully');
+      }, (error) => {
+
+      });
     }
 
   }
 
-   getBalanceList() {
+  getBalanceList() {
     this.loaderService.setLoader(true);
 
     this.firebaseService.getAllBalance().subscribe((res: any[]) => {
@@ -118,7 +118,7 @@ export class BalanceComponent implements OnInit, AfterViewInit {
         this.balanceList = userData;
         this.setFormData(userData);
       }
-       let total = 0;
+      let total = 0;
       this.balanceList?.bankDetails?.forEach((bank: any) => {
         total += parseFloat(bank.balance) || 0;
       });
@@ -130,7 +130,7 @@ export class BalanceComponent implements OnInit, AfterViewInit {
   }
 
 
-    setFormData(data: any) {
+  setFormData(data: any) {
     this.balanceForm.patchValue({
       cashBalance: data.cashBalance || 0
     });
@@ -148,7 +148,7 @@ export class BalanceComponent implements OnInit, AfterViewInit {
 
 
 
-   onCheckboxChange(event: MatCheckboxChange, selectedIndex: number) {
+  onCheckboxChange(event: MatCheckboxChange, selectedIndex: number) {
     const bankFormArray = this.balanceForm.get('bankDetails') as FormArray;
 
     if (event.checked) {
@@ -168,7 +168,7 @@ export class BalanceComponent implements OnInit, AfterViewInit {
     }
   }
 
-   openConfigSnackBar(snackbarTitle: any) {
+  openConfigSnackBar(snackbarTitle: any) {
     this._snackBar.open(snackbarTitle, 'Splash', {
       duration: 2 * 1000,
       horizontalPosition: 'right',

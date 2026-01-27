@@ -8,15 +8,16 @@ import { WarrantyDialogComponent } from './warranty-dialog/warranty-dialog.compo
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
+import { ViewWarrantyComponent } from './view-warranty/view-warranty.component';
 
 @Component({
   selector: 'app-warranty-master',
   templateUrl: './warranty-master.component.html',
   styleUrls: ['./warranty-master.component.scss']
 })
-export class WarrantyMasterComponent  implements OnInit{
+export class WarrantyMasterComponent implements OnInit {
   dateWarrantyListForm: FormGroup
-   displayedColumns: string[] = [
+  displayedColumns: string[] = [
     'billNo',
     'invoiceNo',
     'date',
@@ -24,27 +25,27 @@ export class WarrantyMasterComponent  implements OnInit{
     'address',
     'action',
   ];
-  warrantyList :any []=[];
+  warrantyList: any[] = [];
 
-    warrantyDataSource = new MatTableDataSource(this.warrantyList);
-    @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
-   @ViewChild(MatSort) sort!: MatSort;
+  warrantyDataSource = new MatTableDataSource(this.warrantyList);
+  @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
+  @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(  
-    private dialog: MatDialog, 
+  constructor(
+    private dialog: MatDialog,
     private fb: FormBuilder,
     private firebaseService: FirebaseService,
-      private loaderService: LoaderService,
-      private _snackBar: MatSnackBar
-    ){}
+    private loaderService: LoaderService,
+    private _snackBar: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
-     this.getWarrantyList();
-      this.dateform();
+    this.getWarrantyList();
+    this.dateform();
   }
 
-   dateform() {
+  dateform() {
     const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -54,7 +55,7 @@ export class WarrantyMasterComponent  implements OnInit{
     });
   }
 
-  
+
   applyFilter(filterValue: string): void {
     this.warrantyDataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -84,12 +85,12 @@ export class WarrantyMasterComponent  implements OnInit{
     }
   }
 
-  addWarranty(action:any, obj:any){
+  addWarranty(action: any, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(WarrantyDialogComponent, { data: obj });
-     dialogRef.afterClosed().subscribe(async (result) => {
+    dialogRef.afterClosed().subscribe(async (result) => {
       if (!result) return;
-        if (result.event === 'Add') {
+      if (result.event === 'Add') {
         const payload = {
           ...result.data,
           userId: localStorage.getItem('userId')
@@ -99,48 +100,52 @@ export class WarrantyMasterComponent  implements OnInit{
         this.getWarrantyList();
         this.openConfigSnackBar('record create successfully');
       }
-        if (result.event === 'Edit') {
+      if (result.event === 'Edit') {
         const payload = {
           ...result.data,
           userId: localStorage.getItem('userId')
         };
 
-        await this.firebaseService.updateWarranty(  result.data.id, result.data);
+        await this.firebaseService.updateWarranty(result.data.id, result.data);
         this.getWarrantyList();
         this.openConfigSnackBar('record create successfully');
       }
-        if (result.event === 'Delete') {
-        this.firebaseService.deleteWarranty(result.data.id).then((res:any) => {
-            this.getWarrantyList()
-            this.openConfigSnackBar('record delete successfully')
+      if (result.event === 'Delete') {
+        this.firebaseService.deleteWarranty(result.data.id).then((res: any) => {
+          this.getWarrantyList()
+          this.openConfigSnackBar('record delete successfully')
         }, (error) => {
-         
+
         })
       }
 
 
-     })
+    })
   }
 
-    getWarrantyList() {
+  getWarrantyList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllWarranty().subscribe((res: any) => {
       if (res) {
-        this.warrantyList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.warrantyList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
       }
       this.filterDate()
-       this.warrantyDataSource = new MatTableDataSource(this.warrantyList);
+      this.warrantyDataSource = new MatTableDataSource(this.warrantyList);
       this.warrantyDataSource.paginator = this.paginator;
       this.loaderService.setLoader(false)
     })
   }
 
-     openConfigSnackBar(snackbarTitle: any) {
+  openConfigSnackBar(snackbarTitle: any) {
     this._snackBar.open(snackbarTitle, 'Splash', {
       duration: 2 * 1000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
-  });
-}
+    });
+  }
+
+  viewWarrantyDetails(obj: any) {
+    const dialogRef = this.dialog.open(ViewWarrantyComponent, { data: obj });
+  }
 
 }
