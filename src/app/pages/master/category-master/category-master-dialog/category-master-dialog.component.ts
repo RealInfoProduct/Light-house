@@ -9,7 +9,7 @@ import { LoaderService } from 'src/app/services/loader.service';
   templateUrl: './category-master-dialog.component.html',
   styleUrls: ['./category-master-dialog.component.scss']
 })
-export class CategoryMasterDialogComponent  implements OnInit {
+export class CategoryMasterDialogComponent implements OnInit {
   categoryForm: FormGroup;
   action: string;
   local_data: any;
@@ -33,7 +33,7 @@ export class CategoryMasterDialogComponent  implements OnInit {
       this.categoryForm.controls['warrantyPeriods'].setValue(this.local_data.warrantyPeriods)
       this.categoryForm.controls['stockCount'].setValue(this.local_data.stockCount)
     }
-    
+
   }
 
   buildForm() {
@@ -64,6 +64,6 @@ export class CategoryMasterDialogComponent  implements OnInit {
     this.dialogRef.close({ event: 'Cancel' });
   }
 
-  
-  
+
+
 }

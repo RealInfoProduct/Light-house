@@ -28,20 +28,20 @@ export class FirmMasterComponent implements OnInit {
     'Address',
     'action',
   ];
-  firmList: any =[]
+  firmList: any = []
   firmDataSource = new MatTableDataSource(this.firmList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
 
-  constructor(private dialog: MatDialog, 
-    private firebaseService: FirebaseService , 
-    private loaderService : LoaderService,
+  constructor(private dialog: MatDialog,
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
     private _snackBar: MatSnackBar,) { }
 
   ngOnInit(): void {
     this.getFirmList()
   }
-  
+
   applyFilter(filterValue: string): void {
     this.firmDataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -54,7 +54,7 @@ export class FirmMasterComponent implements OnInit {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllFirm().subscribe((res: any) => {
       if (res) {
-        this.firmList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
         this.firmDataSource = new MatTableDataSource(this.firmList);
         this.firmDataSource.paginator = this.paginator;
         this.loaderService.setLoader(false)
@@ -84,7 +84,7 @@ export class FirmMasterComponent implements OnInit {
           accountholdersname: result.data.accountholdersname,
           bankIfsc: result.data.ifscCode,
           bankAccountNo: result.data.bankAccountNo,
-          userId : localStorage.getItem("userId"),
+          userId: localStorage.getItem("userId"),
           isInvoiceTheme: result.data.isInvoiceTheme,
         }
         this.firebaseService.addFirm(payload).then((res) => {
@@ -93,7 +93,7 @@ export class FirmMasterComponent implements OnInit {
             this.openConfigSnackBar('record create successfully')
           }
         }, (error) => {
-        
+
         })
       }
       if (result?.event === 'Edit') {
@@ -113,24 +113,24 @@ export class FirmMasterComponent implements OnInit {
               accountholdersname: result.data.accountholdersname,
               bankIfsc: result.data.ifscCode,
               bankAccountNo: result.data.bankAccountNo,
-              userId : localStorage.getItem("userId"),
+              userId: localStorage.getItem("userId"),
               isInvoiceTheme: result.data.isInvoiceTheme ?? "",
             }
             this.firebaseService.updateFirm(result.data.id, payload).then((res: any) => {
-                this.getFirmList()
-            this.openConfigSnackBar('record update successfully')
+              this.getFirmList()
+              this.openConfigSnackBar('record update successfully')
             }, (error) => {
-            
+
             })
           }
         });
       }
       if (result?.event === 'Delete') {
         this.firebaseService.deleteFirm(result.data.id).then((res: any) => {
-            this.getFirmList()
-            this.openConfigSnackBar('record delete successfully')
+          this.getFirmList()
+          this.openConfigSnackBar('record delete successfully')
         }, (error) => {
-        
+
         })
       }
     });
@@ -162,7 +162,7 @@ export class firmMasterDialogComponent implements OnInit {
     // { name: 'Invoice 3', imageUrl: '../../../../assets/invoice/Invoice3.png', value: 3 },
     // { name: 'Invoice 4', imageUrl: '../../../../assets/invoice/Invoice4.png', value: 4 },
     // { name: 'Invoice 5', imageUrl: '../../../../assets/invoice/Invoice5.png', value: 5 },
-  ] 
+  ]
 
 
   constructor(
@@ -189,20 +189,20 @@ export class firmMasterDialogComponent implements OnInit {
       this.firmForm.controls['accountholdersname'].setValue(this.local_data.accountholdersname)
       this.firmForm.controls['ifscCode'].setValue(this.local_data.bankIfsc)
       this.firmForm.controls['bankAccountNo'].setValue(this.local_data.bankAccountNo)
-      this.firmForm.controls['selectedInvoiceTheme'].setValue(this.invoiceThemeList.find((id:any) => id.value === this.local_data.isInvoiceTheme)?.value)
+      this.firmForm.controls['selectedInvoiceTheme'].setValue(this.invoiceThemeList.find((id: any) => id.value === this.local_data.isInvoiceTheme)?.value)
     }
   }
 
   formBuild() {
     this.firmForm = this.fb.group({
-      header: ['',[Validators.required, Validators.pattern('^[a-zA-Z]+(?: [a-zA-Z]+)*$')]],
-      subHeader: ['',[Validators.required, Validators.pattern('^[a-zA-Z]+(?: [a-zA-Z]+)*$')]],
+      header: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+(?: [a-zA-Z]+)*$')]],
+      subHeader: ['', [Validators.required, Validators.pattern('^[a-zA-Z]+(?: [a-zA-Z]+)*$')]],
       address: [''],
       GSTNo: ['', [Validators.pattern('^([0-3][0-9])([A-Z]{5}[0-9]{4}[A-Z])([1-9A-Z])Z([0-9A-Z])$')]],
       // gstPercentage: [''],
       panNo: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
-      mobileNo: ['',[Validators.required,Validators.pattern(/^\d{10}$/)]],
-      personalMobileNo: ['',[Validators.required,Validators.pattern(/^\d{10}$/)]],
+      mobileNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      personalMobileNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       bankName: [''],
       accountholdersname: [''],
       ifscCode: [''],

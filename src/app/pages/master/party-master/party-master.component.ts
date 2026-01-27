@@ -22,26 +22,26 @@ export class PartyMasterComponent implements OnInit {
     'PartyPan',
     'action',
   ];
-  partyList :any = []
-  
+  partyList: any = []
+
   partyDataSource = new MatTableDataSource(this.partyList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
 
-  constructor(private dialog: MatDialog , 
-    private firebaseService : FirebaseService , 
-    private loaderService : LoaderService,
+  constructor(private dialog: MatDialog,
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
     private _snackBar: MatSnackBar,) { }
 
 
   ngOnInit(): void {
-  this.getPartyList()
+    this.getPartyList()
   }
 
   applyFilter(filterValue: string): void {
     this.partyDataSource.filter = filterValue.trim().toLowerCase();
   }
-  
+
   addParty(action: string, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(partyMasterDialogComponent, { data: obj });
@@ -54,17 +54,17 @@ export class PartyMasterComponent implements OnInit {
           partyGstNo: result.data.partyGSTIN,
           partyPanNo: result.data.partyPanNo,
           partyMobileNo: result.data.partyMobile,
-          isFirm : result.data.isFirm.id,
-          userId : localStorage.getItem("userId")
+          isFirm: result.data.isFirm.id,
+          userId: localStorage.getItem("userId")
         }
 
         this.firebaseService.addParty(payload).then((res) => {
           if (res) {
-              this.getPartyList()
-              this.openConfigSnackBar('record create successfully')
-            }
-        } , (error) => {
-         
+            this.getPartyList()
+            this.openConfigSnackBar('record create successfully')
+          }
+        }, (error) => {
+
         })
       }
       if (result?.event === 'Edit') {
@@ -77,24 +77,24 @@ export class PartyMasterComponent implements OnInit {
               partyGstNo: result.data.partyGSTIN,
               partyPanNo: result.data.partyPanNo,
               partyMobileNo: result.data.partyMobile,
-              isFirm : result.data.isFirm.id,
-              userId : localStorage.getItem("userId")
+              isFirm: result.data.isFirm.id,
+              userId: localStorage.getItem("userId")
             }
-              this.firebaseService.updateParty(result.data.id , payload).then((res:any) => {
-                  this.getPartyList()
-                  this.openConfigSnackBar('record update successfully')
-              }, (error) => {
-            
-              })
+            this.firebaseService.updateParty(result.data.id, payload).then((res: any) => {
+              this.getPartyList()
+              this.openConfigSnackBar('record update successfully')
+            }, (error) => {
+
+            })
           }
         });
       }
       if (result?.event === 'Delete') {
-        this.firebaseService.deleteParty(result.data.id).then((res:any) => {
-            this.getPartyList()
-            this.openConfigSnackBar('record delete successfully')
+        this.firebaseService.deleteParty(result.data.id).then((res: any) => {
+          this.getPartyList()
+          this.openConfigSnackBar('record delete successfully')
         }, (error) => {
-         
+
         })
       }
     });
@@ -104,7 +104,7 @@ export class PartyMasterComponent implements OnInit {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllParty().subscribe((res: any) => {
       if (res) {
-        this.partyList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.partyList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
         this.partyDataSource = new MatTableDataSource(this.partyList);
         this.partyDataSource.paginator = this.paginator;
         this.loaderService.setLoader(false)
@@ -137,8 +137,8 @@ export class partyMasterDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<partyMasterDialogComponent>,
-    private firebaseService : FirebaseService , 
-    private loaderService : LoaderService,
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {
 
@@ -156,7 +156,7 @@ export class partyMasterDialogComponent implements OnInit {
       this.partyForm.controls['partyMobile'].setValue(this.local_data.partyMobileNo)
       this.partyForm.controls['isFirm'].setValue(this.local_data.isFirm.id)
     }
-  
+
   }
 
   buildForm() {
@@ -165,8 +165,8 @@ export class partyMasterDialogComponent implements OnInit {
       partyAddress: [''],
       partyGSTIN: ['', [Validators.pattern('^([0-3][0-9])([A-Z]{5}[0-9]{4}[A-Z])([1-9A-Z])Z([0-9A-Z])$')]],
       partyPanNo: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
-      partyMobile: ['', [Validators.required,Validators.pattern(/^\d{10}$/)]],
-      isFirm : []
+      partyMobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      isFirm: []
     })
   }
 
@@ -178,7 +178,7 @@ export class partyMasterDialogComponent implements OnInit {
       partyGSTIN: this.partyForm.value.partyGSTIN,
       partyPanNo: this.partyForm.value.partyPanNo,
       partyMobile: this.partyForm.value.partyMobile,
-      isFirm : this.partyForm.value.isFirm
+      isFirm: this.partyForm.value.isFirm
     }
     this.dialogRef.close({ event: this.action, data: payload });
   }
@@ -192,7 +192,7 @@ export class partyMasterDialogComponent implements OnInit {
   //   this.firebaseService.getAllFirm().subscribe((res: any) => {
   //     if (res) {
   //       this.firmList = res.filter((firm: any) => firm.userId === localStorage.getItem("userId"));
-  
+
   //       if (this.action === 'Edit') {
   //         const selectedFirm = this.firmList.find((firm: any) => firm.id === this.local_data.isFirm);
   //         if (selectedFirm) {
@@ -203,33 +203,33 @@ export class partyMasterDialogComponent implements OnInit {
   //     this.loaderService.setLoader(false);
   //   });
   // }
-  
+
   getFirmList() {
-  this.loaderService.setLoader(true);
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllFirm().subscribe((res: any) => {
-    if (res) {
-      this.firmList = res.filter((firm: any) =>
-        firm.userId === localStorage.getItem("userId")
-      );
-
-      this.firmList = this.firmList.filter(
-        (item:any, index:any, self:any) =>
-          index === self.findIndex((t:any) => t.header === item.header)
-      );
-
-      if (this.action === 'Edit') {
-        const selectedFirm = this.firmList.find(
-          (firm: any) => firm.id === this.local_data.isFirm
+    this.firebaseService.getAllFirm().subscribe((res: any) => {
+      if (res) {
+        this.firmList = res.filter((firm: any) =>
+          firm.userId === localStorage.getItem("userId")
         );
-        if (selectedFirm) {
-          this.partyForm.controls['isFirm'].setValue(selectedFirm);
+
+        this.firmList = this.firmList.filter(
+          (item: any, index: any, self: any) =>
+            index === self.findIndex((t: any) => t.header === item.header)
+        );
+
+        if (this.action === 'Edit') {
+          const selectedFirm = this.firmList.find(
+            (firm: any) => firm.id === this.local_data.isFirm
+          );
+          if (selectedFirm) {
+            this.partyForm.controls['isFirm'].setValue(selectedFirm);
+          }
         }
       }
-    }
 
-    this.loaderService.setLoader(false);
-  });
-}
+      this.loaderService.setLoader(false);
+    });
+  }
 
 }

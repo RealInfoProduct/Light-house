@@ -15,8 +15,8 @@ import jsPDF from 'jspdf';
   templateUrl: './income-expense.component.html',
   styleUrls: ['./income-expense.component.scss']
 })
-export class IncomeExpenseComponent implements OnInit, AfterViewInit{
-  dateIncomeexpenseListForm:FormGroup
+export class IncomeExpenseComponent implements OnInit, AfterViewInit {
+  dateIncomeexpenseListForm: FormGroup
   displayedColumns: string[] = [
     'srno',
     'billNo',
@@ -27,22 +27,22 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     'finalAmount',
     'action',
   ];
-  incomeExpenseList:any [] =[]
-  partyList:any []=[]
+  incomeExpenseList: any[] = []
+  partyList: any[] = []
   balanceList: any = [];
 
-  
-  incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
-    @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
 
-  constructor(  
+  incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
+  @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
+
+  constructor(
     private dialog: MatDialog,
-     private fb: FormBuilder,
+    private fb: FormBuilder,
     private firebaseService: FirebaseService,
     private loaderService: LoaderService,
     private _snackBar: MatSnackBar,
-    ){}
+  ) { }
 
   ngOnInit(): void {
     this.getExpensesList();
@@ -51,16 +51,16 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     this.getBalanceList();
   }
 
-   ngAfterViewInit() {
+  ngAfterViewInit() {
     this.incomeExpenseDataSource.paginator = this.paginator;
   }
 
   getBillNo(element: any): string {
-  if (element?.accounttype === 'Income') {
-    return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNo) ? `(${element.billNo})` : element?.billNo ?? ''}`;
+    if (element?.accounttype === 'Income') {
+      return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNo) ? `(${element.billNo})` : element?.billNo ?? ''}`;
+    }
+    return element?.billNo ?? '';
   }
-  return element?.billNo ?? '';
-}
 
 
   dateform() {
@@ -98,7 +98,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     }
   }
 
-    getStatusClass(status: string): string {
+  getStatusClass(status: string): string {
     switch (status) {
       case 'Paid':
         return 'status-paid';
@@ -111,11 +111,11 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
     }
   }
 
-    applyFilter(filterValue: string): void {
+  applyFilter(filterValue: string): void {
     this.incomeExpenseDataSource.filter = filterValue.trim().toLowerCase();
   }
 
-   async updateBalance( amount: number, accounttype: 'Income' | 'Expense',  paymentStatus: string, bankId?: string) {
+  async updateBalance(amount: number, accounttype: 'Income' | 'Expense', paymentStatus: string, bankId?: string) {
     if (!this.balanceList?.id) {
       await this.getBalanceList();
     }
@@ -184,7 +184,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
   //               this.openConfigSnackBar('record create successfully')
   //             }
   //           }, (error) => {
-            
+
   //           })
   //         }
   //         if (result?.event === 'Edit') {
@@ -207,7 +207,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
   //                   this.getExpensesList()
   //               this.openConfigSnackBar('record update successfully')
   //               }, (error) => {
-                
+
   //               })
   //             }
   //           });
@@ -217,7 +217,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
   //               this.getExpensesList()
   //               this.openConfigSnackBar('record delete successfully')
   //           }, (error) => {
-            
+
   //           })
   //         }
   //       });
@@ -278,7 +278,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
         );
 
         this.getExpensesList();
-         this.openConfigSnackBar('record update successfully');
+        this.openConfigSnackBar('record update successfully');
       }
 
       if (result.event === 'Delete') {
@@ -299,46 +299,46 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit{
         await this.firebaseService.deleteExpenses(oldData.id);
 
         this.getExpensesList();
-          this.openConfigSnackBar('record delete successfully');
+        this.openConfigSnackBar('record delete successfully');
       }
     });
   }
 
-getBalanceList() {
-  this.loaderService.setLoader(true);
+  getBalanceList() {
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
-    if (res) {
-      const found = res.find(
-        item => item.userId === localStorage.getItem('userId')
-      );
-      this.balanceList = found ? found : { cashBalance: 0, bankDetails: [], id: '', userId: localStorage.getItem('userId') };
-    }
-    this.loaderService.setLoader(false);
-  });
-}
-    getExpensesList() {
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        const found = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+        this.balanceList = found ? found : { cashBalance: 0, bankDetails: [], id: '', userId: localStorage.getItem('userId') };
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
+  getExpensesList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllExpenses().subscribe((res: any) => {
       if (res) {
-        this.incomeExpenseList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
-         this.incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
+        this.incomeExpenseList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
         this.incomeExpenseDataSource.paginator = this.paginator;
         this.loaderService.setLoader(false)
       }
     })
   }
 
-    openConfigSnackBar(snackbarTitle: any) {
+  openConfigSnackBar(snackbarTitle: any) {
     this._snackBar.open(snackbarTitle, 'Splash', {
       duration: 2 * 1000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
-  });
-}
+    });
+  }
 
 
-   getPartyList() {
+  getPartyList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllParty().subscribe((res: any) => {
       if (res) {
@@ -350,9 +350,9 @@ getBalanceList() {
 
   getpartyName(nameid: any) {
     return this.partyList.find((id: any) => id.id === nameid)?.partyName
-}
+  }
 
-filedownload() {
+  filedownload() {
     const doc: any = new jsPDF();
     doc.setFontSize(13);
     const filteredData: any[] = this.incomeExpenseDataSource.data;
@@ -377,36 +377,36 @@ filedownload() {
     });
     doc.text(`Final Total: ${(FinalTotalAmount)}`, 135, 11);
 
-          const IncomeTotalAmount = filteredData.reduce((sum: number, item: any) => {
-          if (item.accounttype === "Income") {
-            return sum + (Number(item.amount) || 0);
-          }
-          return sum;
-        }, 0);
+    const IncomeTotalAmount = filteredData.reduce((sum: number, item: any) => {
+      if (item.accounttype === "Income") {
+        return sum + (Number(item.amount) || 0);
+      }
+      return sum;
+    }, 0);
 
-        const IncomeAmountFormatted = Math.round(IncomeTotalAmount).toLocaleString('en-IN', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+    const IncomeAmountFormatted = Math.round(IncomeTotalAmount).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
 
-        doc.text(`Income Total: ${IncomeAmountFormatted}`, 135, 19);
+    doc.text(`Income Total: ${IncomeAmountFormatted}`, 135, 19);
 
-          const ExpenseTotalAmount = filteredData.reduce((sum: number, item: any) => {
-          if (item.accounttype === "Expense") {
-            return sum + (Number(item.amount) || 0);
-          }
-          return sum;
-        }, 0);
+    const ExpenseTotalAmount = filteredData.reduce((sum: number, item: any) => {
+      if (item.accounttype === "Expense") {
+        return sum + (Number(item.amount) || 0);
+      }
+      return sum;
+    }, 0);
 
-        const ExpenseAmountFormatted = Math.round(ExpenseTotalAmount).toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            });
+    const ExpenseAmountFormatted = Math.round(ExpenseTotalAmount).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
 
-            doc.text(`Expense Total: ${ExpenseAmountFormatted}`, 135, 27);
+    doc.text(`Expense Total: ${ExpenseAmountFormatted}`, 135, 27);
 
 
-    
+
     const headers = [
       "Sr.No",
       "Bill No",
@@ -419,9 +419,9 @@ filedownload() {
 
     const data = filteredData.map((item, i) => {
       debugger
-    
-  const dateStr = moment.unix(item.date.seconds).format('DD/MM/YYYY');
- const notes = this.partyList.find((prod: any) => prod.id === item.notes)?.partyName || item.notes;
+
+      const dateStr = moment.unix(item.date.seconds).format('DD/MM/YYYY');
+      const notes = this.partyList.find((prod: any) => prod.id === item.notes)?.partyName || item.notes;
       return [
         i + 1,
         item.billNo && item.invoiceNo ? `${item.invoiceNo}(${item.billNo})` : item.billNo || item.invoiceNo || '',

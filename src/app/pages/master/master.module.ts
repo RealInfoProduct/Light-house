@@ -30,6 +30,7 @@ import { IncomeExpenseDialogComponent } from './income-expense/income-expense-di
 import { BalanceComponent } from './balance/balance.component';
 import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
 import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warranty-dialog.component';
+import { ViewWarrantyComponent } from './warranty-master/view-warranty/view-warranty.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warra
     BalanceComponent,
     WarrantyMasterComponent,
     WarrantyDialogComponent,
+    ViewWarrantyComponent,
   ],
   imports: [
     CommonModule,
@@ -66,7 +68,7 @@ import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warra
     NgApexchartsModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,
-     NgxMatNativeDateModule,
+    NgxMatNativeDateModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
