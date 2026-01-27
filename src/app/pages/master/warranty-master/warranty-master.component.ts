@@ -106,7 +106,7 @@ export class WarrantyMasterComponent implements OnInit {
           userId: localStorage.getItem('userId')
         };
 
-        await this.firebaseService.updateWarranty(result.data.id, result.data);
+        await this.firebaseService.updateWarranty(result.data.id, payload);
         this.getWarrantyList();
         this.openConfigSnackBar('record create successfully');
       }

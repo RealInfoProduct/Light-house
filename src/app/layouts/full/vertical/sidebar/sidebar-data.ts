@@ -29,17 +29,17 @@ export const navItems: NavItem[] = [
   },
   {
     displayName: 'Category Master',
-    iconName: 'file-invoice',
+    iconName: 'category',
     route: '/master/categorymaster',
   },
   {
     displayName: 'Sale Master',
-    iconName: 'file-invoice',
+    iconName: 'receipt-2',
     route: '/master/shellmaster',
   },
   {
     displayName: 'Warranty Master',
-    iconName: 'file-invoice',
+    iconName: 'shield-check',
     route: '/master/warrantymaster',
   },
   {
