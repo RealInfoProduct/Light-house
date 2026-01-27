@@ -19,13 +19,22 @@ export class PurchaseMasterDialogComponent implements OnInit {
   filteredCategoryList: any[] = [];
   paymentExceeded = false;
   pendingAmount: number = 0;
+  paymentDays = new Date()
+  balanceList: any = []
+  bank: any =[];
 
   StatusList: any[] = [
     { type: 'Pending' },
     { type: 'Paid' },
     { type: 'Unpaid' }
   ];
-oldCompanyDetails: any[] = [];
+
+  paymenttype: any = [
+    'Cash',
+    'G-Pay'
+  ]
+
+  oldCompanyDetails: any[] = [];
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<PurchaseMasterDialogComponent>,
@@ -43,10 +52,12 @@ oldCompanyDetails: any[] = [];
     this.getPartyList();
     this.getCategoryList();
     this.calculatePending();
+    this.paymentDaysChange();
+    this.getBalanceList();
 
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
-      this.local_data.companyDetails.forEach((detail: any, index: number) => {
+      this.local_data.companyDetails?.forEach((detail: any, index: number) => {
         if (index > 0) this.addproductDetail();
         const formGroup = this.companyDetails.at(index) as FormGroup;
         if (formGroup) {
@@ -59,40 +70,29 @@ oldCompanyDetails: any[] = [];
           });
         }
       });
-      this.local_data.paymentDetails.forEach((detail: any, index: number) => {
-        if (index > 0) this.addpaymentDetail();
+      // this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+      //   if (index > 0) this.addpaymentDetail();
 
-        const formGroup = this.paymentDetails.at(index) as FormGroup;
-        if (formGroup) {
-          const paymentDate = detail.paymentReceivedDate
-            ? new Date(detail.paymentReceivedDate.seconds * 1000)
-            : null;
-
-          formGroup.patchValue({
-            paymentR: detail.paymentR,
-            paymentReceivedDate: paymentDate
-          });
-        }
-      });
-
-
+      //   const formGroup = this.paymentDetails.at(index) as FormGroup;
+      //   if (formGroup) {
+      //     const paymentDate = detail.paymentReceivedDate
+      //       ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      //       : null;
+      //     formGroup.patchValue({
+      //       paymentR: detail.paymentR,
+      //       paymentReceivedDate: paymentDate,
+      //       paymentType: detail.paymentType,
+      //       bankName:  detail.bankName
+      //     });
+      //   }
+      // });
     }
     this.productForm.valueChanges.subscribe(() => {
       this.calculatePending();
     });
-  //    this.paymentDetails.controls.forEach((group: any) => {
-  //   group.get('paymentR')?.valueChanges.subscribe((value: number) => {
-  //     if (value > 0) {
-  //       this.productForm.get('paymentStatus')?.setValue('Pending');
-  //     }
-  //     if (value <= 0) {
-  //       this.productForm.get('paymentStatus')?.setValue('Unpaid');
-  //     }
-     
-  //   });
-  // });
-
   }
+
+
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -136,12 +136,42 @@ oldCompanyDetails: any[] = [];
       date: [new Date()],
       total: [0],
       paymentReceived: [false],
+      type: ['Expense'],
+      paymentDays: [0],
+      otherKharch: [0],
       companyDetails: this.fb.array([this.createproductDetailGroup()]),
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
     })
+    this.paymentDaysChange()
 
-    
   }
+
+  limitDigits(event: any) {
+    let value = event.target.value;
+    value = value.replace(/\D/g, '');
+    if (value.length > 3) {
+      value = value.slice(0, 3);
+    }
+    event.target.value = value;
+    this.productForm.get('paymentDays')?.setValue(value, { emitEvent: false });
+  }
+
+  paymentDaysChange() {
+    this.productForm.get('paymentDays')?.valueChanges.subscribe((days: any) => {
+      let numDays = parseInt(days, 10);
+      if (isNaN(numDays) || numDays < 0) {
+        numDays = 0;
+      }
+
+      const date = this.productForm.get('date')?.value;
+      if (date) {
+        const dueDate = new Date(date);
+        dueDate.setDate(dueDate.getDate() + numDays);
+        this.paymentDays = dueDate;
+      }
+    });
+  }
+
 
   createproductDetailGroup(): FormGroup {
     const group = this.fb.group({
@@ -162,16 +192,42 @@ oldCompanyDetails: any[] = [];
 
   createpaymentDetailGroup(): FormGroup {
     const group = this.fb.group({
-      paymentR: [, Validators.min(0)],
-      paymentReceivedDate: [new Date()]
+      paymentR: [0, Validators.min(0)],
+      paymentReceivedDate: [new Date()],
+      paymentType: [''],
+      bankName: ['']
     });
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
     });
+      group.valueChanges.subscribe(() => {
+    this.checkPaymentError(group);
+  });
 
 
     return group;
   }
+
+checkPaymentError(group: FormGroup) {
+  const paymentType = group.get('paymentType')?.value;
+  const amount = Number(group.get('paymentR')?.value) || 0;
+  this.bank = group.get('bankName')?.value;
+
+  group.get('paymentR')?.setErrors(null);
+  if (paymentType === 'Cash') {
+    if (amount > this.balanceList?.cashBalance) {
+      group.get('paymentR')?.setErrors({ cashExceeded: true });
+    }
+  }
+
+  if (paymentType === 'G-Pay' && this.bank?.balance !== undefined) {
+    if (amount > this.bank.balance) {
+      group.get('paymentR')?.setErrors({ insufficientBalance: true });
+    }
+  }
+}
+
+
 
   getTotalPaymentReceived(): number {
     return this.paymentDetails.controls.reduce((sum, ctrl) => {
@@ -200,27 +256,29 @@ oldCompanyDetails: any[] = [];
       const subTotal = Number((ctrl as FormGroup).get('subTotal')?.value) || 0;
       return sum + subTotal;
     }, 0);
-
-    this.productForm.get('total')?.setValue(total, { emitEvent: false });
+    const otherKharch = Number(this.productForm.get('otherKharch')?.value) || 0;
+    const grandTotal = total + otherKharch;
+    this.productForm.get('total')?.setValue(grandTotal, { emitEvent: false });
+    this.calculatePending(grandTotal);
   }
 
-calculatePending() {
-  const grandTotal = Number(this.productForm.get('total')?.value) || 0;
+  calculatePending(grandTotal?: number) {
+    const totalAmount = (grandTotal ?? Number(this.productForm.get('total')?.value)) || 0;
 
-  const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
-    return sum + (Number(group.get('paymentR')?.value) || 0);
-  }, 0);
+    const paidTotal = this.paymentDetails.controls.reduce((sum, group) => {
+      return sum + (Number(group.get('paymentR')?.value) || 0);
+    }, 0);
 
-  this.pendingAmount = grandTotal - paidTotal;
+    this.pendingAmount = totalAmount - paidTotal;
 
-  if (this.pendingAmount === 0 && grandTotal > 0) {
-    this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
-  } else if (paidTotal > 0 && this.pendingAmount > 0) {
-    this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
-  } else {
-    this.productForm.get('paymentStatus')?.setValue('Unpaid', { emitEvent: false });
+    if (this.pendingAmount === 0 && totalAmount > 0) {
+      this.productForm.get('paymentStatus')?.setValue('Paid', { emitEvent: false });
+    } else if (paidTotal > 0 && this.pendingAmount > 0) {
+      this.productForm.get('paymentStatus')?.setValue('Pending', { emitEvent: false });
+    } else {
+      this.productForm.get('paymentStatus')?.setValue('Unpaid', { emitEvent: false });
+    }
   }
-}
 
 
   removeproductDetail(index: number) {
@@ -260,17 +318,19 @@ calculatePending() {
       paymentStatus: this.productForm.value.paymentStatus,
       total: this.productForm.value.total,
       paymentReceived: this.productForm.value.paymentReceived,
+      type: this.productForm.value.type,
+      paymentDays: this.productForm.value.paymentDays,
+      otherKharch: this.productForm.value.otherKharch,
       companyDetails: this.productForm.value.companyDetails,
       paymentDetails: this.productForm.value.paymentDetails
     };
-  this.dialogRef.close({ event: this.action, data: payload });
+    this.dialogRef.close({ event: this.action, data: payload });
   }
 
   closeDialog(): void {
     this.dialogRef.close({ event: 'Cancel' });
   }
 
- 
   getCategoryList() {
     this.loaderService.setLoader(true);
 
@@ -293,7 +353,7 @@ calculatePending() {
     });
   }
 
-   getPartyList() {
+  getPartyList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllParty().subscribe((res: any) => {
       if (res) {
@@ -309,6 +369,48 @@ calculatePending() {
       this.loaderService.setLoader(false);
     });
   }
+
+  getBalanceList() {
+    this.loaderService.setLoader(true);
+
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+        if (this.action === 'Edit') {
+        this.patchPaymentDetails();
+      }
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
+
+  patchPaymentDetails() {
+  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+    if (index > 0) this.addpaymentDetail();
+
+    const formGroup = this.paymentDetails.at(index) as FormGroup;
+    if (!formGroup) return;
+
+    const paymentDate = detail.paymentReceivedDate
+      ? new Date(detail.paymentReceivedDate.seconds * 1000)
+      : null;
+
+    let selectedBank = null;
+    if (this.balanceList?.bankDetails?.length) {
+      selectedBank = this.balanceList.bankDetails.find(
+        (bank: any) => bank.id === detail.bankName
+      );
+    }
+    formGroup.patchValue({
+      paymentR: detail.paymentR,
+      paymentReceivedDate: paymentDate,
+      paymentType: detail.paymentType,
+      bankName: selectedBank ,
+    });
+  });
+}
 
   setCompanyAndCategoryEdit() {
     this.local_data.companyDetails.forEach((detail: any, index: number) => {
@@ -332,11 +434,20 @@ calculatePending() {
         );
 
         if (selectedCategory) {
-          formGroup.get('category')?.setValue(selectedCategory);
+          formGroup?.get('category')?.setValue(selectedCategory);
         }
       }
     });
   }
 
+  onOtherKharchInput(event: any) {
+    let value = event.target.value;
+
+    if (value.length > 1 && value.startsWith('0')) {
+      event.target.value = value.replace(/^0+/, '');
+      this.productForm.get('otherKharch')?.setValue(event.target.value);
+    }
+    this.calculateGrandTotal();
+  }
 
 }

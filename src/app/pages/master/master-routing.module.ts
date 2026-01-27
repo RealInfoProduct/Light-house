@@ -6,6 +6,9 @@ import { PartyMasterComponent } from './party-master/party-master.component';
 import { CategoryMasterComponent } from './category-master/category-master.component';
 import { PurchaseMasterComponent } from './purchase-master/purchase-master.component';
 import { ShellComponent } from './shell/shell.component';
+import { IncomeExpenseComponent } from './income-expense/income-expense.component';
+import { BalanceComponent } from './balance/balance.component';
+import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
 
 
 
@@ -66,6 +69,39 @@ export const MasterRoutes: Routes = [
           urls: [
             { title: 'Master', url: '/master/shellmaster' },
             { title: 'Shell Master' },
+          ],
+        },
+      },
+      {
+        path: 'warrantymaster',
+        component: WarrantyMasterComponent,
+        data: {
+          title: 'Warranty Master',
+          urls: [
+            { title: 'Master', url: '/master/warrantymaster' },
+            { title: 'Warranty Master' },
+          ],
+        },
+      },
+      {
+        path: 'income-expense',
+        component: IncomeExpenseComponent,
+        data: {
+          title: 'Income Expense',
+          urls: [
+            { title: 'Master', url: '/master/income-expense' },
+            { title: 'Income Expense' },
+          ],
+        },
+      },
+      {
+        path: 'balance',
+        component: BalanceComponent,
+        data: {
+          title: 'Balance',
+          urls: [
+            { title: 'Master', url: '/master/balance' },
+            { title: 'Balance' },
           ],
         },
       },

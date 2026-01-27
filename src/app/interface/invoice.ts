@@ -35,6 +35,9 @@ export interface PurchaseList {
     total: number;
     userId: string | null;
     paymentReceived: string;
+    type: string;
+    paymentDays:number;
+    otherKharch:number;
     companyDetails: {
         companyName: string;
         category: string;
@@ -44,7 +47,9 @@ export interface PurchaseList {
     }[];
     paymentDetails: {
         paymentReceivedDate: string;
+        paymentType: string;
         paymentR: number;
+        bankName: string;
     }[];
 }
 
@@ -88,11 +93,16 @@ export interface ShellList {
     customerAddress: string,
     total:number,
     extraDiscount :number,
+    otherKharch :number,
     grandTotal :number,
     paymentStatus :string,
+     paymentReceived:string,
     userId: any,
+     type: string;
     shellDetails: {
-       productsName:string,
+       saleDate:string,
+       companyName:string,
+       category:string,
        qty: number,
        prouctPrice: number,
        discount: number,
@@ -100,7 +110,53 @@ export interface ShellList {
     }[];
      paymentDetails: {
         paymentReceivedDate: string;
+         paymentType: string;
         paymentR: number;
+        bankName: string;
     }[];
+}
+
+export interface WarrantyList {
+    id: string,
+    billNumber: number,
+    invoiceNo: number,
+    date: string,
+    customerName: string,
+    mobileNumber: string,
+    customerAddress: string,
+    userId: any,
+    shellDetails: {
+       saleDate:string,
+       warrantyDate:string,
+       companyName:string,
+       category:string,
+       qty: number,
+       warranty: number,
+       warrantyType:string,
+    }[];
+     
+}
+
+export interface ExpensesList {
+    id:any,
+    billNo?:any,
+    invoiceNo?:any,
+    amount:any,
+    // bankName:string,
+    notes:any,
+    paymentStatus:any,
+    accounttype:any,
+    status:any,
+    date:any,
+    userId:any,
+    isActive?:any
+}
+
+export interface BalanceList {
+    id:any,
+    cashBalance:any,
+    bankDetails:any,
+    userId:any,
+    cashFlow?:any
 }
 

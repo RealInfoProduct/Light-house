@@ -13,49 +13,73 @@ export class PaymentDetailsComponent implements OnInit {
   displayedColumns: string[] = [
     'srno',
     'paymentR',
-    'paymentReceivedDate'
+    'paymentReceivedDate',
+    'paymenttype',
+    'bank'
   ];
-  
+
   Viewpayment: any = {};
- categoryList:any[] =[]
+  categoryList: any[] = []
+  balanceList: any = []
 
-     paymentDetailsDataSource = new MatTableDataSource<any>();
-    @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
+  paymentDetailsDataSource = new MatTableDataSource<any>();
+  @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
 
-  constructor( 
-    public dialogRef: MatDialogRef<PaymentDetailsComponent>, 
+  constructor(
+    public dialogRef: MatDialogRef<PaymentDetailsComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-     private firebaseService: FirebaseService,
-        private loaderService: LoaderService,
-  ) { 
-     this.Viewpayment = { ...data };
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
+  ) {
+    this.Viewpayment = { ...data };
   }
 
   ngOnInit(): void {
-  this.getCategoryList();
-  const details = this.Viewpayment.paymentDetails;
-  this.paymentDetailsDataSource = details;
-}
+    this.getCategoryList();
+    this.getBalanceList();
+    const details = this.Viewpayment.paymentDetails;
+    this.paymentDetailsDataSource = details;
+  }
 
- getCategoryList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllCategory().subscribe((res: any) => {
-        if (res) {
-          this.categoryList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))   
-          this.loaderService.setLoader(false)
-        }
-      })
+  getCategoryList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllCategory().subscribe((res: any) => {
+      if (res) {
+        this.categoryList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
+
+  getBalanceList() {
+    this.loaderService.setLoader(true);
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
+  getBankname(bankId: any, paymentType: string) {
+
+    // ✅ CASH case
+    if (paymentType === 'Cash') {
+      return '-';
     }
 
-  getcompanyname(companyid:any){
-    return this.categoryList.find((id: any) => id.id === companyid)?.companyName
-  }
-  
-  getcategory(categoryid:any){
-    return this.categoryList.find((id: any) => id.id === categoryid)?.category 
-  }
+    // ✅ Only Bank payment
+    if (paymentType === 'G-Pay') {
+      debugger
 
-  getsubcategory(keySpecifiCationsid:any){
-    return this.categoryList.find((id: any) => id.id === keySpecifiCationsid)?.keySpecifiCations 
+      const bankName = this.balanceList?.bankDetails
+        ?.find((b: any) => b.id == bankId)
+        ?.bankName;
+
+      return bankName || '-';
+    }
+    return '-';
   }
 }

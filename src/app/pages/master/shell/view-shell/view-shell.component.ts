@@ -9,74 +9,76 @@ import { LoaderService } from 'src/app/services/loader.service';
   templateUrl: './view-shell.component.html',
   styleUrls: ['./view-shell.component.scss']
 })
-export class ViewShellComponent implements OnInit{
+export class ViewShellComponent implements OnInit {
   displayedColumns: string[] = [
     'srno',
+    'Date',
     'companyName',
+    'category',
     'qty',
     'prouctPrice',
     'discount',
     'finalTotal',
   ];
-  
+
   Viewcompany: any = {};
- shellList:any[] =[]
- categoryList :any []=[]
- 
+  shellList: any[] = []
+  categoryList: any[] = []
 
-     shellDetailsDataSource = new MatTableDataSource<any>();
-    @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
 
-  constructor( 
-    public dialogRef: MatDialogRef<ViewShellComponent>, 
+  shellDetailsDataSource = new MatTableDataSource<any>();
+  @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
+
+  constructor(
+    public dialogRef: MatDialogRef<ViewShellComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-     private firebaseService: FirebaseService,
-        private loaderService: LoaderService,
-  ) { 
-     this.Viewcompany = { ...data };
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
+  ) {
+    this.Viewcompany = { ...data };
   }
 
   ngOnInit(): void {
-  this.getShellList();
-  this.getCategoryList()
+    this.getShellList();
+    this.getCategoryList()
 
-  const details = this.Viewcompany.shellDetails;
-  
-
-  this.shellDetailsDataSource = details;
-  
-}
-
- getShellList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllShell().subscribe((res: any) => {
-        if (res) {
-          this.shellList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))   
-          this.loaderService.setLoader(false)
-        }
-      })
-    }
+    const details = this.Viewcompany.shellDetails;
 
 
-     getCategoryList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllCategory().subscribe((res: any) => {
-        if (res) {
-          this.categoryList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))   
-          this.loaderService.setLoader(false)
-        }
-      })
-    }
+    this.shellDetailsDataSource = details;
 
-  getcompanyname(companyid:any){
+  }
+
+  getShellList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllShell().subscribe((res: any) => {
+      if (res) {
+        this.shellList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
+
+
+  getCategoryList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllCategory().subscribe((res: any) => {
+      if (res) {
+        this.categoryList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
+
+  getcompanyname(companyid: any) {
     return this.categoryList.find((id: any) => id.id === companyid)?.companyName
   }
-  
-  getcategory(categoryid:any){
-    return this.categoryList.find((id: any) => id.id === categoryid)?.category 
+
+  getcategory(categoryid: any) {
+    return this.categoryList.find((id: any) => id.id === categoryid)?.category
   }
 
-  getsubcategory(keySpecifiCationsid:any){
-    return this.categoryList.find((id: any) => id.id === keySpecifiCationsid)?.keySpecifiCations 
+  getsubcategory(keySpecifiCationsid: any) {
+    return this.categoryList.find((id: any) => id.id === keySpecifiCationsid)?.keySpecifiCations
   }
 }

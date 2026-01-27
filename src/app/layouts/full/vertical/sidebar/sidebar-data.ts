@@ -23,18 +23,33 @@ export const navItems: NavItem[] = [
     route: '/master/partymaster',
   },
   {
-    displayName: 'Purchase Master',
+    displayName: 'Purchase ',
     iconName: 'file-invoice',
     route: '/master/purchasemaster',
   },
   {
     displayName: 'Category Master',
-    iconName: 'file-invoice',
+    iconName: 'category',
     route: '/master/categorymaster',
   },
   {
     displayName: 'Sale Master',
-    iconName: 'file-invoice',
+    iconName: 'receipt-2',
     route: '/master/shellmaster',
+  },
+  {
+    displayName: 'Warranty Master',
+    iconName: 'shield-check',
+    route: '/master/warrantymaster',
+  },
+  {
+    displayName: 'Income/Expense',
+    iconName: 'presentation-analytics',
+     route: '/master/income-expense',
+  },
+  {
+    displayName: 'Balance',
+    iconName: 'wallet',
+     route: '/master/balance',
   },
 ]

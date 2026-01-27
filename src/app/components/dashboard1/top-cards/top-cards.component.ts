@@ -45,15 +45,15 @@ export class AppTopCardsComponent implements OnInit{
     {
       id: 4,
       color: 'error',
-      img: '/assets/images/svgs/icon-favorites.svg',
-      title: 'Pending Bills',
+      img: '/assets/images/svgs/mobile-phone-766.svg',
+      title: 'Ava.Bank ',
       subtitle: 0,
     },
     {
       id: 5,
       color: 'success',
-      img: '/assets/images/svgs/icon-speech-bubble.svg',
-      title: 'Ava. Balance',
+      img: '/assets/images/svgs/cash-payment-6401.svg',
+      title: 'Ava.Cash ',
       subtitle: 0,
     },
     {
@@ -68,16 +68,18 @@ export class AppTopCardsComponent implements OnInit{
   firmList:any [] =[];
   partyList :any [] =[];
   shellList :any [] =[];
+  categoryList :any [] =[];
 
   constructor(private firebaseService : FirebaseService, private loaderService : LoaderService , private translate : TranslateService){
     
     this.loaderService.setLoader(true)
     this.translate.get('dashboard').subscribe((res: any) => {
-      this.topcards[0].title = res[0].TotalFirm
-      this.topcards[1].title = res[1].TotalParty
-      this.topcards[5].title = res[4].TotalProduct
-      this.topcards[2].title = res[2].TotalInvoice
-      this.topcards[3].title = res[3].PendingBills
+      this.topcards[0].title = res[0].TotalFirm ;
+      this.topcards[1].title = res[1].TotalParty ;
+      this.topcards[2].title = res[2].TotalInvoice ;
+      this.topcards[3].title = res[3]?.Ava?.BankBalance ?? 'Ava.Bank';
+      this.topcards[5].title = res[4].TotalProduct;
+
     })
     this.loaderService.setLoader(false)
 
@@ -86,7 +88,9 @@ export class AppTopCardsComponent implements OnInit{
   ngOnInit(): void {
       this.getFirmList();
       this.getPartyList();
-      this. getShellList(); 
+      this.getShellList(); 
+      this.getBalanceList();
+      this.getCategoryList();
   }
 
     getFirmList() {
@@ -113,7 +117,7 @@ export class AppTopCardsComponent implements OnInit{
       }
 
 
-        getShellList() {
+     getShellList() {
           this.loaderService.setLoader(true)
           this.firebaseService.getAllShell().subscribe((res: any) => {
             if (res) {
@@ -122,6 +126,38 @@ export class AppTopCardsComponent implements OnInit{
             }
             this.loaderService.setLoader(false)
       
+          })
+       }
+
+      getBalanceList() {
+        this.loaderService.setLoader(true);
+
+        this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+          const userData = res.find(
+            item => item.userId === localStorage.getItem('userId')
+          );
+          if (userData) {
+            let totalBankBalance = 0;
+            userData.bankDetails?.forEach((bank: any) => {
+              totalBankBalance += parseFloat(bank.balance) || 0;
+            }
+            );
+            this.topcards[3].subtitle = totalBankBalance;
+
+            this.topcards[4].subtitle = userData.cashBalance || 0;
+          }
+          this.loaderService.setLoader(false);
+        });
+      }
+
+        getCategoryList() {
+          this.loaderService.setLoader(true)
+          this.firebaseService.getAllCategory().subscribe((res: any) => {
+            if (res) {
+              this.categoryList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+               this.topcards[5].subtitle = this.categoryList.length;
+              this.loaderService.setLoader(false)
+            }
           })
         }
 }

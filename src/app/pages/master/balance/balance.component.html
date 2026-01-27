@@ -1,0 +1,103 @@
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab label="Bank">
+        <mat-card class="cardWithShadow">
+            <mat-card-content class="p-24">
+                <div class="row justify-content-between">
+
+                    <form [formGroup]="balanceForm">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <mat-label>Cash Balance</mat-label>
+                                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                    <input type="number" matInput min="0" formControlName="cashBalance"
+                                        placeholder="Enter cashBalance">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-lg-6">
+                                <mat-label>Bank Balance</mat-label>
+                                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                    <input type="number" matInput min="0" [value]="totalBalance" disabled
+                                        placeholder="Enter cashBalance">
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div formArrayName="bankDetails">
+                            <div *ngFor="let bankGroup of bankDetails.controls; let i = index" [formGroupName]="i"
+                                class="row">
+
+                                <!-- <div class="col-lg-1 d-flex align-items-center">
+                                    <section class="example-section">
+                                        <mat-checkbox formControlName="selected" class="example-margin"
+                                            (change)="onCheckboxChange($event, i)"
+                                            [disabled]="selectedBankIndex !== null && selectedBankIndex !== i">
+                                        </mat-checkbox>
+                                    </section>
+                                </div> -->
+
+                                <div class="col-lg-3">
+                                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                        <mat-label>Bank Name</mat-label>
+                                        <input type="text" matInput formControlName="bankName" placeholder="Bank Name">
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                        <mat-label>Account Holder Name</mat-label>
+                                        <input type="text" matInput formControlName="accountHolderName"
+                                            placeholder="Account Holder Name">
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                        <mat-label>Mobile Number</mat-label>
+                                        <input type="number" matInput formControlName="mobileNumber"
+                                            placeholder="Mobile Number" min="0">
+                                        <mat-hint
+                                            *ngIf="balanceForm.get('mobileNumber')?.hasError('required') && balanceForm.get('mobileNumber')?.touched"
+                                            class="error-message error-color">
+                                            Invalid Mobile Number
+                                        </mat-hint>
+                                        <mat-hint
+                                            *ngIf="balanceForm.get('mobileNumber')?.hasError('pattern') && balanceForm.get('mobileNumber')?.touched"
+                                            class="error-message error-color">
+                                            Invalid Mobileno is Required
+                                        </mat-hint>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                                        <mat-label>Balance</mat-label>
+                                        <input type="number" matInput formControlName="balance" placeholder="Balance">
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="col-lg-1 d-flex align-items-center m-b-10">
+                                    <a class="m-r-10 cursor-pointer">
+                                        <i-tabler name="trash" (click)="removeBankDetail(i)" class="icon-18"></i-tabler>
+                                    </a>
+                                    <a class="m-r-10 cursor-pointer">
+                                        <i-tabler name="plus" (click)="addBankDetail()" class="icon-18"></i-tabler>
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-1 m-t-20">
+                            <button mat-flat-button [disabled]="!balanceForm.valid" color="primary"
+                                (click)="saveBalance()">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </mat-tab>
+</mat-tab-group>

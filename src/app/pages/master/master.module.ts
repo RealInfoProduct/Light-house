@@ -24,6 +24,13 @@ import { ShellDialogComponent } from './shell/shell-dialog/shell-dialog.componen
 import { ViewcompanyComponent } from './purchase-master/viewcompany/viewcompany.component';
 import { ViewShellComponent } from './shell/view-shell/view-shell.component';
 import { PaymentDetailsComponent } from './purchase-master/payment-details/payment-details.component';
+import { SalePaymentDetailsComponent } from './shell/sale-payment-details/sale-payment-details.component';
+import { IncomeExpenseComponent } from './income-expense/income-expense.component';
+import { IncomeExpenseDialogComponent } from './income-expense/income-expense-dialog/income-expense-dialog.component';
+import { BalanceComponent } from './balance/balance.component';
+import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
+import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warranty-dialog.component';
+import { ViewWarrantyComponent } from './warranty-master/view-warranty/view-warranty.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +46,14 @@ import { PaymentDetailsComponent } from './purchase-master/payment-details/payme
     ShellDialogComponent,
     ViewcompanyComponent,
     ViewShellComponent,
-    PaymentDetailsComponent
+    PaymentDetailsComponent,
+    SalePaymentDetailsComponent,
+    IncomeExpenseComponent,
+    IncomeExpenseDialogComponent,
+    BalanceComponent,
+    WarrantyMasterComponent,
+    WarrantyDialogComponent,
+    ViewWarrantyComponent,
   ],
   imports: [
     CommonModule,
@@ -54,7 +68,7 @@ import { PaymentDetailsComponent } from './purchase-master/payment-details/payme
     NgApexchartsModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,
-     NgxMatNativeDateModule,
+    NgxMatNativeDateModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

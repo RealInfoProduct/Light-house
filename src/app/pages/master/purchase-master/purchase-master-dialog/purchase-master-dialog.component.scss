@@ -13,12 +13,43 @@
   font-weight: 600;
 }
 
-.text-danger{
-      color: red;
+.text-danger {
+  color: red;
 }
 
-.payment{
-      font-weight: 900;
-    font-family: 'Plus Jakarta Sans';
-    font-style: initial;
+.payment {
+  font-weight: 900;
+  font-family: 'Plus Jakarta Sans';
+  font-style: initial;
+}
+
+.payment-date {
+  background-color: green;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  padding-left: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  margin-top: 8px;
+}
+
+.payment-width {
+  width: 190px;
+  margin-right: 10px;
+}
+
+.paymenttype-width {
+  // width: 190px;
+  // margin-right: 10px;
+  // display: flex;
+  // align-items: center;
+  width: 189px;
+  margin-top: 13px;
+}
+
+.bank-width {
+  margin-right: 10px;
 }

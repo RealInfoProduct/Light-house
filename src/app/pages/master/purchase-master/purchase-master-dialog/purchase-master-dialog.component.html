@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Purchase</h2>
-<mat-dialog-content class="mat-typography" style="max-width: 850px" *ngIf="action !== 'Delete'; else elseTemplate">
+<mat-dialog-content class="mat-typography" style="max-width: 950px" *ngIf="action !== 'Delete'; else elseTemplate">
   <form [formGroup]="productForm">
     <div class="row">
 
@@ -36,6 +36,17 @@
           <mat-datepicker-toggle matSuffix [for]="Date"></mat-datepicker-toggle>
           <mat-datepicker #Date></mat-datepicker>
         </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <mat-label>Payment Day's</mat-label>
+          <input type="number" matInput required (ngModelChange)="paymentDaysChange()" formControlName="paymentDays"
+            placeholder="Enter Payment Day's" min="0" (input)="limitDigits($event)">
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-4 payment-date">
+        Payment due date is &nbsp;<b>{{ paymentDays | date : "dd-MM-yyyy" }}</b>
       </div>
 
 
@@ -97,6 +108,16 @@
       </div>
     </div>
 
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <mat-label>Other Kharch</mat-label>
+          <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"
+            (input)="onOtherKharchInput($event)" />
+        </mat-form-field>
+      </div>
+    </div>
 
     <div class="row">
       <div class="col-12 col-md-6">
@@ -118,14 +139,17 @@
 
     <div formArrayName="paymentDetails" class="m-t-10" *ngIf="productForm.get('paymentReceived')?.value">
       <div class="row" *ngFor="let bankGroup of paymentDetails.controls; let i = index" [formGroupName]="i">
-        <div class="col-12 col-md-5">
+        <div class="payment-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received </mat-label>
             <input type="number" matInput required formControlName="paymentR" placeholder="Total" min="0" />
+            <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('cashExceeded')">
+              Cash Amount {{ balanceList?.cashBalance | number:'1.2-2' }}
+            </mat-error>
           </mat-form-field>
         </div>
 
-        <div class="col-12 col-md-5">
+        <div class="payment-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received Date</mat-label>
             <input matInput formControlName="paymentReceivedDate" [matDatepicker]="PaymentReceivedDate"
@@ -135,7 +159,28 @@
           </mat-form-field>
         </div>
 
-        <div class="col-lg-2 d-flex align-items-center m-b-10">
+        <div class="paymenttype-width">
+          <mat-radio-group formControlName="paymentType" required>
+            <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
+              {{ item }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="bank-width" *ngIf="bankGroup.get('paymentType')?.value === 'G-Pay'">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Bank</mat-label>
+            <mat-select value="text" formControlName="bankName" placeholder="Selecta Bank Name">
+              <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br>
+                ({{item.mobileNumber}})</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('insufficientBalance')">
+            Selected bank Amount {{ bank?.balance | number:'1.2-2' }}
+          </mat-error>
+        </div>
+
+        <div class=" d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
             <i-tabler name="trash" (click)="removepaymentDetail(i)" class="icon-18"></i-tabler>
           </a>

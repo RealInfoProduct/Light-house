@@ -70,11 +70,11 @@ export class HeaderComponent {
       code: 'en',
       icon: '../../../../../assets/images/flag/englishlanguage.png',
     },
-    {
-      language: 'Gujarati',
-      code: 'gu',
-      icon: '../../../../../assets/images/flag/gujaratilanguage.png',
-    }
+    // {
+    //   language: 'Gujarati',
+    //   code: 'gu',
+    //   icon: '../../../../../assets/images/flag/gujaratilanguage.png',
+    // }
   ];
 
   public selectedLanguage: any = this.languages.find((id:any) => id.code === localStorage.getItem('languageCode'))

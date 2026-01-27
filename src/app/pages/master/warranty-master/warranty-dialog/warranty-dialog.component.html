@@ -1,0 +1,181 @@
+<h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Warranty</h2>
+<mat-dialog-content class="mat-typography" style="max-width: 1200px" *ngIf="action !== 'Delete'; else elseTemplate">
+    <form [formGroup]="warrantyForm">
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Invoice No</mat-label>
+                    <mat-select formControlName="invoiceNo" placeholder="Invoice No"
+                        (selectionChange)="onWarrantyProductChange($event)">
+                        <input matInput class="search" type="text" placeholder="Search..."
+                            (keyup)="filterWarrantyProducts($event)" style="width: 100%; outline: none;">
+                        <mat-option [value]="item.invoiceNo"
+                            *ngFor="let item of filteredWarrantyProducts">{{item.invoiceNo}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Bill No</mat-label>
+                    <input type="number" matInput formControlName="billNumber" placeholder="Bill No" min="0" />
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Date</mat-label>
+                    <input matInput formControlName="date" [matDatepicker]="Date" placeholder="Enter date">
+                    <mat-datepicker-toggle matSuffix [for]="Date"></mat-datepicker-toggle>
+                    <mat-datepicker #Date></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Customer Name</mat-label>
+                    <input type="text" matInput required formControlName="customerName" placeholder="Customer Name" />
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Customer Address</mat-label>
+                    <textarea matInput required formControlName="customerAddress" placeholder="Address"
+                        rows="1"></textarea>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Customer Mobile No</mat-label>
+                    <input type="number" matInput required formControlName="mobileNumber"
+                        placeholder="Customer Mobile No" min="0" />
+                    <mat-hint
+                        *ngIf="warrantyForm.get('mobileNumber')?.hasError('required') && warrantyForm.get('mobileNumber')?.touched"
+                        class="error-message error-color">
+                        Mobileno is required
+                    </mat-hint>
+                    <mat-hint
+                        *ngIf="warrantyForm.get('mobileNumber')?.hasError('pattern') && warrantyForm.get('mobileNumber')?.touched"
+                        class="error-message error-color">
+                        Invalid mobileno is required
+                    </mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div formArrayName="shellDetails" class="m-t-10">
+            <div class="row" *ngFor="let bankGroup of shellDetails.controls; let i = index" [formGroupName]="i">
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Date</mat-label>
+                        <input matInput formControlName="saleDate" [matDatepicker]="saleDate" placeholder="Enter date">
+                        <mat-datepicker-toggle matSuffix [for]="saleDate"></mat-datepicker-toggle>
+                        <mat-datepicker #saleDate></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <!-- <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Company Name</mat-label>
+                        <mat-select formControlName="companyName" placeholder="Company Name"
+                            (selectionChange)="onCompanyChange(i)">
+                            <mat-option [value]="item.id"
+                                *ngFor="let item of companyList">{{item.companyName}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Category Name</mat-label>
+                        <mat-select formControlName="category" placeholder="Category Name">
+                            <mat-option [value]="item.id" *ngFor="let item of filteredCategoryList[i]">
+                                {{item.category}} - {{item.keySpecifiCations}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div> -->
+
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Company Name</mat-label>
+                        <input type="text" matInput formControlName="companyName" placeholder="Company Name" />
+                    </mat-form-field>
+                </div>
+
+                <div class="in-widths">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Category Name</mat-label>
+                        <input type="text" matInput formControlName="category" placeholder="Category Name" />
+                    </mat-form-field>
+                </div>
+
+                <div class="input-width-warranty">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Warranty</mat-label>
+                        <input type="number" matInput formControlName="warranty" placeholder="Prouct Warranty"
+                            min="0" />
+                    </mat-form-field>
+                </div>
+
+                <div class="input-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Qty</mat-label>
+                        <input type="number" matInput formControlName="qty" placeholder="Prouct Qty" min="0" />
+                    </mat-form-field>
+                </div>
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Date</mat-label>
+                        <input matInput formControlName="warrantyDate" [matDatepicker]="warrantyDate"
+                            placeholder="Enter date">
+                        <mat-datepicker-toggle matSuffix [for]="warrantyDate"></mat-datepicker-toggle>
+                        <mat-datepicker #warrantyDate></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <div class="in-width">
+                    <mat-form-field appearance="outline" class="w-100 m-t-10">
+                        <mat-label>Warranty Type</mat-label>
+                        <mat-select formControlName="warrantyType" placeholder="Warranty Type">
+                            <mat-option [value]="item" *ngFor="let item of warrantyTypeList">{{item}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="add-width d-flex align-items-center m-b-10">
+                    <a class="m-r-10 cursor-pointer" *ngIf="shellDetails.length > 1">
+                        <i-tabler name="trash" (click)="removeShellDetail(i)" class="icon-18"></i-tabler>
+                    </a>
+                    <!-- <a class="m-r-10 cursor-pointer">
+            <i-tabler name="plus" (click)="addShellDetail()" class="icon-18"></i-tabler>
+          </a> -->
+                </div>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+        <mat-dialog-actions class="p-24 justify-content-end">
+            <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+            <button mat-flat-button [mat-dialog-close]="true" [disabled]="!warrantyForm.valid" color="primary"
+                (click)="warrantyPayload();">
+                {{'actions.' + action | translate}}
+            </button>
+        </mat-dialog-actions>
+    </form>
+</mat-dialog-content>
+<ng-template #elseTemplate>
+    <div class="p-x-24">
+        <p>Sure to delete <span class="f-w-600">{{local_data.Name}}</span> ?</p>
+    </div>
+    <mat-divider></mat-divider>
+    <div mat-dialog-actions class="p-x-24 p-b-24 m-t-10 justify-content-end">
+        <button mat-button (click)="warrantyPayload()" mat-flat-button color="warn">
+            {{'actions.' + action | translate}}
+        </button>
+        <button mat-stroked-button color="warn" (click)="closeDialog()" class="m-l-8">Cancel</button>
+    </div>
+</ng-template>
