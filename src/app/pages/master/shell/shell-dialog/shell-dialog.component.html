@@ -42,18 +42,21 @@
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Customer Mobile No</mat-label>
-          <input type="number" matInput required formControlName="mobileNumber" placeholder="Customer Mobile No" min="0"/>
-           <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('required') && saleForm.get('mobileNumber')?.touched" class="error-message error-color">
-           Mobileno is required
+          <input type="number" matInput required formControlName="mobileNumber" placeholder="Customer Mobile No"
+            min="0" />
+          <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('required') && saleForm.get('mobileNumber')?.touched"
+            class="error-message error-color">
+            Mobileno is required
           </mat-hint>
-          <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('pattern') && saleForm.get('mobileNumber')?.touched" class="error-message error-color">
-           Invalid mobileno is required
+          <mat-hint *ngIf="saleForm.get('mobileNumber')?.hasError('pattern') && saleForm.get('mobileNumber')?.touched"
+            class="error-message error-color">
+            Invalid mobileno is required
           </mat-hint>
         </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
+        <mat-form-field appearance="outline" class="w-100">
           <mat-label>Status</mat-label>
           <mat-select value="text" formControlName="paymentStatus" placeholder="Selecta Status">
             <mat-option *ngFor="let item of StatusList" [value]="item.type"
@@ -67,19 +70,19 @@
     <div formArrayName="shellDetails" class="m-t-10">
       <div class="row" *ngFor="let bankGroup of shellDetails.controls; let i = index" [formGroupName]="i">
 
-        <div class="in-width"> 
-            <mat-form-field appearance="outline" class="w-100 m-t-10">
-              <mat-label>Date</mat-label>
-              <input matInput formControlName="saleDate" [matDatepicker]="saleDate" placeholder="Enter date">
-              <mat-datepicker-toggle matSuffix [for]="saleDate"></mat-datepicker-toggle>
-              <mat-datepicker #saleDate></mat-datepicker>
-            </mat-form-field>
+        <div class="in-width">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
+            <mat-label>Date</mat-label>
+            <input matInput formControlName="saleDate" [matDatepicker]="saleDate" placeholder="Enter date">
+            <mat-datepicker-toggle matSuffix [for]="saleDate"></mat-datepicker-toggle>
+            <mat-datepicker #saleDate></mat-datepicker>
+          </mat-form-field>
         </div>
 
         <div class="in-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Company Name</mat-label>
-            <mat-select formControlName="companyName" placeholder="Company Name"  (selectionChange)="onCompanyChange(i)">
+            <mat-select formControlName="companyName" placeholder="Company Name" (selectionChange)="onCompanyChange(i)">
               <mat-option [value]="item" *ngFor="let item of companyList">{{item.companyName}}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -88,9 +91,10 @@
         <div class="in-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Category Name</mat-label>
-            <mat-select formControlName="category" placeholder="Category Name"  (selectionChange)="onCategoryChange($event, i)">
+            <mat-select formControlName="category" placeholder="Category Name"
+              (selectionChange)="onCategoryChange($event, i)">
               <mat-option [value]="item" *ngFor="let item of filteredCategoryList[i]">
-                 {{item.category}} - {{item.keySpecifiCations}}</mat-option>
+                {{item.category}} - {{item.keySpecifiCations}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -99,7 +103,7 @@
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Warranty</mat-label>
             <input type="number" matInput formControlName="warranty" placeholder="Prouct Warranty" min="0" />
-          </mat-form-field>          
+          </mat-form-field>
         </div>
 
         <div class="input-width">
@@ -112,7 +116,7 @@
             <mat-error *ngIf="shellDetails.at(i).get('qty')?.hasError('exceedsStock')">
               Quantity cannot exceed available stock {{ shellDetails.at(i).get('category')?.value.stockCount }}
             </mat-error>
-          </mat-form-field>          
+          </mat-form-field>
         </div>
 
         <div class="input-width">
@@ -146,15 +150,15 @@
         </div>
       </div>
     </div>
-     <mat-divider></mat-divider>
+    <mat-divider></mat-divider>
     <div class="row">
       <div class="col-12 col-md-6"></div>
       <div class="col-12 col-md-1"></div>
       <div class="col-12 col-sm-5 total-align">
-         <mat-label  class="f-w-600">Total : </mat-label>
-          <mat-form-field appearance="outline" class="w-20 m-t-10  m-l-42">
-            <input matInput  [value]="saleForm.get('total')?.value | number:'1.2-2'" readonly />
-          </mat-form-field>
+        <mat-label class="f-w-600">Total : </mat-label>
+        <mat-form-field appearance="outline" class="w-20 m-t-10  m-l-42">
+          <input matInput [value]="saleForm.get('total')?.value | number:'1.2-2'" readonly />
+        </mat-form-field>
       </div>
     </div>
 
@@ -162,34 +166,35 @@
       <div class="col-12 col-md-6"></div>
       <div class="col-12 col-md-1"></div>
       <div class="col-12 col-sm-5 discount-align">
-        <mat-label  class="f-w-600">Discount ₹ : </mat-label>
-          <mat-form-field appearance="outline" class="w-20">
-            <input type="number" matInput formControlName="extraDiscount" min="0" />
-          </mat-form-field>
+        <mat-label class="f-w-600">Discount ₹ : </mat-label>
+        <mat-form-field appearance="outline" class="w-20">
+          <input type="number" matInput formControlName="extraDiscount" min="0" />
+        </mat-form-field>
       </div>
     </div>
-   
+
     <div class="row">
       <div class="col-12 col-md-6"></div>
       <div class="col-12 col-md-1"></div>
       <div class="col-12 col-md-5">
-        <mat-label  class="font-family">Grand Total : </mat-label>
-          <mat-form-field appearance="outline" class="w-20 m-t-10">
-            <input matInput class="font-family"  [value]="saleForm.get('grandTotal')?.value | number:'1.2-2'"  readonly />
-          </mat-form-field>
+        <mat-label class="font-family">Grand Total : </mat-label>
+        <mat-form-field appearance="outline" class="w-20 m-t-10">
+          <input matInput class="font-family" [value]="saleForm.get('grandTotal')?.value | number:'1.2-2'" readonly />
+        </mat-form-field>
       </div>
     </div>
 
-     <div class="row">
-        <div class="col-12 col-md-3">
-          <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Other Kharch</mat-label>
-            <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"   (input)="onOtherKharchInput($event)"/>
-          </mat-form-field>
-        </div>
+    <div class="row">
+      <div class="col-12 col-md-3">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <mat-label>Other Kharch</mat-label>
+          <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"
+            (input)="onOtherKharchInput($event)" />
+        </mat-form-field>
       </div>
+    </div>
 
-     <div>
+    <div>
       <section class="example-section">
         <mat-checkbox formControlName="paymentReceived">
           Pending Payment
@@ -237,7 +242,7 @@
           </a>
         </div> -->
 
-         <div class="payment-width">
+        <div class="payment-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received </mat-label>
             <input type="number" matInput required formControlName="paymentR" placeholder="Total" min="0" />
@@ -253,23 +258,24 @@
             <mat-datepicker #PaymentReceivedDate></mat-datepicker>
           </mat-form-field>
         </div>
-        
-         <div class="paymenttype-width">
-            <mat-radio-group formControlName="paymentType" required>
-              <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
-                {{ item }}
-              </mat-radio-button>
-            </mat-radio-group>
-         </div>
 
-         <div class="bank-width" *ngIf="bankGroup.get('paymentType')?.value === 'G-Pay'">
-            <mat-form-field appearance="outline" class="w-100 m-t-10">
+        <div class="paymenttype-width">
+          <mat-radio-group formControlName="paymentType" required>
+            <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
+              {{ item }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="bank-width" *ngIf="bankGroup.get('paymentType')?.value === 'G-Pay'">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Bank</mat-label>
             <mat-select value="text" formControlName="bankName" placeholder="Selecta Bank Name">
-              <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br> ({{item.mobileNumber}})</mat-option>
+              <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br>
+                ({{item.mobileNumber}})</mat-option>
             </mat-select>
           </mat-form-field>
-         </div>
+        </div>
 
         <div class=" d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
@@ -289,7 +295,7 @@
     <mat-dialog-actions class="p-24 justify-content-end">
       <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
       <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
-      [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
+        [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
         (click)="shellPayload();">
         {{'actions.' + action | translate}}
       </button>

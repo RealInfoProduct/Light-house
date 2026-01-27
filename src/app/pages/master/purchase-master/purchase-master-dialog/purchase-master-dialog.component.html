@@ -38,16 +38,16 @@
         </mat-form-field>
       </div>
 
-        <div class="col-12 col-md-4">
-          <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Payment Day's</mat-label>
-            <input type="number" matInput required (ngModelChange)="paymentDaysChange()" formControlName="paymentDays"
-              placeholder="Enter Payment Day's" min="0"   (input)="limitDigits($event)" >
-          </mat-form-field>
-        </div>
-        <div class="col-12 col-md-4 payment-date">
-          Payment due date is &nbsp;<b>{{ paymentDays | date : "dd-MM-yyyy" }}</b>
-        </div>
+      <div class="col-12 col-md-4">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <mat-label>Payment Day's</mat-label>
+          <input type="number" matInput required (ngModelChange)="paymentDaysChange()" formControlName="paymentDays"
+            placeholder="Enter Payment Day's" min="0" (input)="limitDigits($event)">
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-4 payment-date">
+        Payment due date is &nbsp;<b>{{ paymentDays | date : "dd-MM-yyyy" }}</b>
+      </div>
 
 
     </div>
@@ -107,16 +107,17 @@
         </div>
       </div>
     </div>
-    
-  <mat-divider></mat-divider>
-      <div class="row">
-        <div class="col-12 col-md-6">
-          <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Other Kharch</mat-label>
-            <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"   (input)="onOtherKharchInput($event)"/>
-          </mat-form-field>
-        </div>
+
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <mat-form-field appearance="outline" class="w-100 m-t-10">
+          <mat-label>Other Kharch</mat-label>
+          <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"
+            (input)="onOtherKharchInput($event)" />
+        </mat-form-field>
       </div>
+    </div>
 
     <div class="row">
       <div class="col-12 col-md-6">
@@ -142,9 +143,9 @@
           <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Payment Received </mat-label>
             <input type="number" matInput required formControlName="paymentR" placeholder="Total" min="0" />
-              <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('cashExceeded')">
-               Cash Amount {{ balanceList?.cashBalance | number:'1.2-2' }}
-          </mat-error>
+            <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('cashExceeded')">
+              Cash Amount {{ balanceList?.cashBalance | number:'1.2-2' }}
+            </mat-error>
           </mat-form-field>
         </div>
 
@@ -157,26 +158,27 @@
             <mat-datepicker #PaymentReceivedDate></mat-datepicker>
           </mat-form-field>
         </div>
-        
-         <div class="paymenttype-width">
-            <mat-radio-group formControlName="paymentType" required>
-              <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
-                {{ item }}
-              </mat-radio-button>
-            </mat-radio-group>
-         </div>
 
-         <div class="bank-width" *ngIf="bankGroup.get('paymentType')?.value === 'G-Pay'">
-            <mat-form-field appearance="outline" class="w-100 m-t-10">
+        <div class="paymenttype-width">
+          <mat-radio-group formControlName="paymentType" required>
+            <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
+              {{ item }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div class="bank-width" *ngIf="bankGroup.get('paymentType')?.value === 'G-Pay'">
+          <mat-form-field appearance="outline" class="w-100 m-t-10">
             <mat-label>Bank</mat-label>
             <mat-select value="text" formControlName="bankName" placeholder="Selecta Bank Name">
-              <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br> ({{item.mobileNumber}})</mat-option>
+              <mat-option *ngFor="let item of balanceList.bankDetails" [value]="item">{{item.bankName}}<br>
+                ({{item.mobileNumber}})</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-error *ngIf="bankGroup.get('paymentR')?.hasError('insufficientBalance')">
             Selected bank Amount {{ bank?.balance | number:'1.2-2' }}
           </mat-error>
-          </div>
+        </div>
 
         <div class=" d-flex align-items-center m-b-10">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">

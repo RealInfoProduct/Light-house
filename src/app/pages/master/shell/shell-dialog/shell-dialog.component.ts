@@ -16,7 +16,7 @@ export class ShellDialogComponent implements OnInit {
   filteredRentProducts: any[] = [];
   companyList: any[] = [];
   categoryList: any[] = [];
-   balanceList: any = [];
+  balanceList: any = [];
   StatusList: any[] = [
     { type: 'Pending' },
     { type: 'Paid' },
@@ -50,7 +50,7 @@ export class ShellDialogComponent implements OnInit {
     this.getCategoryList();
     this.calculatePending();
     this.getBalanceList();
-    
+
     if (this.action === 'Edit') {
       this.saleForm.patchValue(this.local_data);
       this.local_data.shellDetails.forEach((detail: any, index: number) => {
@@ -65,7 +65,7 @@ export class ShellDialogComponent implements OnInit {
             companyName: detail.companyName,
             category: detail.category,
             qty: detail.qty,
-            warranty:detail.warranty,
+            warranty: detail.warranty,
             productPrice: detail.productPrice,
             discount: detail.discount,
             subTotal: detail.subTotal,
@@ -79,7 +79,7 @@ export class ShellDialogComponent implements OnInit {
           ]);
           formGroup.get('qty')?.updateValueAndValidity();
         }
-        
+
       });
       // this.local_data.paymentDetails.forEach((detail: any, index: number) => {
       //   if (index > 0) this.addpaymentDetail();
@@ -157,16 +157,16 @@ export class ShellDialogComponent implements OnInit {
   //   this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
   // }
   calculateGrandTotalWithExtra() {
-  const total = Number(this.saleForm.get('total')?.value) || 0;
-  const extraDiscounts = Number(this.saleForm.get('extraDiscount')?.value) || 0;
-  const otherKharch = Number(this.saleForm.get('otherKharch')?.value) || 0;
+    const total = Number(this.saleForm.get('total')?.value) || 0;
+    const extraDiscounts = Number(this.saleForm.get('extraDiscount')?.value) || 0;
+    const otherKharch = Number(this.saleForm.get('otherKharch')?.value) || 0;
 
-  // grandTotal = total - discount + otherKharch
-  const grandTotal = total - extraDiscounts + otherKharch;
+    // grandTotal = total - discount + otherKharch
+    const grandTotal = total - extraDiscounts + otherKharch;
 
-  this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
-  this.calculatePending();
-}
+    this.saleForm.get('grandTotal')?.setValue(grandTotal, { emitEvent: false });
+    this.calculatePending();
+  }
 
 
   calculatePending() {
@@ -188,30 +188,30 @@ export class ShellDialogComponent implements OnInit {
   }
 
   onOtherKharchInput(event: any) {
-  let value = event.target.value;
+    let value = event.target.value;
 
-  if (value.length > 1 && value.startsWith('0')) {
-    event.target.value = value.replace(/^0+/, '');
-    this.saleForm.get('otherKharch')?.setValue(event.target.value);
+    if (value.length > 1 && value.startsWith('0')) {
+      event.target.value = value.replace(/^0+/, '');
+      this.saleForm.get('otherKharch')?.setValue(event.target.value);
+    }
+
+    this.calculateGrandTotalWithExtra();
   }
-
-  this.calculateGrandTotalWithExtra();
-}
 
   setAutoBillNo() {
-  this.firebaseService.getAllShell().subscribe((res: any) => {
-  const userId = localStorage.getItem("userId");
-  let invoiceNumber = 1;
+    this.firebaseService.getAllShell().subscribe((res: any) => {
+      const userId = localStorage.getItem("userId");
+      let invoiceNumber = 1;
 
-  if (res && res.length > 0) {
-    const userData = res.filter((item: any) => item.userId === userId);
-    invoiceNumber = userData.length + 1;
-  }
+      if (res && res.length > 0) {
+        const userData = res.filter((item: any) => item.userId === userId);
+        invoiceNumber = userData.length + 1;
+      }
 
-  const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
+      const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
 
-  this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
-});
+      this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
+    });
   }
 
   buildForm() {
@@ -253,16 +253,16 @@ export class ShellDialogComponent implements OnInit {
       this.calculateSubTotal(group);
     });
 
-  //    group.get('category')?.valueChanges.subscribe((selectedCategory: any) => {
-  //   const stockCount = selectedCategory ? selectedCategory.stockCount : 0;
-  //   group.get('qty')?.setValidators([
-  //     Validators.required,
-  //     Validators.min(1),
-  //     this.stockQtyValidator(stockCount)
-  //   ]);
-  //   group.get('qty')?.updateValueAndValidity({ emitEvent: false });
-  //  });
-    
+    //    group.get('category')?.valueChanges.subscribe((selectedCategory: any) => {
+    //   const stockCount = selectedCategory ? selectedCategory.stockCount : 0;
+    //   group.get('qty')?.setValidators([
+    //     Validators.required,
+    //     Validators.min(1),
+    //     this.stockQtyValidator(stockCount)
+    //   ]);
+    //   group.get('qty')?.updateValueAndValidity({ emitEvent: false });
+    //  });
+
     return group;
   }
 
@@ -353,9 +353,9 @@ export class ShellDialogComponent implements OnInit {
       this.filteredCategoryList[index] = this.categoryList.filter(
         (cat: any) => cat.companyName === selectedCompany.companyName
       );
-        group.get('qty')?.setValue('');
-        group.get('qty')?.setValidators([Validators.required, Validators.min(1)]);
-        group.get('qty')?.updateValueAndValidity({ emitEvent: false });
+      group.get('qty')?.setValue('');
+      group.get('qty')?.setValidators([Validators.required, Validators.min(1)]);
+      group.get('qty')?.updateValueAndValidity({ emitEvent: false });
     } else {
       group.get('category')?.reset();
       group.get('category')?.disable();
@@ -364,31 +364,31 @@ export class ShellDialogComponent implements OnInit {
     }
   }
 
-onCategoryChange(event: any, index: number) {
-  const group = this.shellDetails.at(index) as FormGroup;
-  const selectedCategory = event.value;
-if (selectedCategory && selectedCategory.warrantyPeriods != null) {
-   group.get('warranty')?.setValue(selectedCategory.warrantyPeriods);
-  } else {
-   group.get('warranty')?.setValue(null);
+  onCategoryChange(event: any, index: number) {
+    const group = this.shellDetails.at(index) as FormGroup;
+    const selectedCategory = event.value;
+    if (selectedCategory && selectedCategory.warrantyPeriods != null) {
+      group.get('warranty')?.setValue(selectedCategory.warrantyPeriods);
+    } else {
+      group.get('warranty')?.setValue(null);
+    }
+    if (!selectedCategory) return;
+
+    const stockCount = selectedCategory.stockCount || 0;
+
+    let oldQty = 0;
+    if (this.action === 'Edit' && this.local_data?.shellDetails?.[index]) {
+      oldQty = Number(this.local_data.shellDetails[index]?.qty || 0);
+    }
+
+    group.get('qty')?.setValidators([
+      Validators.required,
+      Validators.min(1),
+      this.stockQtyValidator(stockCount, oldQty)
+    ]);
+
+    group.get('qty')?.updateValueAndValidity();
   }
-  if (!selectedCategory) return;
-
-  const stockCount = selectedCategory.stockCount || 0;
-
-  let oldQty = 0;
-  if (this.action === 'Edit' && this.local_data?.shellDetails?.[index]) {
-    oldQty = Number(this.local_data.shellDetails[index]?.qty || 0);
-  }
-
-  group.get('qty')?.setValidators([
-    Validators.required,
-    Validators.min(1),
-    this.stockQtyValidator(stockCount, oldQty)
-  ]);
-
-  group.get('qty')?.updateValueAndValidity();
-}
 
 
   closeDialog(): void {
@@ -443,7 +443,7 @@ if (selectedCategory && selectedCategory.warrantyPeriods != null) {
   }
 
 
-   stockQtyValidator(stockCount: number, oldQty: number = 0): ValidatorFn {
+  stockQtyValidator(stockCount: number, oldQty: number = 0): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const qty = Number(control.value) || 0;
 
@@ -458,46 +458,46 @@ if (selectedCategory && selectedCategory.warrantyPeriods != null) {
   }
 
   getBalanceList() {
-  this.loaderService.setLoader(true);
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
-    if (res) {
-      this.balanceList = res.find(
-        item => item.userId === localStorage.getItem('userId')
-      );
-      if (this.action === 'Edit') {
-        this.patchPaymentDetails();
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
+        if (this.action === 'Edit') {
+          this.patchPaymentDetails();
+        }
       }
-    }
-    this.loaderService.setLoader(false);
-  });
-}
-
-
-patchPaymentDetails() {
-  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
-    if (index > 0) this.addpaymentDetail();
-
-    const formGroup = this.paymentDetails.at(index) as FormGroup;
-    if (!formGroup) return;
-
-    const paymentDate = detail.paymentReceivedDate
-      ? new Date(detail.paymentReceivedDate.seconds * 1000)
-      : null;
-
-    let selectedBank = null;
-    if (this.balanceList?.bankDetails?.length) {
-      selectedBank = this.balanceList.bankDetails.find(
-        (bank: any) => bank.id === detail.bankName
-      );
-    }
-    formGroup.patchValue({
-      paymentR: detail.paymentR,
-      paymentReceivedDate: paymentDate,
-      paymentType: detail.paymentType,
-      bankName: selectedBank ,
+      this.loaderService.setLoader(false);
     });
-  });
-}
+  }
+
+
+  patchPaymentDetails() {
+    this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+      if (index > 0) this.addpaymentDetail();
+
+      const formGroup = this.paymentDetails.at(index) as FormGroup;
+      if (!formGroup) return;
+
+      const paymentDate = detail.paymentReceivedDate
+        ? new Date(detail.paymentReceivedDate.seconds * 1000)
+        : null;
+
+      let selectedBank = null;
+      if (this.balanceList?.bankDetails?.length) {
+        selectedBank = this.balanceList.bankDetails.find(
+          (bank: any) => bank.id === detail.bankName
+        );
+      }
+      formGroup.patchValue({
+        paymentR: detail.paymentR,
+        paymentReceivedDate: paymentDate,
+        paymentType: detail.paymentType,
+        bankName: selectedBank,
+      });
+    });
+  }
 
 }

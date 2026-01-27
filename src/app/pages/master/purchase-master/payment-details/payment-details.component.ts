@@ -15,7 +15,7 @@ export class PaymentDetailsComponent implements OnInit {
     'paymentR',
     'paymentReceivedDate',
     'paymenttype',
-      'bank'
+    'bank'
   ];
 
   Viewpayment: any = {};

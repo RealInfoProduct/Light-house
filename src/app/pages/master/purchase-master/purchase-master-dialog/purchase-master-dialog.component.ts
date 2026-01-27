@@ -450,8 +450,4 @@ checkPaymentError(group: FormGroup) {
     this.calculateGrandTotal();
   }
 
-
-
-
-
 }
