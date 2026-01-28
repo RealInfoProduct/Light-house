@@ -39,6 +39,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   categoryList:any []=[]
   incomeExpenseList:any []=[]
    balanceList:any =[]
+  firmList: any = []
 
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -54,11 +55,12 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-      this.getShellList();
-      this.getCategoryList();
-      this.dateform();
-      this.getExpensesList();
-       this.getBalanceList()
+    this.getShellList();
+    this.getCategoryList();
+    this.dateform();
+    this.getExpensesList();
+    this.getBalanceList();
+    this.getFirmList();
   }
 
   ngAfterViewInit() {
@@ -435,93 +437,103 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   getBalanceList() {
-  this.loaderService.setLoader(true);
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllBalance().subscribe((res: any[]) => {
-    if (res) {
-      this.balanceList = res.find(
-        item => item.userId === localStorage.getItem('userId')
-      );
+    this.firebaseService.getAllBalance().subscribe((res: any[]) => {
+      if (res) {
+        this.balanceList = res.find(
+          item => item.userId === localStorage.getItem('userId')
+        );
 
+      }
+      this.loaderService.setLoader(false);
+    });
+  }
+
+  getFirmList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllFirm().subscribe((res: any) => {
+      if (res) {
+        this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
+
+  filedownload() {
+    const doc: any = new jsPDF();
+    doc.setFontSize(13);
+    const filteredData: any[] = this.shellDataSource.data;
+
+    if (!filteredData || filteredData.length === 0) {
+      window.alert("No Shell data available for the selected filters.");
+      return;
     }
-    this.loaderService.setLoader(false);
-  });
-}
 
-   filedownload() {
-     const doc: any = new jsPDF();
-     doc.setFontSize(13);
-     const filteredData: any[] = this.shellDataSource.data;
- 
-     if (!filteredData || filteredData.length === 0) {
-       window.alert("No Shell data available for the selected filters.");
-       return;
-     }
- 
-     const startDate = this.dateSaleListForm.value.start;
-     const endDate = this.dateSaleListForm.value.end;
- 
-     const formattedStart = new Date(startDate).toLocaleDateString('en-GB');
-     const formattedEnd = new Date(endDate).toLocaleDateString('en-GB');
- 
-     doc.text(`Report Date: ${formattedStart} To ${formattedEnd}`, 14, 15);
- 
-     const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
-     const FinalTotalAmount = Math.round(TotalAmounttotal).toLocaleString('en-IN', {
-       minimumFractionDigits: 2,
-       maximumFractionDigits: 2
-     });
-     doc.text(`Final Total: ${(FinalTotalAmount)}`, 135, 11);
- 
-     const RecivedtotalAmount = filteredData.reduce((sum: number, item: any) => {
-       if (item.paymentDetails && Array.isArray(item.paymentDetails)) {
-         return sum + item.paymentDetails.reduce((innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0), 0);
-       }
-       return sum;
-     }, 0);
-     const RecivedAmount = Math.round(RecivedtotalAmount).toLocaleString('en-IN', {
-       minimumFractionDigits: 2,
-       maximumFractionDigits: 2
-     });
-     doc.text(`Spent Total: ${(RecivedAmount)}`, 135, 19);
- 
-      const PendingtotalAmount = filteredData.reduce((sum: number, item: any) => {
-        const paymentReceived = item.paymentDetails?.reduce(
-          (innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0),
-          0
-        ) || 0;
-        const totalAmount = item.grandTotal || 0;
-        return sum + (totalAmount - paymentReceived);
-      }, 0);
- 
-      const PendingAmount = Math.round(PendingtotalAmount).toLocaleString('en-IN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
- 
-      doc.text(`Pending Total: ${PendingAmount}`, 135, 27);
-     
-     const headers = [
-       "Sr.No",
-       "Bill No",
-       "Invoice No",
-       "Date",
-       "Customer Name",
-       "Customer Mobile",
-       "Status",
-       "Amount Final",
-       "Amount Spent",
-       "Pending Amount"
-     ];
- 
-     const data = filteredData.map((item, i) => {
- 
-   const dateStr = moment(item.date).format('DD/MM/YYYY');
- 
-   const paymentReceived = item.paymentDetails.reduce(
-     (sum: number, pd: any) => sum + (pd.paymentR || 0),
-     0
-   );
+    const startDate = this.dateSaleListForm.value.start;
+    const endDate = this.dateSaleListForm.value.end;
+
+    const formattedStart = new Date(startDate).toLocaleDateString('en-GB');
+    const formattedEnd = new Date(endDate).toLocaleDateString('en-GB');
+
+    doc.text(`Report Date: ${formattedStart} To ${formattedEnd}`, 14, 15);
+
+    const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
+    const FinalTotalAmount = Math.round(TotalAmounttotal).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    doc.text(`Final Total: ${(FinalTotalAmount)}`, 135, 11);
+
+    const RecivedtotalAmount = filteredData.reduce((sum: number, item: any) => {
+      if (item.paymentDetails && Array.isArray(item.paymentDetails)) {
+        return sum + item.paymentDetails.reduce((innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0), 0);
+      }
+      return sum;
+    }, 0);
+    const RecivedAmount = Math.round(RecivedtotalAmount).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    doc.text(`Spent Total: ${(RecivedAmount)}`, 135, 19);
+
+    const PendingtotalAmount = filteredData.reduce((sum: number, item: any) => {
+      const paymentReceived = item.paymentDetails?.reduce(
+        (innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0),
+        0
+      ) || 0;
+      const totalAmount = item.grandTotal || 0;
+      return sum + (totalAmount - paymentReceived);
+    }, 0);
+
+    const PendingAmount = Math.round(PendingtotalAmount).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    doc.text(`Pending Total: ${PendingAmount}`, 135, 27);
+
+    const headers = [
+      "Sr.No",
+      "Bill No",
+      "Invoice No",
+      "Date",
+      "Customer Name",
+      "Customer Mobile",
+      "Status",
+      "Amount Final",
+      "Amount Spent",
+      "Pending Amount"
+    ];
+
+    const data = filteredData.map((item, i) => {
+
+      const dateStr = moment(item.date).format('DD/MM/YYYY');
+
+      const paymentReceived = item.paymentDetails.reduce(
+        (sum: number, pd: any) => sum + (pd.paymentR || 0),
+        0
+       );
  
    const totalAmount = item.grandTotal || 0;
  
@@ -553,7 +565,6 @@ export class ShellComponent implements OnInit ,AfterViewInit {
          ]);
        }
      }
- 
      doc.setFontSize(10);
      (doc as any).autoTable({
        head: [headers],
@@ -575,6 +586,229 @@ export class ShellComponent implements OnInit ,AfterViewInit {
  
      doc.save(`Shell Report.pdf`);
    }
-   
+
+  setPaymentStatusColor(doc: jsPDF, status: string) {
+    switch (status) {
+      case 'Paid':
+        doc.setTextColor(46, 204, 113); // Green
+        break;
+      case 'Pending':
+        doc.setTextColor(241, 196, 15); // Yellow/Orange
+        break;
+      case 'Unpaid':
+        doc.setTextColor(231, 76, 60); // Red
+        break;
+      default:
+        doc.setTextColor(0, 0, 0); // Black
+    }
+  }
+
+
+  fileDataDownload(item: any) {
+    const doc = new jsPDF();
+
+    const firm = this.firmList[0];
+    // =========================
+    // Modern Header Section
+    // =========================
+    // Company Header
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('YOUR COMPANY NAME', 10, 15);
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Address:- ${firm.address || ''}`, 10, 25);
+    doc.text(`Phone:- ${firm.mobileNo || ''}`, 10, 30);
+    doc.text(`GST:- ${firm.gstNo || ''}`, 10, 35);
+
+    // Invoice Title
+    doc.setTextColor(41, 128, 185);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INVOICE', 200, 15, { align: 'right' });
+
+    // Invoice Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+
+    doc.setTextColor(255, 0, 0);
+    doc.text(`Invoice No:`, 192, 25, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+    doc.text(` ${item.invoiceNo}`, 200, 25, { align: 'right' });
+
+    doc.setTextColor(255, 0, 0);
+    doc.text(`Bill No:`, 192, 30, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+    doc.text(` ${item.billNumber}`, 200, 30, { align: 'right' });
+
+    doc.text(`Date: ${moment(item.date).format('DD/MM/YYYY')}`, 200, 35, { align: 'right' });
+
+    doc.setDrawColor(100, 100, 100);
+    doc.setLineWidth(0.5);
+    doc.line(0, 40, 210, 40);
+
+    // =========================
+    // Customer & Payment Section
+    // =========================
+    // Customer Information
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(41, 128, 185);
+    doc.text('BILL TO:', 10, 50);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Name:- ${item.customerName}`, 10, 60);
+    doc.text(`Address:- ${item.customerAddress || 'No address provided'}`, 10, 65);
+    doc.text(`Mobile:- ${item.mobileNumber || 'N/A'}`, 10, 70);
+
+
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(41, 128, 185);
+    doc.text('PAYMENT SUMMARY', 195, 181, { align: 'right' });
+
+
+    // Calculate amounts
+    const receivedAmount = item.paymentDetails?.reduce(
+      (sum: number, pd: any) => sum + (Number(pd.paymentR) || 0),
+      0
+    ) || 0;
+
+    const pendingAmount = (item.grandTotal || 0) - receivedAmount;
+
+    // Payment details
+    doc.text(`Total :`, 180, 186, { align: 'right' });
+    doc.text(` ${item.total}`, 195, 186, { align: 'right' });
+
+    doc.text(`Discount :`, 180, 191, { align: 'right' });
+    doc.text(` ${item.extraDiscount}`, 195, 191, { align: 'right' });
+
+    doc.text(`Final Amount:`, 180, 196, { align: 'right' });
+    doc.text(` ${item.grandTotal}`, 195, 196, { align: 'right' });
+
+    doc.text(`Pending:`, 180, 201, { align: 'right' });
+    doc.text(` ${pendingAmount}`, 195, 201, { align: 'right' });
+
+
+    doc.text(`Status:`, 180, 206, { align: 'right' });
+    this.setPaymentStatusColor(doc, item.paymentStatus);
+    doc.setFont('helvetica', 'bold');
+    doc.text(` ${item.paymentStatus}`, 195, 206, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+
+    const headers = [
+      "Sr.No",
+      "Date",
+      "Company Name",
+      "Category Name",
+      "Warranty",
+      "Qty",
+      "Prouct Price",
+      "Discount %",
+      "Final Total"
+    ];
+
+    const data = item.shellDetails.map((item: any, i: any) => {
+
+      const dateStr = moment(item.date).format('DD/MM/YYYY');
+
+      return [
+        i + 1,
+        dateStr,
+        this.getCompanyName(item.companyName),
+        `${this.getCategoryName(item.category)}  ${this.getkeySpecifiCations(item.category)}`,
+        item.warranty,
+        item.qty,
+        item.productPrice,
+        item.discount,
+        item.subTotal,
+      ];
+    });
+
+    const MIN_ROWS = 12;
+    if (data.length < MIN_ROWS) {
+      for (let idx = data.length; idx < MIN_ROWS; idx++) {
+        data.push([
+          idx + 1,
+          '',
+          '',
+          '',
+          '',
+          ''
+        ]);
+      }
+    }
+
+    doc.setFontSize(10);
+    (doc as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 80,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [255, 187, 0],
+        textColor: [8, 8, 8],
+        fontStyle: 'bold'
+      },
+      styles: {
+        textColor: [8, 8, 8],
+        fontSize: 8,
+        valign: 'middle',
+        halign: 'center',
+        cellPadding: 2
+      }
+    });
+
+
+    // // =========================
+    // // Modern Footer Section
+    // // =========================
+
+
+    // // Thank you note
+    // doc.setFontSize(11);
+    // doc.setFont('helvetica', 'italic');
+    // doc.setTextColor(100, 100, 100);
+    // doc.text('Thank you for your business!', 100,250, { align: 'center' });
+
+    // // Contact info
+    // doc.setFontSize(9);
+    // doc.setFont('helvetica', 'normal');
+    // doc.setTextColor(70, 70, 70);
+    // doc.text('Email: contact@yourcompany.com | Phone: +91 9876543210 | Website: www.yourcompany.com', 
+    //          pageWidth / 2, finalY + 7, { align: 'center' });
+
+    // // Signature
+    // doc.setFontSize(12);
+    // doc.setFont('helvetica', 'bold');
+    // doc.setTextColor(41, 128, 185);
+    // doc.text('Authorized Signature', pageWidth - margin, finalY, { align: 'right' });
+
+    // // Decorative line for signature
+    // doc.setDrawColor(41, 128, 185);
+    // doc.setLineWidth(0.5);
+    // doc.line(pageWidth - margin - 80, finalY + 5, pageWidth - margin, finalY + 5);
+
+    // // Save document
+    doc.save(`Invoice_${item.billNumber}.pdf`);
+  }
+
+  getCompanyName(companyId: any) {
+    return this.categoryList.find((c: any) => c.id === companyId)?.companyName || '';
+  }
+
+  getCategoryName(categoryId: any) {
+    return this.categoryList.find((c: any) => c.id === categoryId)?.category || '';
+  }
+
+  getkeySpecifiCations(categoryId: any) {
+    return this.categoryList.find((c: any) => c.id === categoryId)?.keySpecifiCations || '';
+  }
+
 
 }
