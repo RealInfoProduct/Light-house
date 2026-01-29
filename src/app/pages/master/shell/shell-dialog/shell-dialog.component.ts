@@ -32,6 +32,7 @@ export class ShellDialogComponent implements OnInit {
   pendingAmount: number = 0;
   filteredCategoryList: any[] = [];
   selectedStock: number[] = [];
+  firmList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -50,6 +51,7 @@ export class ShellDialogComponent implements OnInit {
     this.getCategoryList();
     this.calculatePending();
     this.getBalanceList();
+    this.getFirmList();
 
     if (this.action === 'Edit') {
       this.saleForm.patchValue(this.local_data);
@@ -99,9 +101,14 @@ export class ShellDialogComponent implements OnInit {
       // });
     }
 
-    if (this.action === 'Add') {
-      this.setAutoBillNo();
+    // if (this.action === 'Add') {
+    //   this.setAutoBillNo();
+    // }
+    this.saleForm.get('firmName')?.valueChanges.subscribe(firmId => {
+    if (firmId) {
+      this.setAutoBillNoByFirm(firmId);
     }
+  });
 
     this.saleForm.valueChanges.subscribe(() => {
       this.calculatePending();
@@ -198,24 +205,45 @@ export class ShellDialogComponent implements OnInit {
     this.calculateGrandTotalWithExtra();
   }
 
-  setAutoBillNo() {
-    this.firebaseService.getAllShell().subscribe((res: any) => {
-      const userId = localStorage.getItem("userId");
-      let invoiceNumber = 1;
+  // setAutoBillNo() {
+  //   this.firebaseService.getAllShell().subscribe((res: any) => {
+  //     const userId = localStorage.getItem("userId");
+  //     let invoiceNumber = 1;
 
-      if (res && res.length > 0) {
-        const userData = res.filter((item: any) => item.userId === userId);
-        invoiceNumber = userData.length + 1;
-      }
+  //     if (res && res.length > 0) {
+  //       const userData = res.filter((item: any) => item.userId === userId);
+  //       invoiceNumber = userData.length + 1;
+  //     }
 
-      const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
+  //     const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
 
-      this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
-    });
-  }
+  //     this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
+  //   });
+  // }
+
+  setAutoBillNoByFirm(firmId: string) {
+  this.firebaseService.getAllShell().subscribe((res: any[]) => {
+    const userId = localStorage.getItem('userId');
+    let invoiceNumber = 1;
+
+    if (res && res.length > 0) {
+      const filteredData = res.filter(item =>
+        item.userId === userId &&
+        item.firmName === firmId
+      );
+
+      invoiceNumber = filteredData.length + 1;
+    }
+
+    const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
+    this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
+  });
+}
+
 
   buildForm() {
     this.saleForm = this.fb.group({
+      firmName: [''],
       billNumber: [0],
       invoiceNo: [0],
       date: [new Date()],
@@ -322,6 +350,7 @@ export class ShellDialogComponent implements OnInit {
   shellPayload(): void {
     const payload = {
       id: this.local_data.id ? this.local_data.id : '',
+      firmName: this.saleForm.value.firmName,
       billNumber: this.saleForm.value.billNumber,
       invoiceNo: this.saleForm.value.invoiceNo,
       date: this.saleForm.value.date,
@@ -413,6 +442,16 @@ export class ShellDialogComponent implements OnInit {
       this.loaderService.setLoader(false);
     });
   }
+
+  getFirmList() {
+      this.loaderService.setLoader(true)
+      this.firebaseService.getAllFirm().subscribe((res: any) => {
+        if (res) {
+          this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+          this.loaderService.setLoader(false)
+        }
+      })
+    }
 
   setCompanyAndCategoryEdit() {
     this.local_data.shellDetails.forEach((detail: any, index: number) => {
