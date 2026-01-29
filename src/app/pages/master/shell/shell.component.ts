@@ -22,6 +22,7 @@ import { MatSort } from '@angular/material/sort';
 export class ShellComponent implements OnInit ,AfterViewInit {
  dateSaleListForm: FormGroup;
   displayedColumns: string[] = [
+    'firmName',
     'billNo',
     'invoiceNo',
     'date',
@@ -187,6 +188,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
         const payload: ShellList = {
          id: '',
           invoiceNo: result.data.invoiceNo,
+          firmName: result.data.firmName,
           billNumber: result.data.billNumber,
           date: result.data.date,
           customerName: result.data.customerName,
@@ -256,38 +258,39 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   
         const payload: ShellList = {
           id: result.data.id,
-              invoiceNo: result.data.invoiceNo,
-              billNumber: result.data.billNumber,
-              date: result.data.date,
-              customerName: result.data.customerName,
-              customerAddress: result.data.customerAddress,
-              mobileNumber: result.data.mobileNumber,
-              total: result.data.total,
-              extraDiscount: result.data.extraDiscount,
-              grandTotal: result.data.grandTotal,
-              paymentStatus: result.data.paymentStatus,
-              otherKharch: result.data.otherKharch,
-               paymentReceived:result.data.paymentReceived,
-               type: result.data.type,
-              shellDetails: result.data.shellDetails.map((detail: any) => ({
-                saleDate: detail.saleDate,
-                companyName: detail.companyName.id,
-                category: detail.category.id,
-                qty: detail.qty,
-                warranty:detail.warranty,
-                productPrice: detail.productPrice,
-                discount: detail.discount,
-                subTotal: detail.subTotal,
-              })),
-              paymentDetails: result.data.paymentDetails.map((detail: any) => ({
-                paymentR: detail.paymentR,
-                paymentReceivedDate: detail.paymentReceivedDate,
-                 paymentType: detail.paymentType,
-                  bankName: detail.bankName?.id || ''
-              })),
-              userId: localStorage.getItem("userId")
+          firmName: result.data.firmName,
+          invoiceNo: result.data.invoiceNo,
+          billNumber: result.data.billNumber,
+          date: result.data.date,
+          customerName: result.data.customerName,
+          customerAddress: result.data.customerAddress,
+          mobileNumber: result.data.mobileNumber,
+          total: result.data.total,
+          extraDiscount: result.data.extraDiscount,
+          grandTotal: result.data.grandTotal,
+          paymentStatus: result.data.paymentStatus,
+          otherKharch: result.data.otherKharch,
+          paymentReceived: result.data.paymentReceived,
+          type: result.data.type,
+          shellDetails: result.data.shellDetails.map((detail: any) => ({
+            saleDate: detail.saleDate,
+            companyName: detail.companyName.id,
+            category: detail.category.id,
+            qty: detail.qty,
+            warranty: detail.warranty,
+            productPrice: detail.productPrice,
+            discount: detail.discount,
+            subTotal: detail.subTotal,
+          })),
+          paymentDetails: result.data.paymentDetails.map((detail: any) => ({
+            paymentR: detail.paymentR,
+            paymentReceivedDate: detail.paymentReceivedDate,
+            paymentType: detail.paymentType,
+            bankName: detail.bankName?.id || ''
+          })),
+          userId: localStorage.getItem("userId")
 
-            };
+        };
        
 
           const oldExpense = this.incomeExpenseList.find(
@@ -603,200 +606,164 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     }
   }
 
-
   fileDataDownload(item: any) {
-    const doc = new jsPDF();
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const firm = this.firmList[0];
 
-    const firm = this.firmList[0];
-    // =========================
-    // Modern Header Section
-    // =========================
-    // Company Header
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text('YOUR COMPANY NAME', 10, 15);
+  const PAGE_WIDTH = 210;
+  let currentY = 10;
 
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Address:- ${firm.address || ''}`, 10, 25);
-    doc.text(`Phone:- ${firm.mobileNo || ''}`, 10, 30);
-    doc.text(`GST:- ${firm.gstNo || ''}`, 10, 35);
+  /* =========================
+     HEADER BAR
+  ========================= */
+  doc.setFillColor(41, 128, 185);
+  doc.rect(0, 0, PAGE_WIDTH, 35, 'F');
 
-    // Invoice Title
-    doc.setTextColor(41, 128, 185);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INVOICE', 200, 15, { align: 'right' });
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text(firm?.firmName || 'YOUR COMPANY NAME', 10, 15);
 
-    // Invoice Details
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Address: ${firm.address || ''}`, 10, 22);
+  doc.text(`Phone: ${firm.mobileNo || ''}`, 10, 27);
+  doc.text(`GST: ${firm.gstNo || ''}`, 10, 32);
 
-    doc.setTextColor(255, 0, 0);
-    doc.text(`Invoice No:`, 192, 25, { align: 'right' });
-    doc.setTextColor(0, 0, 0);
-    doc.text(` ${item.invoiceNo}`, 200, 25, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(26);
+  doc.text('INVOICE', PAGE_WIDTH - 10, 22, { align: 'right' });
 
-    doc.setTextColor(255, 0, 0);
-    doc.text(`Bill No:`, 192, 30, { align: 'right' });
-    doc.setTextColor(0, 0, 0);
-    doc.text(` ${item.billNumber}`, 200, 30, { align: 'right' });
+  currentY = 45;
 
-    doc.text(`Date: ${moment(item.date).format('DD/MM/YYYY')}`, 200, 35, { align: 'right' });
+  /* =========================
+     INVOICE META BOX
+  ========================= */
+  doc.setDrawColor(200);
+  doc.setFillColor(245, 247, 250);
+  // doc.rect(130, currentY - 10, 70, 28, 'FD');
 
-    doc.setDrawColor(100, 100, 100);
-    doc.setLineWidth(0.5);
-    doc.line(0, 40, 210, 40);
+  doc.setFontSize(10);
+  doc.setTextColor(0);
+  doc.text('Invoice No:', 155, currentY);
+  doc.text(`${item.invoiceNo}`, 195, currentY, { align: 'right' });
+  
+  doc.text('Bill No:', 155, currentY + 6);
+  doc.text(` ${item.billNumber}`, 195, currentY + 6, { align: 'right' });
 
-    // =========================
-    // Customer & Payment Section
-    // =========================
-    // Customer Information
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
-    doc.text('BILL TO:', 10, 50);
+  doc.text('Date:', 155, currentY + 12);
+  doc.text(moment(item.date).format('DD/MM/YYYY'), 195, currentY + 12, { align: 'right' });
 
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Name:- ${item.customerName}`, 10, 60);
-    doc.text(`Address:- ${item.customerAddress || 'No address provided'}`, 10, 65);
-    doc.text(`Mobile:- ${item.mobileNumber || 'N/A'}`, 10, 70);
+  /* =========================
+     BILL TO
+  ========================= */
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(41, 128, 185);
+  doc.text('BILL TO', 10, currentY);
 
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0);
+  doc.text(`Name: ${item.customerName}`, 10, currentY + 7);
+  doc.text(`Address: ${item.customerAddress || 'No address provided'}`, 10, currentY + 13);
+  doc.text(`Mobile: ${item.mobileNumber || 'N/A'}`, 10, currentY + 19);
 
+  /* =========================
+     TABLE
+  ========================= */
+  const headers = [
+    'Sr',
+    'Date',
+    'Company',
+    'Category',
+    'Warranty',
+    'Qty',
+    'Price',
+    'Disc %',
+    'Total'
+  ];
 
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(41, 128, 185);
-    doc.text('PAYMENT SUMMARY', 195, 181, { align: 'right' });
+  const body = item.shellDetails.map((row: any, i: number) => [
+    i + 1,
+    moment(row.date).format('DD/MM/YYYY'),
+    this.getCompanyName(row.companyName),
+    `${this.getCategoryName(row.category)} ${this.getkeySpecifiCations(row.category)}`,
+    row.warranty,
+    row.qty,
+    row.productPrice,
+    row.discount,
+    row.subTotal
+  ]);
 
+  (doc as any).autoTable({
+    head: [headers],
+    body,
+    startY: currentY + 30,
+    theme: 'striped',
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    styles: {
+      fontSize: 8,
+      halign: 'center',
+      valign: 'middle'
+    },
+    columnStyles: {
+      3: { halign: 'left' }
+    }
+  });
 
-    // Calculate amounts
-    const receivedAmount = item.paymentDetails?.reduce(
-      (sum: number, pd: any) => sum + (Number(pd.paymentR) || 0),
+  const tableEndY = (doc as any).lastAutoTable.finalY + 10;
+
+  /* =========================
+     PAYMENT SUMMARY BOX
+  ========================= */
+  const receivedAmount =
+    item.paymentDetails?.reduce(
+      (sum: number, p: any) => sum + (Number(p.paymentR) || 0),
       0
     ) || 0;
 
-    const pendingAmount = (item.grandTotal || 0) - receivedAmount;
+  const pendingAmount = (item.grandTotal || 0) - receivedAmount;
 
-    // Payment details
-    doc.text(`Total :`, 180, 186, { align: 'right' });
-    doc.text(` ${item.total}`, 195, 186, { align: 'right' });
+  doc.setFillColor(245, 247, 250);
+  doc.rect(120, tableEndY, 80, 40, 'F');
 
-    doc.text(`Discount :`, 180, 191, { align: 'right' });
-    doc.text(` ${item.extraDiscount}`, 195, 191, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text('PAYMENT SUMMARY', 160, tableEndY + 8, { align: 'center' });
 
-    doc.text(`Final Amount:`, 180, 196, { align: 'right' });
-    doc.text(` ${item.grandTotal}`, 195, 196, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.text('Total:', 125, tableEndY + 16);
+  doc.text(String(item.total), 195, tableEndY + 16, { align: 'right' });
 
-    doc.text(`Pending:`, 180, 201, { align: 'right' });
-    doc.text(` ${pendingAmount}`, 195, 201, { align: 'right' });
+  doc.text('Discount:', 125, tableEndY + 22);
+  doc.text(String(item.extraDiscount), 195, tableEndY + 22, { align: 'right' });
 
+  doc.text('Final Amount:', 125, tableEndY + 28);
+  doc.text(String(item.grandTotal), 195, tableEndY + 28, { align: 'right' });
 
-    doc.text(`Status:`, 180, 206, { align: 'right' });
-    this.setPaymentStatusColor(doc, item.paymentStatus);
-    doc.setFont('helvetica', 'bold');
-    doc.text(` ${item.paymentStatus}`, 195, 206, { align: 'right' });
+  doc.text('Pending:', 125, tableEndY + 34);
+  doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
 
-    doc.setFont('helvetica', 'normal');
+  /* =========================
+     FOOTER
+  ========================= */
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    'Thank you for your business!',
+    PAGE_WIDTH / 2,
+    290,
+    { align: 'center' }
+  );
 
-    const headers = [
-      "Sr.No",
-      "Date",
-      "Company Name",
-      "Category Name",
-      "Warranty",
-      "Qty",
-      "Prouct Price",
-      "Discount %",
-      "Final Total"
-    ];
+  doc.save(`Invoice_${item.billNumber}.pdf`);
+}
 
-    const data = item.shellDetails.map((item: any, i: any) => {
-
-      const dateStr = moment(item.date).format('DD/MM/YYYY');
-
-      return [
-        i + 1,
-        dateStr,
-        this.getCompanyName(item.companyName),
-        `${this.getCategoryName(item.category)}  ${this.getkeySpecifiCations(item.category)}`,
-        item.warranty,
-        item.qty,
-        item.productPrice,
-        item.discount,
-        item.subTotal,
-      ];
-    });
-
-    const MIN_ROWS = 12;
-    if (data.length < MIN_ROWS) {
-      for (let idx = data.length; idx < MIN_ROWS; idx++) {
-        data.push([
-          idx + 1,
-          '',
-          '',
-          '',
-          '',
-          ''
-        ]);
-      }
-    }
-
-    doc.setFontSize(10);
-    (doc as any).autoTable({
-      head: [headers],
-      body: data,
-      startY: 80,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [255, 187, 0],
-        textColor: [8, 8, 8],
-        fontStyle: 'bold'
-      },
-      styles: {
-        textColor: [8, 8, 8],
-        fontSize: 8,
-        valign: 'middle',
-        halign: 'center',
-        cellPadding: 2
-      }
-    });
-
-
-    // // =========================
-    // // Modern Footer Section
-    // // =========================
-
-
-    // // Thank you note
-    // doc.setFontSize(11);
-    // doc.setFont('helvetica', 'italic');
-    // doc.setTextColor(100, 100, 100);
-    // doc.text('Thank you for your business!', 100,250, { align: 'center' });
-
-    // // Contact info
-    // doc.setFontSize(9);
-    // doc.setFont('helvetica', 'normal');
-    // doc.setTextColor(70, 70, 70);
-    // doc.text('Email: contact@yourcompany.com | Phone: +91 9876543210 | Website: www.yourcompany.com', 
-    //          pageWidth / 2, finalY + 7, { align: 'center' });
-
-    // // Signature
-    // doc.setFontSize(12);
-    // doc.setFont('helvetica', 'bold');
-    // doc.setTextColor(41, 128, 185);
-    // doc.text('Authorized Signature', pageWidth - margin, finalY, { align: 'right' });
-
-    // // Decorative line for signature
-    // doc.setDrawColor(41, 128, 185);
-    // doc.setLineWidth(0.5);
-    // doc.line(pageWidth - margin - 80, finalY + 5, pageWidth - margin, finalY + 5);
-
-    // // Save document
-    doc.save(`Invoice_${item.billNumber}.pdf`);
-  }
 
   getCompanyName(companyId: any) {
     return this.categoryList.find((c: any) => c.id === companyId)?.companyName || '';
@@ -808,6 +775,13 @@ export class ShellComponent implements OnInit ,AfterViewInit {
 
   getkeySpecifiCations(categoryId: any) {
     return this.categoryList.find((c: any) => c.id === categoryId)?.keySpecifiCations || '';
+  }
+  getFinalfirm(firmId: any) {
+    return this.firmList.find((c: any) => c.id === firmId)?.header || '';
+  }
+
+  getFinalsubHeaderfirm(firmId: any) {
+    return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
 
