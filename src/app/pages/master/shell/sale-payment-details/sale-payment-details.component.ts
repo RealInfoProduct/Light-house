@@ -72,7 +72,6 @@ export class SalePaymentDetailsComponent implements OnInit {
 
     // ✅ Only Bank payment
     if (paymentType === 'G-Pay') {
-      debugger
 
       const bankName = this.balanceList?.bankDetails
         ?.find((b: any) => b.id == bankId)
