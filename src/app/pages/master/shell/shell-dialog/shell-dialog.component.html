@@ -303,6 +303,12 @@
 
     <mat-divider></mat-divider>
     <mat-dialog-actions class="p-24 justify-content-end">
+        <div class="d-flex align-items-center m-r-56">
+        <section class="example-section">
+          <mat-checkbox formControlName="selected" class="example-margin"></mat-checkbox>
+          <mat-label>Send Message In WhatsApp</mat-label>
+        </section>
+      </div>
       <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
       <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
         [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"

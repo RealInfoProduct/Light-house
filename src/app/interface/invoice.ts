@@ -86,6 +86,7 @@ export interface FirmList {
 export interface ShellList {
     id: string,
     firmName: string,
+    selected: string,
     billNumber: number,
     invoiceNo: number,
     date: string,
