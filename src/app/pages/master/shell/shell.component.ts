@@ -14,6 +14,8 @@ import moment from 'moment';
 import jsPDF from 'jspdf';
 import { MatSort } from '@angular/material/sort';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { firebaseStorage } from 'src/environments/environment.prod';
+
 
 @Component({
   selector: 'app-shell',
@@ -842,73 +844,73 @@ export class ShellComponent implements OnInit ,AfterViewInit {
 //   }
 // }
 
-async sendWhatsAppMessage(order: any) {
-  if (!order.selected) return;
+// async sendWhatsAppMessage(order: any) {
+//   if (!order.selected) return;
 
-  if (!order.mobileNumber) {
-    this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
-    return;
-  }
+//   if (!order.mobileNumber) {
+//     this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
+//     return;
+//   }
 
-  this.loaderService.setLoader(true);
+//   this.loaderService.setLoader(true);
 
-  try {
-    // Prepare phone number
-    let phone = order.mobileNumber.toString().replace(/\D/g, '');
-    if (phone.length === 10) phone = '91' + phone;
+//   try {
+//     // Prepare phone number
+//     let phone = order.mobileNumber.toString().replace(/\D/g, '');
+//     if (phone.length === 10) phone = '91' + phone;
 
-    // Generate PDF as Blob
-    // const pdfBlob = this.generatePDFBlob(order); // We'll create this function
+//     // Generate PDF as Blob
+//     // const pdfBlob = this.generatePDFBlob(order); // We'll create this function
 
-    // // Create downloadable URL
-    // const pdfUrl = URL.createObjectURL(pdfBlob);
+//     // // Create downloadable URL
+//     // const pdfUrl = URL.createObjectURL(pdfBlob);
 
-    // // WhatsApp message with PDF link
-    // const message = encodeURIComponent(
-    //   `*Hello ${order.customerName || ''}!*\n\n` +
-    //   `Thank you for your purchase.\n` +
-    //   `Here is your invoice:\n\n` +
-    //   `Bill No: *${order.billNumber}*\n` +
-    //   `Invoice No: *${order.invoiceNo}*\n` +
-    //   `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-    //   `Amount: *₹${order.grandTotal}*\n\n` +
-    //   `Click here to download your invoice PDF: ${pdfUrl}\n\n` +
-    //     `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-    //   );
+//     // // WhatsApp message with PDF link
+//     // const message = encodeURIComponent(
+//     //   `*Hello ${order.customerName || ''}!*\n\n` +
+//     //   `Thank you for your purchase.\n` +
+//     //   `Here is your invoice:\n\n` +
+//     //   `Bill No: *${order.billNumber}*\n` +
+//     //   `Invoice No: *${order.invoiceNo}*\n` +
+//     //   `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+//     //   `Amount: *₹${order.grandTotal}*\n\n` +
+//     //   `Click here to download your invoice PDF: ${pdfUrl}\n\n` +
+//     //     `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+//     //   );
 
-       const pdfBlob = this.generatePDFBlob(order);
-const pdfUrl = URL.createObjectURL(pdfBlob);
-const clickableText = "`" + pdfUrl + "`"; 
+//        const pdfBlob = this.generatePDFBlob(order);
+// const pdfUrl = URL.createObjectURL(pdfBlob);
+// const clickableText = "`" + pdfUrl + "`"; 
 
-const message = encodeURIComponent(
-  `*Hello ${order.customerName || ''}!*\n\n` +
-  `Thank you for your purchase.\n` +
-  `Here is your invoice:\n\n` +
-  `Bill No: *${order.billNumber}*\n` +
-  `Invoice No: *${order.invoiceNo}*\n` +
-  `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-  `Amount: *₹${order.grandTotal}*\n\n` +
+// const message = encodeURIComponent(
+//   `*Hello ${order.customerName || ''}!*\n\n` +
+//   `Thank you for your purchase.\n` +
+//   `Here is your invoice:\n\n` +
+//   `Bill No: *${order.billNumber}*\n` +
+//   `Invoice No: *${order.invoiceNo}*\n` +
+//   `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+//   `Amount: *₹${order.grandTotal}*\n\n` +
   
- `Click here : ${clickableText}\n\n` +
-  `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-);
+//  `Click here : ${clickableText}\n\n` +
+//   `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+  
+// );
 
   
 
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-    window.open(whatsappUrl, '_blank');
+//     const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
+//     window.open(whatsappUrl, '_blank');
 
-    this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
+//     this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
 
-  } catch (err) {
-    console.error(err);
-    this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
-  } finally {
-    this.loaderService.setLoader(false);
-  }
-}
+//   } catch (err) {
+//     console.error(err);
+//     this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
+//   } finally {
+//     this.loaderService.setLoader(false);
+//   }
+// }
 
-// Function to generate PDF as Blob instead of directly saving
 generatePDFBlob(item: any): Blob {
   const doc = new jsPDF('p', 'mm', 'a4');
    const firm = this.firmList.find((f: any) => f.id === item.firmName);
@@ -1068,6 +1070,44 @@ generatePDFBlob(item: any): Blob {
 
   return doc.output('blob');
 }
+
+
+// //////////////////////////////////////////////////////new
+  async sendWhatsAppMessage(order: any) {
+    try {
+      const pdfUrl = await this.uploadInvoicePDF(order);
+
+      const message = encodeURIComponent(
+        `*Hello ${order.customerName || ''}!*\n\n` +
+        `Thank you for your purchase.\n` +
+        `Here is your invoice:\n\n` +
+        `Bill No: *${order.billNumber}*\n` +
+        `Invoice No: *${order.invoiceNo}*\n` +
+        `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+        `Amount: *₹${order.grandTotal}*\n\n` +
+        `📄 Invoice PDF:\n${pdfUrl}\n\n` +
+        `Regards,\nTeam`
+      );
+
+      const phone = order.customerPhone; // 919xxxxxxxxx
+      window.open(`https://web.whatsapp.com/send?phone=${phone}&text=${message}`, '_blank');
+
+    } catch (err) {
+      console.error('ERROR:', err);
+      alert('Something went wrong. Check console.');
+    }
+  }
+
+  async uploadInvoicePDF(order: any): Promise<string> {
+    const pdfBlob = this.generatePDFBlob(order);
+
+    const fileName = `invoices/invoice_${order.invoiceNo}_${Date.now()}.pdf`;
+    const storageRef = ref(firebaseStorage, fileName);
+
+    await uploadBytes(storageRef, pdfBlob);
+    return await getDownloadURL(storageRef);
+  }
+
 
 
 
