@@ -13,7 +13,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import { MatSort } from '@angular/material/sort';
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+
 
 @Component({
   selector: 'app-shell',
@@ -857,41 +857,23 @@ async sendWhatsAppMessage(order: any) {
     let phone = order.mobileNumber.toString().replace(/\D/g, '');
     if (phone.length === 10) phone = '91' + phone;
 
-    // Generate PDF as Blob
-    // const pdfBlob = this.generatePDFBlob(order); // We'll create this function
+    const pdfBlob = this.generatePDFBlob(order);
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const clickableText = "`" + pdfUrl + "`";
 
-    // // Create downloadable URL
-    // const pdfUrl = URL.createObjectURL(pdfBlob);
+    const message = encodeURIComponent(
+      `*Hello ${order.customerName || ''}!*\n\n` +
+      `Thank you for your purchase.\n` +
+      `Here is your invoice:\n\n` +
+      `Bill No: *${order.billNumber}*\n` +
+      `Invoice No: *${order.invoiceNo}*\n` +
+      `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+      `Amount: *₹${order.grandTotal}*\n\n` +
 
-    // // WhatsApp message with PDF link
-    // const message = encodeURIComponent(
-    //   `*Hello ${order.customerName || ''}!*\n\n` +
-    //   `Thank you for your purchase.\n` +
-    //   `Here is your invoice:\n\n` +
-    //   `Bill No: *${order.billNumber}*\n` +
-    //   `Invoice No: *${order.invoiceNo}*\n` +
-    //   `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-    //   `Amount: *₹${order.grandTotal}*\n\n` +
-    //   `Click here to download your invoice PDF: ${pdfUrl}\n\n` +
-    //     `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-    //   );
+      `Click here : ${clickableText}\n\n` +
+      `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
 
-       const pdfBlob = this.generatePDFBlob(order);
-const pdfUrl = URL.createObjectURL(pdfBlob);
-const clickableText = "`" + pdfUrl + "`"; 
-
-const message = encodeURIComponent(
-  `*Hello ${order.customerName || ''}!*\n\n` +
-  `Thank you for your purchase.\n` +
-  `Here is your invoice:\n\n` +
-  `Bill No: *${order.billNumber}*\n` +
-  `Invoice No: *${order.invoiceNo}*\n` +
-  `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-  `Amount: *₹${order.grandTotal}*\n\n` +
-  
- `Click here : ${clickableText}\n\n` +
-  `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-);
+    );
 
   
 
@@ -908,7 +890,6 @@ const message = encodeURIComponent(
   }
 }
 
-// Function to generate PDF as Blob instead of directly saving
 generatePDFBlob(item: any): Blob {
   const doc = new jsPDF('p', 'mm', 'a4');
    const firm = this.firmList.find((f: any) => f.id === item.firmName);
