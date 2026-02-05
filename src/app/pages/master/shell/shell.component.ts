@@ -794,53 +794,6 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   getFinalsubHeaderfirm(firmId: any) {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
-//   async sendWhatsAppMessage(order: any) {
-//   if (!order.selected) return;
-
-//   if (!order.mobileNumber) {
-//     this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
-//     return;
-//   }
-
-//   this.loaderService.setLoader(true);
-
-//   try {
-
-    
-//     let phone = order.mobileNumber.toString().replace(/\D/g, '');
-
-    
-//     if (phone.length === 10) {
-//       phone = '91' + phone;
-//     }
-
-//     // 4. WhatsApp Message
-//     const message = encodeURIComponent(
-//       `*Hello ${order.customerName || ''}!*\n\n` +
-//       `Thank you for your purchase.\n` +
-//       `Here is your invoice:\n\n` +
-//       `Bill No: *${order.billNumber}*\n` +
-//       `Invoice No: *${order.invoiceNo}*\n` +
-//       `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-//       `Amount: *₹${order.grandTotal}*\n\n` +
-//       `Please check the attached PDF.\n` +
-//       `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-//     );
-
-//   const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-
-// window.open(whatsappUrl, '_blank');
-
-
-//     this._snackBar.open('PDF Downloaded & WhatsApp Opened!', 'OK', { duration: 3000 });
-
-//   } catch (err) {
-//     console.error(err);
-//     this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
-//   } finally {
-//     this.loaderService.setLoader(false);
-//   }
-// }
 
 async sendWhatsAppMessage(order: any) {
   if (!order.selected) return;
@@ -859,7 +812,7 @@ async sendWhatsAppMessage(order: any) {
 
     const pdfBlob = this.generatePDFBlob(order);
     const pdfUrl = URL.createObjectURL(pdfBlob);
-    const clickableText = "`" + pdfUrl + "`";
+    // const clickableText = "`" + pdfUrl + "`";
 
     const message = encodeURIComponent(
       `*Hello ${order.customerName || ''}!*\n\n` +
@@ -870,7 +823,8 @@ async sendWhatsAppMessage(order: any) {
       `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
       `Amount: *₹${order.grandTotal}*\n\n` +
 
-      `Click here : ${clickableText}\n\n` +
+      // `Click here : ${clickableText}\n\n` +
+      `Click here : ${pdfUrl}\n\n` +
       `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
 
     );
