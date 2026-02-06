@@ -2,7 +2,16 @@
 <mat-dialog-content class="mat-typography" style="max-width: 1200px" *ngIf="action !== 'Delete'; else elseTemplate">
     <form [formGroup]="warrantyForm">
         <div class="row">
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
+                <mat-form-field appearance="outline" class="w-100 m-t-10">
+                    <mat-label>Firm Name</mat-label>
+                    <mat-select value="text" formControlName="firmName" placeholder="Selecta Firm"   (selectionChange)="onFirmChange($event)">
+                        <mat-option *ngFor="let item of firmList" [value]="item.id">{{item.header}} {{item.subHeader}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12 col-md-3">
                 <mat-form-field appearance="outline" class="w-100 m-t-10">
                     <mat-label>Invoice No</mat-label>
                     <mat-select formControlName="invoiceNo" placeholder="Invoice No"
@@ -15,14 +24,14 @@
                 </mat-form-field>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
                 <mat-form-field appearance="outline" class="w-100 m-t-10">
                     <mat-label>Bill No</mat-label>
                     <input type="number" matInput formControlName="billNumber" placeholder="Bill No" min="0" />
                 </mat-form-field>
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
                 <mat-form-field appearance="outline" class="w-100 m-t-10">
                     <mat-label>Date</mat-label>
                     <input matInput formControlName="date" [matDatepicker]="Date" placeholder="Enter date">

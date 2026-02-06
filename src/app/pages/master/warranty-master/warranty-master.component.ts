@@ -18,6 +18,7 @@ import { ViewWarrantyComponent } from './view-warranty/view-warranty.component';
 export class WarrantyMasterComponent implements OnInit {
   dateWarrantyListForm: FormGroup
   displayedColumns: string[] = [
+    'firmName',
     'billNo',
     'invoiceNo',
     'date',
@@ -26,6 +27,7 @@ export class WarrantyMasterComponent implements OnInit {
     'action',
   ];
   warrantyList: any[] = [];
+  firmList: any[] = [];
 
   warrantyDataSource = new MatTableDataSource(this.warrantyList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
@@ -43,6 +45,7 @@ export class WarrantyMasterComponent implements OnInit {
   ngOnInit(): void {
     this.getWarrantyList();
     this.dateform();
+    this.getFirmList();
   }
 
   dateform() {
@@ -146,6 +149,24 @@ export class WarrantyMasterComponent implements OnInit {
 
   viewWarrantyDetails(obj: any) {
     const dialogRef = this.dialog.open(ViewWarrantyComponent, { data: obj });
+  }
+
+    getFirmList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllFirm().subscribe((res: any) => {
+      if (res) {
+        this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
+
+    getFinalfirm(firmId: any) {
+    return this.firmList.find((c: any) => c.id === firmId)?.header || '';
+  }
+
+  getFinalsubHeaderfirm(firmId: any) {
+    return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
 }
