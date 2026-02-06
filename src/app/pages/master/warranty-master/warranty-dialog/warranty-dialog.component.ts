@@ -17,6 +17,7 @@ export class WarrantyDialogComponent implements OnInit {
   categoryList: any[] = [];
   companyList: any[] = [];
   shellList: any[] = [];
+  firmList: any[] = [];
 
   filteredWarrantyProducts: any = []
   warrantyTypeList: any[] = [
@@ -40,6 +41,8 @@ export class WarrantyDialogComponent implements OnInit {
     this.buildForm();
     this.getCategoryList();
     this.getShellList();
+    this.getFirmList();
+
     if (this.action === 'Edit') {
       this.warrantyForm.patchValue(this.local_data);
       this.warrantyForm.get('date')?.setValue(new Date(this.local_data.date.toDate()));
@@ -72,7 +75,7 @@ export class WarrantyDialogComponent implements OnInit {
     this.firebaseService.getAllShell().subscribe((res: any) => {
       if (res) {
         this.shellList = res.filter((id: any) => id.userId === localStorage.getItem("userId"));
-        this.filteredWarrantyProducts = [...this.shellList];
+        // this.filteredWarrantyProducts = [...this.shellList];
       }
       this.loaderService.setLoader(false)
 
@@ -82,6 +85,7 @@ export class WarrantyDialogComponent implements OnInit {
 
   buildForm() {
     this.warrantyForm = this.fb.group({
+      firmName: [''],
       billNumber: [0],
       invoiceNo: [''],
       date: [new Date()],
@@ -264,6 +268,32 @@ export class WarrantyDialogComponent implements OnInit {
     );
   }
 
+  onFirmChange(event: any) {
+  const firmId = event.value;
+
+  // Firm id par thi invoice filter
+  this.filteredWarrantyProducts = this.shellList.filter(
+    (item: any) => item.firmName === firmId
+  );
+
+  // Invoice dropdown reset
+  this.warrantyForm.patchValue({
+    invoiceNo: null
+  });
+}
+
+
+   getFirmList() {
+      this.loaderService.setLoader(true)
+      this.firebaseService.getAllFirm().subscribe((res: any) => {
+        if (res) {
+          this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+          this.loaderService.setLoader(false)
+        }
+      })
+    }
+
+
   updateWarrantyDate(group: FormGroup, saleDateValue?: any, warrantyValue?: any) {
     const saleDate = saleDateValue || group.get('saleDate')?.value;
     const warranty = warrantyValue ?? group.get('warranty')?.value;
@@ -288,6 +318,7 @@ export class WarrantyDialogComponent implements OnInit {
   warrantyPayload() {
     const payload = {
       id: this.local_data.id ? this.local_data.id : '',
+      firmName: this.warrantyForm.value.firmName,
       invoiceNo: this.warrantyForm.value.invoiceNo,
       billNumber: this.warrantyForm.value.billNumber,
       date: this.warrantyForm.value.date,
