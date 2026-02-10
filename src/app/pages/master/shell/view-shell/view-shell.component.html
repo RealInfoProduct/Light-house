@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class=""> Sale Details</h2>
-<mat-dialog-content class="mat-typography" style="max-width: 900px">
+<mat-dialog-content class="mat-typography" style="max-width: 1100px">
   <mat-card class="cardWithShadow">
     <mat-card-content class="p-24">
       <div class="table-responsive">
@@ -7,7 +7,7 @@
 
           <ng-container matColumnDef="srno">
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
-            <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+            <td mat-cell *matCellDef="let element; let i = index"  class="text-align">{{ i + 1 }}</td>
           </ng-container>
 
           <ng-container matColumnDef="Date">
@@ -23,7 +23,7 @@
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
               Company Name
             </th>
-            <td mat-cell *matCellDef="let element" class="f-s-14">
+            <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
               {{ getcompanyname(element.companyName)}}
             </td>
           </ng-container>
@@ -42,7 +42,7 @@
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
               Qty
             </th>
-            <td mat-cell *matCellDef="let element" class="f-s-14">
+            <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
               {{ element.qty }}
             </td>
           </ng-container>
@@ -51,7 +51,7 @@
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
               Prouct Price
             </th>
-            <td mat-cell *matCellDef="let element" class="f-s-14">
+            <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
               {{ element.productPrice }}
             </td>
           </ng-container>
@@ -60,7 +60,7 @@
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
               Discount %
             </th>
-            <td mat-cell *matCellDef="let element" class="f-s-14">
+            <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
               {{ element.discount }}
             </td>
           </ng-container>
@@ -69,7 +69,7 @@
             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
               Final Total
             </th>
-            <td mat-cell *matCellDef="let element" class="f-s-14">
+            <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
               {{ element.subTotal }}
             </td>
           </ng-container>
