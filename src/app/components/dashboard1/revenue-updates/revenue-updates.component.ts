@@ -129,89 +129,14 @@ monthlyExpense: number[] = new Array(12).fill(0);
         this.incomeExpenseList = res.filter(
           (item: any) => item.userId === localStorage.getItem('userId')
         );
-
-        // this.totalIncome = 0;
-        // this.totalExpense = 0;
-
-        // this.incomeExpenseList.forEach((item: any) => {
-        //   const amount = Number(item.amount);
-        //   if (item.accounttype === 'Income') {
-        //     this.totalIncome += amount;
-        //   } else if (item.accounttype === 'Expense') {
-        //     this.totalExpense += amount;
-        //   }
-        // });
  this.calculateMonthWiseTotals();
         this.loaderService.setLoader(false);
       }
     });
   }
 
-//  calculateMonthWiseTotals() {
-//   this.totalIncome = 0;
-//   this.totalExpense = 0;
+ 
 
-//   this.incomeExpenseList.forEach((item: any) => {
-//     let itemDate: Date = item.date?.toDate
-//       ? item.date.toDate()
-//       : new Date(item.date);
-
-//     if (
-//       itemDate.getMonth() === this.currentMonthValue &&
-//       itemDate.getFullYear() === this.currentYear
-//     ) {
-//       const amount = Number(item.amount);
-
-//       if (item.accounttype === 'Income') {
-//         this.totalIncome += amount;
-//       } else if (item.accounttype === 'Expense') {
-//         this.totalExpense += amount;
-//       }
-//     }
-//   });
-// }
-  // calculateMonthWiseTotals() {
-  //   this.monthlyIncome = new Array(12).fill(0);
-  //   this.monthlyExpense = new Array(12).fill(0);
-  //   this.totalIncome = 0;
-  //   this.totalExpense = 0;
-  //   this.incomeExpenseList.forEach((item: any) => {
-  //     let itemDate: Date = item.date?.toDate
-  //       ? item.date.toDate()
-  //       : new Date(item.date);
-  //     const month = itemDate.getMonth();
-  //     const year = itemDate.getFullYear();
-  //     const amount = Number(item.amount);
-  //     if (year === this.currentYear) {
-  //       if (item.accounttype === 'Income') {
-  //         this.monthlyIncome[month] += amount;
-  //         if (month === this.currentMonthValue) {
-  //           this.totalIncome += amount;
-  //         }
-  //       } else if (item.accounttype === 'Expense') {
-  //         this.monthlyExpense[month] += amount;
-  //         if (month === this.currentMonthValue) {
-  //           this.totalExpense += amount;
-  //         }
-  //       }
-  //     }
-  //   });
-
-  //   // Update chart data    
-  //   this.revenueChart.series = [
-  //     {
-  //       name: 'Eanings this month',
-
-  //       data: this.monthlyIncome,
-  //       color: '#5D87FF',
-  //     },      
-  //     {
-  //       name: 'Expense this month',
-  //       data: this.monthlyExpense,
-  //       color: '#49BEFF',
-  //     },
-  //   ];
-  // }
   calculateMonthWiseTotals() {
     this.monthlyIncome.fill(0);
     this.monthlyExpense.fill(0);
@@ -278,17 +203,9 @@ onMonthChange(month: number) {
 }
 
 
-  // get totalEarnings(): number {
-  //   const totalIncome = this.monthlyIncome.reduce((sum, val) => sum + val, 0);
-  //   const totalExpense = this.monthlyExpense.reduce((sum, val) => sum + val, 0);
-  //   return totalIncome - totalExpense;
-    
-  // }
+
   
   formatIndianAmount(value: number): string {
-    // if (value === null || value === undefined) return '0';
-
-    // return value.toLocaleString('en-IN');
      return value?.toLocaleString('en-IN') ?? '0';
   }
 
