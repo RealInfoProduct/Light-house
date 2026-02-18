@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../material.module';
 import { CommonModule } from '@angular/common';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { LoaderService } from 'src/app/services/loader.service';
+import { FirebaseService } from 'src/app/services/firebase.service';
+import { MatPaginator } from '@angular/material/paginator';
 
 
 export interface productsData {
@@ -13,44 +17,7 @@ export interface productsData {
   priority: string;
 }
 
-const ELEMENT_DATA: productsData[] = [
-  {
-    id: 1,
-    imagePath: 'assets/images/profile/user-1.jpg',
-    uname: 'Sunil Joshi',
-    position: 'Web Designer',
-    productName: 'Elite Admin',
-    budget: 3.9,
-    priority: 'low'
-  },
-  {
-    id: 2,
-    imagePath: 'assets/images/profile/user-2.jpg',
-    uname: 'Andrew McDownland',
-    position: 'Project Manager',
-    productName: 'Real Homes Theme',
-    budget: 24.5,
-    priority: 'medium'
-  },
-  {
-    id: 3,
-    imagePath: 'assets/images/profile/user-3.jpg',
-    uname: 'Christopher Jamil',
-    position: 'Project Manager',
-    productName: 'MedicalPro Theme',
-    budget: 12.8,
-    priority: 'high'
-  },
-  {
-    id: 4,
-    imagePath: 'assets/images/profile/user-4.jpg',
-    uname: 'Nirav Joshi',
-    position: 'Frontend Engineer',
-    productName: 'Hosting Press HTML',
-    budget: 2.4,
-    priority: 'critical'
-  },
-];
+
 
 interface month {
   value: string;
@@ -63,14 +30,103 @@ interface month {
   imports: [MaterialModule, CommonModule],
   templateUrl: './top-projects.component.html',
 })
-export class AppTopProjectsComponent {
+export class AppTopProjectsComponent  implements OnInit{
+  shellList:any []=[]
 
-  displayedColumns: string[] = ['assigned', 'name', 'priority', 'budget'];
-  dataSource = ELEMENT_DATA;
+  displayedColumns: string[] = ['billNo','customerName','date','pendingAmount'];
+  dataSource = new MatTableDataSource(this.shellList);
+  @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
 
-  months: month[] = [
-    { value: 'mar', viewValue: 'March 2023' },
-    { value: 'apr', viewValue: 'April 2023' },
-    { value: 'june', viewValue: 'June 2023' },
-  ];
+  constructor(  
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
+  ) {
+    
+  }
+  
+  ngOnInit(): void {
+      this.getShellList();
+  }
+
+getShellList() {
+  this.loaderService.setLoader(true);
+
+  this.firebaseService.getAllShell().subscribe((res: any) => {
+    if (res) {
+
+      const today = new Date();
+      today.setHours(0,0,0,0); // remove time
+
+      this.shellList = res
+        .filter((item: any) => {
+          if (item.userId !== localStorage.getItem("userId")) return false;
+          if (Number(item.paymentDays) <= 0) return false;
+
+          const dueDate = this.getDueDateFromInvoice(item);
+          if (!dueDate) return false;
+
+          dueDate.setHours(0,0,0,0);
+
+          return dueDate.getTime() === today.getTime(); // 👈 Only today's due
+        })
+        .map((item: any) => ({
+          ...item,
+          pending: this.calculatePending(item),
+            dueDate: this.calculateDueDate(item)  
+        }));
+
+      this.dataSource = new MatTableDataSource(this.shellList);
+      this.dataSource.paginator = this.paginator;
+    }
+
+    this.loaderService.setLoader(false);
+  });
+}
+
+
+
+    getBillNo(element: any): string {
+      return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNumber) ? `(${element.billNumber})` : element?.billNumber ?? ''}`;
+  }
+
+calculateDueDate(item: any): string {
+  if (!item?.paymentDays || !item?.date?.seconds) return '';
+
+  const invoiceDate = new Date(item.date.seconds * 1000);
+
+  const dueDate = new Date(invoiceDate);
+  dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
+
+  const day = String(dueDate.getDate()).padStart(2, '0');
+  const month = String(dueDate.getMonth() + 1).padStart(2, '0');
+  const year = dueDate.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
+
+getDueDateFromInvoice(item: any): Date | null {
+  if (!item?.paymentDays || !item?.date?.seconds) return null;
+
+  const invoiceDate = new Date(item.date.seconds * 1000);
+  const dueDate = new Date(invoiceDate);
+  dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
+
+  return dueDate;
+}
+
+
+calculatePending(element: any): number {
+  const grandTotal = Number(element.grandTotal) || 0;
+
+  const totalPaid = (element.paymentDetails || []).reduce(
+    (sum: number, payment: any) => sum + Number(payment.paymentR || 0),
+    0
+  );
+
+  return grandTotal - totalPaid;
+}
+
+
 }
