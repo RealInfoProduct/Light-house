@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   ApexChart,
   ChartComponent,
@@ -47,7 +47,7 @@ export interface revenueChart {
   imports: [NgApexchartsModule, MaterialModule, TablerIconsModule, NgForOf, CommonModule],
   templateUrl: './revenue-updates.component.html',
 })
-export class AppRevenueUpdatesComponent {
+export class AppRevenueUpdatesComponent implements OnInit{
   @ViewChild('chart') chart!: ChartComponent;
 
   incomeExpenseList: any[] = [];
