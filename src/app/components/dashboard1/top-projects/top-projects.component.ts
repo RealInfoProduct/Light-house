@@ -33,7 +33,7 @@ interface month {
 export class AppTopProjectsComponent  implements OnInit{
   shellList:any []=[]
 
-  displayedColumns: string[] = ['billNo','customerName','date','pendingAmount'];
+  displayedColumns: string[] = ['billNo','customerName','mobileNumber','date','pendingAmount'];
   dataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
