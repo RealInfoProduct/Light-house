@@ -94,6 +94,7 @@ export interface ShellList {
     mobileNumber: string,
     customerAddress: string,
     total:number,
+    paymentDays:any,
     extraDiscount :number,
     otherKharch :number,
     grandTotal :number,

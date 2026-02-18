@@ -33,6 +33,7 @@ export class ShellDialogComponent implements OnInit {
   filteredCategoryList: any[] = [];
   selectedStock: number[] = [];
   firmList: any[] = [];
+  paymentDays = new Date()
 
   constructor(
     private fb: FormBuilder,
@@ -52,6 +53,7 @@ export class ShellDialogComponent implements OnInit {
     this.calculatePending();
     this.getBalanceList();
     this.getFirmList();
+    this.paymentDaysChange();
 
     if (this.action === 'Edit') {
       this.saleForm.patchValue(this.local_data);
@@ -257,13 +259,41 @@ export class ShellDialogComponent implements OnInit {
       paymentReceived: [false],
       type: ['Income'],
       otherKharch: [0],
+      paymentDays: [0],
       paymentStatus: ['Unpaid', Validators.required],
       shellDetails: this.fb.array([this.createSaleDetailGroup()]),
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
 
     })
+     this.paymentDaysChange()
     this.saleForm.get('extraDiscount')?.valueChanges.subscribe(() => {
       this.calculateGrandTotalWithExtra();
+    });
+  }
+
+  limitDigits(event: any) {
+    let value = event.target.value;
+    value = value.replace(/\D/g, '');
+    if (value.length > 3) {
+      value = value.slice(0, 3);
+    }
+    event.target.value = value;
+    this.saleForm.get('paymentDays')?.setValue(value, { emitEvent: false });
+  }
+
+    paymentDaysChange() {
+    this.saleForm.get('paymentDays')?.valueChanges.subscribe((days: any) => {
+      let numDays = parseInt(days, 10);
+      if (isNaN(numDays) || numDays < 0) {
+        numDays = 0;
+      }
+
+      const date = this.saleForm.get('date')?.value;
+      if (date) {
+        const dueDate = new Date(date);
+        dueDate.setDate(dueDate.getDate() + numDays);
+        this.paymentDays = dueDate;
+      }
     });
   }
 
@@ -361,6 +391,7 @@ export class ShellDialogComponent implements OnInit {
       paymentReceived: this.saleForm.value.paymentReceived,
       customerAddress: this.saleForm.value.customerAddress,
       total: this.saleForm.value.total,
+      paymentDays: this.saleForm.value.paymentDays,
       selected: this.saleForm.value.selected,
       extraDiscount: this.saleForm.value.extraDiscount,
       grandTotal: this.saleForm.value.grandTotal,
