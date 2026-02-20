@@ -21,7 +21,7 @@ export class PurchaseMasterDialogComponent implements OnInit {
   pendingAmount: number = 0;
   paymentDays = new Date()
   balanceList: any = []
-  bank: any =[];
+  bank: any = [];
 
   StatusList: any[] = [
     { type: 'Pending' },
@@ -200,32 +200,32 @@ export class PurchaseMasterDialogComponent implements OnInit {
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
     });
-      group.valueChanges.subscribe(() => {
-    this.checkPaymentError(group);
-  });
+    group.valueChanges.subscribe(() => {
+      this.checkPaymentError(group);
+    });
 
 
     return group;
   }
 
-checkPaymentError(group: FormGroup) {
-  const paymentType = group.get('paymentType')?.value;
-  const amount = Number(group.get('paymentR')?.value) || 0;
-  this.bank = group.get('bankName')?.value;
+  checkPaymentError(group: FormGroup) {
+    const paymentType = group.get('paymentType')?.value;
+    const amount = Number(group.get('paymentR')?.value) || 0;
+    this.bank = group.get('bankName')?.value;
 
-  group.get('paymentR')?.setErrors(null);
-  if (paymentType === 'Cash') {
-    if (amount > this.balanceList?.cashBalance) {
-      group.get('paymentR')?.setErrors({ cashExceeded: true });
+    group.get('paymentR')?.setErrors(null);
+    if (paymentType === 'Cash') {
+      if (amount > this.balanceList?.cashBalance) {
+        group.get('paymentR')?.setErrors({ cashExceeded: true });
+      }
+    }
+
+    if (paymentType === 'G-Pay' && this.bank?.balance !== undefined) {
+      if (amount > this.bank.balance) {
+        group.get('paymentR')?.setErrors({ insufficientBalance: true });
+      }
     }
   }
-
-  if (paymentType === 'G-Pay' && this.bank?.balance !== undefined) {
-    if (amount > this.bank.balance) {
-      group.get('paymentR')?.setErrors({ insufficientBalance: true });
-    }
-  }
-}
 
 
 
@@ -379,38 +379,38 @@ checkPaymentError(group: FormGroup) {
           item => item.userId === localStorage.getItem('userId')
         );
         if (this.action === 'Edit') {
-        this.patchPaymentDetails();
-      }
+          this.patchPaymentDetails();
+        }
       }
       this.loaderService.setLoader(false);
     });
   }
 
   patchPaymentDetails() {
-  this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
-    if (index > 0) this.addpaymentDetail();
+    this.local_data.paymentDetails?.forEach((detail: any, index: number) => {
+      if (index > 0) this.addpaymentDetail();
 
-    const formGroup = this.paymentDetails.at(index) as FormGroup;
-    if (!formGroup) return;
+      const formGroup = this.paymentDetails.at(index) as FormGroup;
+      if (!formGroup) return;
 
-    const paymentDate = detail.paymentReceivedDate
-      ? new Date(detail.paymentReceivedDate.seconds * 1000)
-      : null;
+      const paymentDate = detail.paymentReceivedDate
+        ? new Date(detail.paymentReceivedDate.seconds * 1000)
+        : null;
 
-    let selectedBank = null;
-    if (this.balanceList?.bankDetails?.length) {
-      selectedBank = this.balanceList.bankDetails.find(
-        (bank: any) => bank.id === detail.bankName
-      );
-    }
-    formGroup.patchValue({
-      paymentR: detail.paymentR,
-      paymentReceivedDate: paymentDate,
-      paymentType: detail.paymentType,
-      bankName: selectedBank ,
+      let selectedBank = null;
+      if (this.balanceList?.bankDetails?.length) {
+        selectedBank = this.balanceList.bankDetails.find(
+          (bank: any) => bank.id === detail.bankName
+        );
+      }
+      formGroup.patchValue({
+        paymentR: detail.paymentR,
+        paymentReceivedDate: paymentDate,
+        paymentType: detail.paymentType,
+        bankName: selectedBank,
+      });
     });
-  });
-}
+  }
 
   setCompanyAndCategoryEdit() {
     this.local_data.companyDetails.forEach((detail: any, index: number) => {

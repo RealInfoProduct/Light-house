@@ -269,29 +269,29 @@ export class WarrantyDialogComponent implements OnInit {
   }
 
   onFirmChange(event: any) {
-  const firmId = event.value;
+    const firmId = event.value;
 
-  // Firm id par thi invoice filter
-  this.filteredWarrantyProducts = this.shellList.filter(
-    (item: any) => item.firmName === firmId
-  );
+    // Firm id par thi invoice filter
+    this.filteredWarrantyProducts = this.shellList.filter(
+      (item: any) => item.firmName === firmId
+    );
 
-  // Invoice dropdown reset
-  this.warrantyForm.patchValue({
-    invoiceNo: null
-  });
-}
+    // Invoice dropdown reset
+    this.warrantyForm.patchValue({
+      invoiceNo: null
+    });
+  }
 
 
-   getFirmList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllFirm().subscribe((res: any) => {
-        if (res) {
-          this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
-          this.loaderService.setLoader(false)
-        }
-      })
-    }
+  getFirmList() {
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllFirm().subscribe((res: any) => {
+      if (res) {
+        this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
 
 
   updateWarrantyDate(group: FormGroup, saleDateValue?: any, warrantyValue?: any) {

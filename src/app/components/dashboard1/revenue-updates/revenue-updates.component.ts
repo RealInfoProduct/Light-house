@@ -47,53 +47,53 @@ export interface revenueChart {
   imports: [NgApexchartsModule, MaterialModule, TablerIconsModule, NgForOf, CommonModule],
   templateUrl: './revenue-updates.component.html',
 })
-export class AppRevenueUpdatesComponent implements OnInit{
+export class AppRevenueUpdatesComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
 
   incomeExpenseList: any[] = [];
   public revenueChart!: Partial<revenueChart> | any;
 
   currentYear: number = new Date().getFullYear();
-totalIncome: number = 0;
-totalExpense: number = 0;
+  totalIncome: number = 0;
+  totalExpense: number = 0;
   totalEarnings = 0;
 
-monthlyIncome: number[] = new Array(12).fill(0);
-monthlyExpense: number[] = new Array(12).fill(0);
+  monthlyIncome: number[] = new Array(12).fill(0);
+  monthlyExpense: number[] = new Array(12).fill(0);
 
 
-  currentMonthValue = new Date().getMonth(); // 0 = Jan
+  currentMonthValue = new Date().getMonth(); 
 
 
   months: month[] = [
     { value: 0, viewValue: `January ${this.currentYear}` },
-  { value: 1, viewValue: `February ${this.currentYear}` },
-  { value: 2, viewValue: `March ${this.currentYear}` },
-  { value: 3, viewValue: `April ${this.currentYear}` },
-  { value: 4, viewValue: `May ${this.currentYear}` },
-  { value: 5, viewValue: `June ${this.currentYear}` },
-  { value: 6, viewValue: `July ${this.currentYear}` },
-  { value: 7, viewValue: `August ${this.currentYear}` },
-  { value: 8, viewValue: `September ${this.currentYear}` },
-  { value: 9, viewValue: `October ${this.currentYear}` },
-  { value: 10, viewValue: `November ${this.currentYear}` },
-  { value: 11, viewValue: `December ${this.currentYear}` }
+    { value: 1, viewValue: `February ${this.currentYear}` },
+    { value: 2, viewValue: `March ${this.currentYear}` },
+    { value: 3, viewValue: `April ${this.currentYear}` },
+    { value: 4, viewValue: `May ${this.currentYear}` },
+    { value: 5, viewValue: `June ${this.currentYear}` },
+    { value: 6, viewValue: `July ${this.currentYear}` },
+    { value: 7, viewValue: `August ${this.currentYear}` },
+    { value: 8, viewValue: `September ${this.currentYear}` },
+    { value: 9, viewValue: `October ${this.currentYear}` },
+    { value: 10, viewValue: `November ${this.currentYear}` },
+    { value: 11, viewValue: `December ${this.currentYear}` }
   ];
-
-  
 
   constructor(private firebaseService: FirebaseService, private loaderService: LoaderService) {
 
     this.revenueChart = {
       series: [
-        { name: 'Eanings this month',
-           data: [] ,
-            color: '#5D87FF', 
-          },
-        { name: 'Expense this month',
-           data: [],
-            color: '#49BEFF',  
-           },
+        {
+          name: 'Eanings this month',
+          data: [],
+          color: '#5D87FF',
+        },
+        {
+          name: 'Expense this month',
+          data: [],
+          color: '#49BEFF',
+        },
       ],
       chart: {
         type: 'bar',
@@ -111,10 +111,9 @@ monthlyExpense: number[] = new Array(12).fill(0);
       },
     };
 
-
     const now = new Date();
-    const monthIndex = now.getMonth(); 
-    this.currentMonthValue = this.months[monthIndex].value; 
+    const monthIndex = now.getMonth();
+    this.currentMonthValue = this.months[monthIndex].value;
   }
 
   ngOnInit(): void {
@@ -129,13 +128,11 @@ monthlyExpense: number[] = new Array(12).fill(0);
         this.incomeExpenseList = res.filter(
           (item: any) => item.userId === localStorage.getItem('userId')
         );
- this.calculateMonthWiseTotals();
+        this.calculateMonthWiseTotals();
         this.loaderService.setLoader(false);
       }
     });
   }
-
- 
 
   calculateMonthWiseTotals() {
     this.monthlyIncome.fill(0);
@@ -178,35 +175,30 @@ monthlyExpense: number[] = new Array(12).fill(0);
     ];
   }
 
+  updateChart() {
+    if (!this.chart) return;
+
+    this.chart.updateSeries([
+      {
+        name: 'Eanings this month',
+        data: this.monthlyIncome,
+      },
+      {
+        name: 'Expense this month',
+        data: this.monthlyExpense,
+      },
+    ], true);
+  }
 
 
-updateChart() {
-  if (!this.chart) return;
-
-  this.chart.updateSeries([
-    {
-      name: 'Eanings this month',
-      data: this.monthlyIncome,
-    },
-    {
-      name: 'Expense this month',
-      data: this.monthlyExpense,
-    },
-  ], true);
-}
+  onMonthChange(month: number) {
+    this.currentMonthValue = month;
+    this.calculateMonthWiseTotals();
+  }
 
 
-
-onMonthChange(month: number) {
-  this.currentMonthValue = month;
-  this.calculateMonthWiseTotals();
-}
-
-
-
-  
   formatIndianAmount(value: number): string {
-     return value?.toLocaleString('en-IN') ?? '0';
+    return value?.toLocaleString('en-IN') ?? '0';
   }
 
 }
