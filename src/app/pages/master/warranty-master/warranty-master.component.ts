@@ -151,7 +151,7 @@ export class WarrantyMasterComponent implements OnInit {
     const dialogRef = this.dialog.open(ViewWarrantyComponent, { data: obj });
   }
 
-    getFirmList() {
+  getFirmList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllFirm().subscribe((res: any) => {
       if (res) {
@@ -161,7 +161,7 @@ export class WarrantyMasterComponent implements OnInit {
     })
   }
 
-    getFinalfirm(firmId: any) {
+  getFinalfirm(firmId: any) {
     return this.firmList.find((c: any) => c.id === firmId)?.header || '';
   }
 

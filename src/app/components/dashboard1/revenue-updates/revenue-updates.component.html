@@ -3,14 +3,12 @@
     <div class="d-flex w-100">
       <div>
         <mat-card-title>Revenue Updates</mat-card-title>
-        <mat-card-subtitle class="mat-body-1"
-          >Overview of Profit</mat-card-subtitle
-        >
-        
+        <mat-card-subtitle class="mat-body-1">Overview of Profit</mat-card-subtitle>
+
       </div>
       <div class="m-l-auto">
         <mat-form-field class="theme-select" appearance="outline">
-          <mat-select [value]="currentMonthValue"   (selectionChange)="onMonthChange($event.value)">
+          <mat-select [value]="currentMonthValue" (selectionChange)="onMonthChange($event.value)">
             <mat-option *ngFor="let month of months" [value]="month.value">
               {{ month.viewValue }}
             </mat-option>
@@ -41,7 +39,7 @@
           <span class="text-primary bg-light-primary rounded icon-40 d-flex align-items-center justify-content-center">
             <i-tabler name="grid-dots" class="icon-20 d-flex"></i-tabler>
           </span>
-         
+
           <div class="m-l-12">
             <h5 class="mat-headline-5 m-b-4">₹{{formatIndianAmount(totalEarnings)}}</h5>
             <span class="mat-subtitle-2">Total Earnings</span>
@@ -49,10 +47,7 @@
         </div>
 
         <div class="d-flex m-t-32">
-          <i-tabler
-            name="circle-filled"
-            class="text-primary icon-12"
-          ></i-tabler>
+          <i-tabler name="circle-filled" class="text-primary icon-12"></i-tabler>
           <div class="m-l-12">
             <span class="mat-subtitle-2">Income</span>
             <h3 class="mat-headline-6 m-t-4">₹{{ formatIndianAmount(totalIncome) }}</h3>
@@ -67,9 +62,6 @@
           </div>
         </div>
 
-        <!-- <button mat-flat-button color="primary" class="d-block w-100 m-t-32">
-          View Full Report
-        </button> -->
       </div>
     </div>
   </mat-card-content>

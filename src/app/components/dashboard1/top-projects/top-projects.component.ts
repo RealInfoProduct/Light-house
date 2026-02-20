@@ -30,103 +30,103 @@ interface month {
   imports: [MaterialModule, CommonModule],
   templateUrl: './top-projects.component.html',
 })
-export class AppTopProjectsComponent  implements OnInit{
-  shellList:any []=[]
+export class AppTopProjectsComponent implements OnInit {
+  shellList: any[] = []
 
-  displayedColumns: string[] = ['billNo','customerName','mobileNumber','date','pendingAmount'];
+  displayedColumns: string[] = ['billNo', 'customerName', 'mobileNumber', 'date', 'pendingAmount'];
   dataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
 
-  constructor(  
+  constructor(
     private firebaseService: FirebaseService,
     private loaderService: LoaderService,
   ) {
-    
+
   }
-  
+
   ngOnInit(): void {
-      this.getShellList();
+    this.getShellList();
   }
 
-getShellList() {
-  this.loaderService.setLoader(true);
+  getShellList() {
+    this.loaderService.setLoader(true);
 
-  this.firebaseService.getAllShell().subscribe((res: any) => {
-    if (res) {
+    this.firebaseService.getAllShell().subscribe((res: any) => {
+      if (res) {
 
-      const today = new Date();
-      today.setHours(0,0,0,0); // remove time
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        
+        this.shellList = res
+          .filter((item: any) => {
+            if (item.userId !== localStorage.getItem("userId")) return false;
+            if (Number(item.paymentDays) <= 0) return false;
 
-      this.shellList = res
-        .filter((item: any) => {
-          if (item.userId !== localStorage.getItem("userId")) return false;
-          if (Number(item.paymentDays) <= 0) return false;
+            const dueDate = this.getDueDateFromInvoice(item);
+            if (!dueDate) return false;
 
-          const dueDate = this.getDueDateFromInvoice(item);
-          if (!dueDate) return false;
+            dueDate.setHours(0, 0, 0, 0);
 
-          dueDate.setHours(0,0,0,0);
+            return dueDate.getTime() === today.getTime(); // 👈 Only today's due
+          })
+          .map((item: any) => ({
+            ...item,
+            pending: this.calculatePending(item),
+            dueDate: this.calculateDueDate(item)
+          }));
 
-          return dueDate.getTime() === today.getTime(); // 👈 Only today's due
-        })
-        .map((item: any) => ({
-          ...item,
-          pending: this.calculatePending(item),
-            dueDate: this.calculateDueDate(item)  
-        }));
+        this.dataSource = new MatTableDataSource(this.shellList);
+        this.dataSource.paginator = this.paginator;
+      }
 
-      this.dataSource = new MatTableDataSource(this.shellList);
-      this.dataSource.paginator = this.paginator;
-    }
-
-    this.loaderService.setLoader(false);
-  });
-}
-
-
-
-    getBillNo(element: any): string {
-      return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNumber) ? `(${element.billNumber})` : element?.billNumber ?? ''}`;
+      this.loaderService.setLoader(false);
+    });
   }
 
-calculateDueDate(item: any): string {
-  if (!item?.paymentDays || !item?.date?.seconds) return '';
-
-  const invoiceDate = new Date(item.date.seconds * 1000);
-
-  const dueDate = new Date(invoiceDate);
-  dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
-
-  const day = String(dueDate.getDate()).padStart(2, '0');
-  const month = String(dueDate.getMonth() + 1).padStart(2, '0');
-  const year = dueDate.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}
 
 
-getDueDateFromInvoice(item: any): Date | null {
-  if (!item?.paymentDays || !item?.date?.seconds) return null;
+  getBillNo(element: any): string {
+    return `${element?.invoiceNo ?? ''}${(element?.invoiceNo && element?.billNumber) ? `(${element.billNumber})` : element?.billNumber ?? ''}`;
+  }
 
-  const invoiceDate = new Date(item.date.seconds * 1000);
-  const dueDate = new Date(invoiceDate);
-  dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
+  calculateDueDate(item: any): string {
+    if (!item?.paymentDays || !item?.date?.seconds) return '';
 
-  return dueDate;
-}
+    const invoiceDate = new Date(item.date.seconds * 1000);
+
+    const dueDate = new Date(invoiceDate);
+    dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
+
+    const day = String(dueDate.getDate()).padStart(2, '0');
+    const month = String(dueDate.getMonth() + 1).padStart(2, '0');
+    const year = dueDate.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
 
 
-calculatePending(element: any): number {
-  const grandTotal = Number(element.grandTotal) || 0;
+  getDueDateFromInvoice(item: any): Date | null {
+    if (!item?.paymentDays || !item?.date?.seconds) return null;
 
-  const totalPaid = (element.paymentDetails || []).reduce(
-    (sum: number, payment: any) => sum + Number(payment.paymentR || 0),
-    0
-  );
+    const invoiceDate = new Date(item.date.seconds * 1000);
+    const dueDate = new Date(invoiceDate);
+    dueDate.setDate(invoiceDate.getDate() + Number(item.paymentDays));
 
-  return grandTotal - totalPaid;
-}
+    return dueDate;
+  }
+
+
+  calculatePending(element: any): number {
+    const grandTotal = Number(element.grandTotal) || 0;
+
+    const totalPaid = (element.paymentDetails || []).reduce(
+      (sum: number, payment: any) => sum + Number(payment.paymentR || 0),
+      0
+    );
+
+    return grandTotal - totalPaid;
+  }
 
 
 }

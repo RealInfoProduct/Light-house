@@ -3,7 +3,7 @@
   <form [formGroup]="saleForm">
     <div class="row">
 
-        <div class="col-12 col-md-3">
+      <div class="col-12 col-md-3">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
           <mat-label>Firm Name</mat-label>
           <mat-select value="text" formControlName="firmName" placeholder="Selecta Firm">
@@ -75,7 +75,7 @@
         </mat-form-field>
       </div>
 
-        <div class="col-12 col-md-4">
+      <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
           <mat-label>Payment Day's</mat-label>
           <input type="number" matInput required (ngModelChange)="paymentDaysChange()" formControlName="paymentDays"
@@ -314,7 +314,7 @@
 
     <mat-divider></mat-divider>
     <mat-dialog-actions class="p-24 justify-content-end">
-        <div class="d-flex align-items-center m-r-56">
+      <div class="d-flex align-items-center m-r-56">
         <section class="example-section">
           <mat-checkbox formControlName="selected" class="example-margin"></mat-checkbox>
           <mat-label>Send Message In WhatsApp</mat-label>
