@@ -5,8 +5,10 @@
             <div class="col-12 col-md-3">
                 <mat-form-field appearance="outline" class="w-100 m-t-10">
                     <mat-label>Firm Name</mat-label>
-                    <mat-select value="text" formControlName="firmName" placeholder="Selecta Firm"   (selectionChange)="onFirmChange($event)">
-                        <mat-option *ngFor="let item of firmList" [value]="item.id">{{item.header}} {{item.subHeader}}</mat-option>
+                    <mat-select value="text" formControlName="firmName" placeholder="Selecta Firm"
+                        (selectionChange)="onFirmChange($event)">
+                        <mat-option *ngFor="let item of firmList" [value]="item.id">{{item.header}}
+                            {{item.subHeader}}</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>

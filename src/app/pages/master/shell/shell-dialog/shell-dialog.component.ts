@@ -107,10 +107,10 @@ export class ShellDialogComponent implements OnInit {
     //   this.setAutoBillNo();
     // }
     this.saleForm.get('firmName')?.valueChanges.subscribe(firmId => {
-    if (firmId) {
-      this.setAutoBillNoByFirm(firmId);
-    }
-  });
+      if (firmId) {
+        this.setAutoBillNoByFirm(firmId);
+      }
+    });
 
     this.saleForm.valueChanges.subscribe(() => {
       this.calculatePending();
@@ -224,23 +224,23 @@ export class ShellDialogComponent implements OnInit {
   // }
 
   setAutoBillNoByFirm(firmId: string) {
-  this.firebaseService.getAllShell().subscribe((res: any[]) => {
-    const userId = localStorage.getItem('userId');
-    let invoiceNumber = 1;
+    this.firebaseService.getAllShell().subscribe((res: any[]) => {
+      const userId = localStorage.getItem('userId');
+      let invoiceNumber = 1;
 
-    if (res && res.length > 0) {
-      const filteredData = res.filter(item =>
-        item.userId === userId &&
-        item.firmName === firmId
-      );
+      if (res && res.length > 0) {
+        const filteredData = res.filter(item =>
+          item.userId === userId &&
+          item.firmName === firmId
+        );
 
-      invoiceNumber = filteredData.length + 1;
-    }
+        invoiceNumber = filteredData.length + 1;
+      }
 
-    const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
-    this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
-  });
-}
+      const invoiceNoPadded = invoiceNumber.toString().padStart(4, '0');
+      this.saleForm.get('invoiceNo')?.setValue(invoiceNoPadded);
+    });
+  }
 
 
   buildForm() {
@@ -265,7 +265,7 @@ export class ShellDialogComponent implements OnInit {
       paymentDetails: this.fb.array([this.createpaymentDetailGroup()])
 
     })
-     this.paymentDaysChange()
+    this.paymentDaysChange()
     this.saleForm.get('extraDiscount')?.valueChanges.subscribe(() => {
       this.calculateGrandTotalWithExtra();
     });
@@ -281,7 +281,7 @@ export class ShellDialogComponent implements OnInit {
     this.saleForm.get('paymentDays')?.setValue(value, { emitEvent: false });
   }
 
-    paymentDaysChange() {
+  paymentDaysChange() {
     this.saleForm.get('paymentDays')?.valueChanges.subscribe((days: any) => {
       let numDays = parseInt(days, 10);
       if (isNaN(numDays) || numDays < 0) {
@@ -477,14 +477,14 @@ export class ShellDialogComponent implements OnInit {
   }
 
   getFirmList() {
-      this.loaderService.setLoader(true)
-      this.firebaseService.getAllFirm().subscribe((res: any) => {
-        if (res) {
-          this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
-          this.loaderService.setLoader(false)
-        }
-      })
-    }
+    this.loaderService.setLoader(true)
+    this.firebaseService.getAllFirm().subscribe((res: any) => {
+      if (res) {
+        this.firmList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
+        this.loaderService.setLoader(false)
+      }
+    })
+  }
 
   setCompanyAndCategoryEdit() {
     this.local_data.shellDetails.forEach((detail: any, index: number) => {

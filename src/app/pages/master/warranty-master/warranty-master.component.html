@@ -35,9 +35,10 @@
     <div class="table-responsive">
       <table mat-table [dataSource]="warrantyDataSource" class="w-100">
 
-         <ng-container matColumnDef="firmName">
+        <ng-container matColumnDef="firmName">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Firm Name</th>
-          <td mat-cell *matCellDef="let element">{{ getFinalfirm(element.firmName) }} {{ getFinalsubHeaderfirm(element.firmName)}} </td>
+          <td mat-cell *matCellDef="let element">{{ getFinalfirm(element.firmName) }} {{
+            getFinalsubHeaderfirm(element.firmName)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="billNo">

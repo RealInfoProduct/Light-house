@@ -31,16 +31,16 @@ export interface monthlyChart {
 @Component({
   selector: 'app-monthly-earnings',
   standalone: true,
-  imports:[NgApexchartsModule, MaterialModule, TablerIconsModule,CommonModule],
+  imports: [NgApexchartsModule, MaterialModule, TablerIconsModule, CommonModule],
   templateUrl: './monthly-earnings.component.html',
 })
-export class AppMonthlyEarningsComponent implements OnInit{
+export class AppMonthlyEarningsComponent implements OnInit {
   @ViewChild('chart') chart: ChartComponent = Object.create(null);
   public monthlyChart!: Partial<monthlyChart> | any;
-  incomeExpenseList:any [ ]  = []
+  incomeExpenseList: any[] = []
   currentMonthIncome: number = 0;
-previousMonthIncome: number = 0;
-percentageChange: number = 0;
+  previousMonthIncome: number = 0;
+  percentageChange: number = 0;
 
 
 
@@ -50,7 +50,7 @@ percentageChange: number = 0;
         {
           name: '',
           color: '#49BEFF',
-          data:  Array(7).fill(this.percentageChange) ,
+          data: Array(7).fill(this.percentageChange),
         },
       ],
 
@@ -88,9 +88,9 @@ percentageChange: number = 0;
     };
   }
 
-   ngOnInit(): void {
-    this.getExpensesList() 
-   }
+  ngOnInit(): void {
+    this.getExpensesList()
+  }
 
   getExpensesList() {
     this.loaderService.setLoader(true);
@@ -138,7 +138,7 @@ percentageChange: number = 0;
         this.percentageChange = this.currentMonthIncome > 0 ? 100 : 0;
       } else {
         const rawChange = ((this.currentMonthIncome - this.previousMonthIncome) / Math.abs(this.previousMonthIncome)) * 100;
-         this.percentageChange = Math.max(-100, Math.min(100, rawChange));
+        this.percentageChange = Math.max(-100, Math.min(100, rawChange));
       }
 
       this.loaderService.setLoader(false);

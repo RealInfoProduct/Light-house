@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit,  ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ShellDialogComponent } from './shell-dialog/shell-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,8 +20,8 @@ import { MatSort } from '@angular/material/sort';
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']
 })
-export class ShellComponent implements OnInit ,AfterViewInit {
- dateSaleListForm: FormGroup;
+export class ShellComponent implements OnInit, AfterViewInit {
+  dateSaleListForm: FormGroup;
   displayedColumns: string[] = [
     'firmName',
     'billNo',
@@ -30,7 +30,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     'customerName',
     'address',
     // 'customerMobileNo',
-     'status',
+    'status',
     'finalAmount',
     'recivedAmount',
     'pendingAmount',
@@ -38,19 +38,19 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   ];
 
   shellList: any[] = []
-  categoryList:any []=[]
-  incomeExpenseList:any []=[]
-   balanceList:any =[]
+  categoryList: any[] = []
+  incomeExpenseList: any[] = []
+  balanceList: any = []
   firmList: any = []
 
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
- @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private dialog: MatDialog,
-     private fb: FormBuilder,
+    private fb: FormBuilder,
     private firebaseService: FirebaseService,
     private loaderService: LoaderService,
     private _snackBar: MatSnackBar
@@ -66,10 +66,10 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.shellDataSource.sort = this.sort; 
+    this.shellDataSource.sort = this.sort;
   }
 
-   dateform() {
+  dateform() {
     const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -79,7 +79,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     });
   }
 
-   filterDate() {
+  filterDate() {
     if (!this.shellList) return;
     const startDate = this.dateSaleListForm.value.start ? new Date(this.dateSaleListForm.value.start) : null;
     const endDate = this.dateSaleListForm.value.end ? new Date(this.dateSaleListForm.value.end) : null;
@@ -108,7 +108,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     this.shellDataSource.filter = filterValue.trim().toLowerCase();
   }
 
-   getStatusClass(status: string): string {
+  getStatusClass(status: string): string {
     switch (status) {
       case 'Paid':
         return 'status-paid';
@@ -122,15 +122,15 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   getFinalStatus(element: any): string {
-  return this.getPendingAmount(element) === 0 ? 'Paid' : element.paymentStatus;
-}
+    return this.getPendingAmount(element) === 0 ? 'Paid' : element.paymentStatus;
+  }
 
- getPendingAmount(element: any): number {
-  if (!element.grandTotal) return 0;
-  return element.paymentDetails
-    ? element.grandTotal - this.getTotalReceived(element.paymentDetails)
-    : element.grandTotal;
-}
+  getPendingAmount(element: any): number {
+    if (!element.grandTotal) return 0;
+    return element.paymentDetails
+      ? element.grandTotal - this.getTotalReceived(element.paymentDetails)
+      : element.grandTotal;
+  }
 
   getTotalReceived(paymentDetails: any[]): number {
     if (!paymentDetails || paymentDetails.length === 0) {
@@ -140,54 +140,54 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   async updateBalance(paymentDetails: any[], reverse: boolean = false) {
-  if (!this.balanceList || !paymentDetails?.length) return;
+    if (!this.balanceList || !paymentDetails?.length) return;
 
-  for (const payment of paymentDetails) {
-    const amount = Number(payment.paymentR) || 0;
-    const finalAmount = reverse ? -amount :  amount;
+    for (const payment of paymentDetails) {
+      const amount = Number(payment.paymentR) || 0;
+      const finalAmount = reverse ? -amount : amount;
 
-    if (payment.paymentType === 'Cash') {
-      this.balanceList.cashBalance =
-        (this.balanceList.cashBalance || 0) + finalAmount;
-    }
+      if (payment.paymentType === 'Cash') {
+        this.balanceList.cashBalance =
+          (this.balanceList.cashBalance || 0) + finalAmount;
+      }
 
-    else if (payment.bankName) {
-      const bank = this.balanceList.bankDetails?.find(
-        (b: any) => b.id === payment.bankName
-      );
+      else if (payment.bankName) {
+        const bank = this.balanceList.bankDetails?.find(
+          (b: any) => b.id === payment.bankName
+        );
 
-      if (bank) {
-        bank.balance = (bank.balance || 0) + finalAmount;
+        if (bank) {
+          bank.balance = (bank.balance || 0) + finalAmount;
+        }
       }
     }
-  }
 
-  await this.firebaseService.updateBalance(
-    this.balanceList.id,
-    this.balanceList
-  );
-}
+    await this.firebaseService.updateBalance(
+      this.balanceList.id,
+      this.balanceList
+    );
+  }
 
   addShell(action: string, obj: any) {
     obj.action = action;
     const dialogRef = this.dialog.open(ShellDialogComponent, { data: obj });
-  
+
     dialogRef.afterClosed().subscribe(async (result) => {
       if (!result?.event) return;
-  
+
       const userId = localStorage.getItem("userId");
-  
+
       const updateStock = async (categoryId: string, countChange: number) => {
-        const categoryItem = this.categoryList.find((cat:any) => cat.id === categoryId);
+        const categoryItem = this.categoryList.find((cat: any) => cat.id === categoryId);
         if (categoryItem) {
           categoryItem.stockCount = (categoryItem.stockCount || 0) - countChange;
           await this.firebaseService.updateCategory(categoryItem.id, categoryItem);
         }
       };
-  
+
       if (result.event === 'Add') {
         const payload: ShellList = {
-         id: '',
+          id: '',
           invoiceNo: result.data.invoiceNo,
           firmName: result.data.firmName,
           billNumber: result.data.billNumber,
@@ -201,7 +201,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
           grandTotal: result.data.grandTotal,
           otherKharch: result.data.otherKharch,
           paymentStatus: result.data.paymentStatus,
-          paymentReceived:result.data.paymentReceived,
+          paymentReceived: result.data.paymentReceived,
           type: result.data.type,
           selected: result.data.selected,
           shellDetails: result.data.shellDetails.map((detail: any) => ({
@@ -209,32 +209,32 @@ export class ShellComponent implements OnInit ,AfterViewInit {
             companyName: detail.companyName.id,
             category: detail.category.id,
             qty: detail.qty,
-            warranty:detail.warranty,
+            warranty: detail.warranty,
             productPrice: detail.productPrice,
             discount: detail.discount,
             subTotal: detail.subTotal,
           })),
-           paymentDetails: result.data.paymentDetails.map((detail: any) => ({
-          paymentR: detail.paymentR,
-          paymentReceivedDate: detail.paymentReceivedDate,
-          paymentType: detail.paymentType,
-          bankName: detail.bankName?.id || ''
-        })),
+          paymentDetails: result.data.paymentDetails.map((detail: any) => ({
+            paymentR: detail.paymentR,
+            paymentReceivedDate: detail.paymentReceivedDate,
+            paymentType: detail.paymentType,
+            bankName: detail.bankName?.id || ''
+          })),
           userId: localStorage.getItem("userId")
         };
-  
+
         for (const detail of payload.shellDetails) {
           await updateStock(detail.category, detail.qty);
         }
 
         await this.firebaseService.addShell(payload);
-          await this.updateBalance(payload.paymentDetails);
+        await this.updateBalance(payload.paymentDetails);
 
         const expensePayload: ExpensesList = {
           id: '',
           date: result.data.date,
           billNo: result.data.billNumber || '',
-          invoiceNo:  result.data.invoiceNo ||'',
+          invoiceNo: result.data.invoiceNo || '',
           amount: result.data.grandTotal,
           notes: result.data.customerName || '',
           paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
@@ -244,24 +244,24 @@ export class ShellComponent implements OnInit ,AfterViewInit {
         };
 
         await this.firebaseService.addExpenses(expensePayload);
-         if (payload.selected) {
-             await this.sendWhatsAppMessage(payload);
-            }
+        if (payload.selected) {
+          await this.sendWhatsAppMessage(payload);
+        }
         console.log(expensePayload);
         this.getShellList()
-         this.getBalanceList();
+        this.getBalanceList();
         this.getExpensesList();
         this.openConfigSnackBar('Record created successfully');
       }
-  
+
       if (result.event === 'Edit') {
-        const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
+        const oldPurchase = this.shellList.find((el: any) => el.id === result.data.id);
         if (!oldPurchase) return;
-         await this.updateBalance(oldPurchase.paymentDetails, true);
+        await this.updateBalance(oldPurchase.paymentDetails, true);
         for (const oldDetail of oldPurchase.shellDetails) {
           await updateStock(oldDetail.category, -oldDetail.qty);
         }
-  
+
         const payload: ShellList = {
           id: result.data.id,
           firmName: result.data.firmName,
@@ -299,51 +299,51 @@ export class ShellComponent implements OnInit ,AfterViewInit {
           userId: localStorage.getItem("userId")
 
         };
-       
 
-          const oldExpense = this.incomeExpenseList.find(
-        (el: any) => el.invoiceNo === result.data.invoiceNo && el.notes === result.data.customerName
-      );
 
-      const expensePayload: ExpensesList = {
-        id: oldExpense ? oldExpense.id : '',
-        date: result.data.date,
+        const oldExpense = this.incomeExpenseList.find(
+          (el: any) => el.invoiceNo === result.data.invoiceNo && el.notes === result.data.customerName
+        );
+
+        const expensePayload: ExpensesList = {
+          id: oldExpense ? oldExpense.id : '',
+          date: result.data.date,
           billNo: result.data.billNumber || '',
-           invoiceNo:  result.data.invoiceNo ||'',
+          invoiceNo: result.data.invoiceNo || '',
           amount: result.data.grandTotal,
           notes: result.data.customerName || '',
           paymentStatus: result.data.paymentDetails?.[0]?.paymentType || 'Cash',
           accounttype: result.data.type || '',
           status: result.data.paymentStatus,
-        userId: localStorage.getItem('userId')
-      };
+          userId: localStorage.getItem('userId')
+        };
 
-      if (oldExpense) {
-        await this.firebaseService.updateExpenses(
-          oldExpense.id,
-          expensePayload
-        );
-      } else {
-        await this.firebaseService.addExpenses(expensePayload);
-      }
- 
+        if (oldExpense) {
+          await this.firebaseService.updateExpenses(
+            oldExpense.id,
+            expensePayload
+          );
+        } else {
+          await this.firebaseService.addExpenses(expensePayload);
+        }
+
         for (const detail of payload.shellDetails) {
           await updateStock(detail.category, detail.qty);
         }
-         await this.updateBalance(payload.paymentDetails);
+        await this.updateBalance(payload.paymentDetails);
 
         await this.firebaseService.updateShell(result.data.id, payload);
 
-          if (payload.selected) {
-                await this.sendWhatsAppMessage(payload);
-            }
+        if (payload.selected) {
+          await this.sendWhatsAppMessage(payload);
+        }
         this.getShellList();
         this.getBalanceList();
         this.openConfigSnackBar('Record updated successfully');
       }
-  
+
       if (result.event === 'Delete') {
-        const oldPurchase = this.shellList.find((el:any) => el.id === result.data.id);
+        const oldPurchase = this.shellList.find((el: any) => el.id === result.data.id);
         if (!oldPurchase) return;
 
         await this.updateBalance(oldPurchase.paymentDetails, true);
@@ -352,14 +352,14 @@ export class ShellComponent implements OnInit ,AfterViewInit {
           await updateStock(detail.category, -detail.qty);
         }
         const oldExpense = this.incomeExpenseList.find(
-        (el: any) =>  el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
-      );
+          (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
+        );
 
-      await this.firebaseService.deleteShell(result.data.id);
-      if (oldExpense) {
-        await this.firebaseService.deleteExpenses(oldExpense.id);
-      }
-  
+        await this.firebaseService.deleteShell(result.data.id);
+        if (oldExpense) {
+          await this.firebaseService.deleteExpenses(oldExpense.id);
+        }
+
         this.getShellList();
         this.getBalanceList();
         this.openConfigSnackBar('Record deleted successfully');
@@ -368,8 +368,8 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   updateCategory(category: any, data: any) {
-  return this.firebaseService.updateCategory(category, data);
-}
+    return this.firebaseService.updateCategory(category, data);
+  }
 
   getShellList() {
     this.loaderService.setLoader(true)
@@ -381,12 +381,12 @@ export class ShellComponent implements OnInit ,AfterViewInit {
             ...item,
             date: this.parseDate(item.date)
           }));
-      this.shellList.sort((a, b) => {
-        const numA = parseInt(a.invoiceNo.replace(/\D/g, ''), 10);
-        const numB = parseInt(b.invoiceNo.replace(/\D/g, ''), 10);
-        return numB - numA;
-      });
-    }
+        this.shellList.sort((a, b) => {
+          const numA = parseInt(a.invoiceNo.replace(/\D/g, ''), 10);
+          const numB = parseInt(b.invoiceNo.replace(/\D/g, ''), 10);
+          return numB - numA;
+        });
+      }
       this.shellDataSource = new MatTableDataSource(this.shellList);
       this.shellDataSource.paginator = this.paginator;
       this.shellDataSource.sort = this.sort;
@@ -395,11 +395,11 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     })
   }
 
-    getExpensesList() {
+  getExpensesList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllExpenses().subscribe((res: any) => {
       if (res) {
-        this.incomeExpenseList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
+        this.incomeExpenseList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
         this.loaderService.setLoader(false)
       }
     })
@@ -432,15 +432,15 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   }
 
   viewShellDetails(obj: any) {
-      const dialogRef = this.dialog.open(ViewShellComponent, { data: obj });
-   }
+    const dialogRef = this.dialog.open(ViewShellComponent, { data: obj });
+  }
 
   paymentDetails(obj: any) {
     const dialogRef = this.dialog.open(SalePaymentDetailsComponent, { data: obj });
   }
-   
 
-   getCategoryList() {
+
+  getCategoryList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllCategory().subscribe((res: any) => {
       if (res) {
@@ -547,59 +547,59 @@ export class ShellComponent implements OnInit ,AfterViewInit {
       const paymentReceived = item.paymentDetails.reduce(
         (sum: number, pd: any) => sum + (pd.paymentR || 0),
         0
-       );
- 
-   const totalAmount = item.grandTotal || 0;
- 
-   const pendingAmount = totalAmount - paymentReceived;
-       return [
-         i + 1,
-         item.billNumber,
-         item.invoiceNo,
-         dateStr,
-         item.customerName,
-         item.mobileNumber,
-         item.paymentStatus,
-         totalAmount,
-         paymentReceived,
-         pendingAmount
-       ];
-     });
- 
-     const MIN_ROWS = 35;
-     if (data.length < MIN_ROWS) {
-       for (let idx = data.length; idx < MIN_ROWS; idx++) {
-         data.push([
-           idx + 1,
-           '',
-           '',
-           '',
-           '',
-           ''
-         ]);
-       }
-     }
-     doc.setFontSize(10);
-     (doc as any).autoTable({
-       head: [headers],
-       body: data,
-       startY: 32,
-       theme: 'grid',
-       headStyles: {
-         fillColor: [255, 187, 0],
-         textColor: [8, 8, 8],
-         fontStyle: 'bold'
-       },
-       styles: {
-         textColor: [8, 8, 8],
-         fontSize: 8,
-         valign: 'middle',
-         halign: 'center'
-       }
-     });
- 
-     doc.save(`Shell Report.pdf`);
-   }
+      );
+
+      const totalAmount = item.grandTotal || 0;
+
+      const pendingAmount = totalAmount - paymentReceived;
+      return [
+        i + 1,
+        item.billNumber,
+        item.invoiceNo,
+        dateStr,
+        item.customerName,
+        item.mobileNumber,
+        item.paymentStatus,
+        totalAmount,
+        paymentReceived,
+        pendingAmount
+      ];
+    });
+
+    const MIN_ROWS = 35;
+    if (data.length < MIN_ROWS) {
+      for (let idx = data.length; idx < MIN_ROWS; idx++) {
+        data.push([
+          idx + 1,
+          '',
+          '',
+          '',
+          '',
+          ''
+        ]);
+      }
+    }
+    doc.setFontSize(10);
+    (doc as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 32,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [255, 187, 0],
+        textColor: [8, 8, 8],
+        fontStyle: 'bold'
+      },
+      styles: {
+        textColor: [8, 8, 8],
+        fontSize: 8,
+        valign: 'middle',
+        halign: 'center'
+      }
+    });
+
+    doc.save(`Shell Report.pdf`);
+  }
 
   setPaymentStatusColor(doc: jsPDF, status: string) {
     switch (status) {
@@ -788,7 +788,7 @@ export class ShellComponent implements OnInit ,AfterViewInit {
   getkeySpecifiCations(categoryId: any) {
     return this.categoryList.find((c: any) => c.id === categoryId)?.keySpecifiCations || '';
   }
-  
+
   getFinalfirm(firmId: any) {
     return this.firmList.find((c: any) => c.id === firmId)?.header || '';
   }
@@ -797,55 +797,55 @@ export class ShellComponent implements OnInit ,AfterViewInit {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
-async sendWhatsAppMessage(order: any) {
-  if (!order.selected) return;
+  async sendWhatsAppMessage(order: any) {
+    if (!order.selected) return;
 
-  if (!order.mobileNumber) {
-    this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
-    return;
+    if (!order.mobileNumber) {
+      this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
+      return;
+    }
+
+    this.loaderService.setLoader(true);
+
+    try {
+      // Prepare phone number
+      let phone = order.mobileNumber.toString().replace(/\D/g, '');
+      if (phone.length === 10) phone = '91' + phone;
+
+      const pdfBlob = this.generatePDFBlob(order);
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const clickableText = "`" + pdfUrl + "`";
+
+      const message = encodeURIComponent(
+        `*Hello ${order.customerName || ''}!*\n\n` +
+        `Thank you for your purchase.\n` +
+        `Here is your invoice:\n\n` +
+        `Bill No: *${order.billNumber}*\n` +
+        `Invoice No: *${order.invoiceNo}*\n` +
+        `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+        `Amount: *₹${order.grandTotal}*\n\n` +
+
+        `Click here : ${clickableText}\n\n` +
+        `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+
+      );
+
+      const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
+      window.open(whatsappUrl, '_blank');
+
+      this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
+
+    } catch (err) {
+      console.error(err);
+      this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
+    } finally {
+      this.loaderService.setLoader(false);
+    }
   }
 
-  this.loaderService.setLoader(true);
-
-  try {
-    // Prepare phone number
-    let phone = order.mobileNumber.toString().replace(/\D/g, '');
-    if (phone.length === 10) phone = '91' + phone;
-
-    const pdfBlob = this.generatePDFBlob(order);
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const clickableText = "`" + pdfUrl + "`";
-
-    const message = encodeURIComponent(
-      `*Hello ${order.customerName || ''}!*\n\n` +
-      `Thank you for your purchase.\n` +
-      `Here is your invoice:\n\n` +
-      `Bill No: *${order.billNumber}*\n` +
-      `Invoice No: *${order.invoiceNo}*\n` +
-      `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-      `Amount: *₹${order.grandTotal}*\n\n` +
-
-      `Click here : ${clickableText}\n\n` +
-      `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
-
-    );  
-
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-    window.open(whatsappUrl, '_blank');
-
-    this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
-
-  } catch (err) {
-    console.error(err);
-    this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
-  } finally {
-    this.loaderService.setLoader(false);
-  }
-}
-
-generatePDFBlob(item: any): Blob {
-  const doc = new jsPDF('p', 'mm', 'a4');
-   const firm = this.firmList.find((f: any) => f.id === item.firmName);
+  generatePDFBlob(item: any): Blob {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const firm = this.firmList.find((f: any) => f.id === item.firmName);
 
     const PAGE_WIDTH = 210;
     let currentY = 10;
@@ -1000,8 +1000,8 @@ generatePDFBlob(item: any): Blob {
       { align: 'center' }
     );
 
-  return doc.output('blob');
-}
+    return doc.output('blob');
+  }
 
 
 

@@ -8,16 +8,16 @@
   <mat-card-content>
     <div class="table-responsive m-t-30">
       <table mat-table [dataSource]="dataSource" class="w-100">
-        
+
         <ng-container matColumnDef="billNo">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
-           Bill No
+            Bill No
           </th>
           <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
-          {{ getBillNo(element) }}
+            {{ getBillNo(element) }}
           </td>
         </ng-container>
-      
+
         <ng-container matColumnDef="customerName">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
             Customer Name
@@ -29,7 +29,7 @@
 
         <ng-container matColumnDef="mobileNumber">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
-             Mobile Number
+            Mobile Number
           </th>
           <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
             {{element.mobileNumber}}
@@ -41,10 +41,10 @@
             Date
           </th>
           <td mat-cell *matCellDef="let element" class="f-s-14 text-align">
-           {{ element.dueDate }}
+            {{ element.dueDate }}
           </td>
         </ng-container>
-      
+
         <ng-container matColumnDef="pendingAmount">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
             Pending Amount
@@ -53,7 +53,7 @@
             {{element.pending}}
           </td>
         </ng-container>
-      
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
