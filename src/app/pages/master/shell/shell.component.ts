@@ -13,6 +13,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import { MatSort } from '@angular/material/sort';
+import { initializeApp } from 'firebase/app';
+import { environment } from 'src/environments/environment.prod';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 
 
 @Component({
@@ -797,42 +800,113 @@ export class ShellComponent implements OnInit, AfterViewInit {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
-  async sendWhatsAppMessage(order: any) {
-    if (!order.selected) return;
+  // async sendWhatsAppMessage(order: any) {
+  //   if (!order.selected) return;
 
-    if (!order.mobileNumber) {
-      this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
-      return;
+  //   if (!order.mobileNumber) {
+  //     this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
+  //     return;
+  //   }
+
+  //   this.loaderService.setLoader(true);
+
+  //   try {
+  //     // Prepare phone number
+  //     let phone = order.mobileNumber.toString().replace(/\D/g, '');
+  //     if (phone.length === 10) phone = '91' + phone;
+
+  //     const pdfBlob = this.generatePDFBlob(order);
+  //     const pdfUrl = URL.createObjectURL(pdfBlob);
+  //     const clickableText = "`" + pdfUrl + "`";
+
+  //     const message = encodeURIComponent(
+  //       `*Hello ${order.customerName || ''}!*\n\n` +
+  //       `Thank you for your purchase.\n` +
+  //       `Here is your invoice:\n\n` +
+  //       `Bill No: *${order.billNumber}*\n` +
+  //       `Invoice No: *${order.invoiceNo}*\n` +
+  //       `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+  //       `Amount: *₹${order.grandTotal}*\n\n` +
+
+  //       `Click here : ${clickableText}\n\n` +
+  //       `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+
+  //     );
+
+  //     const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
+  //     // window.open(whatsappUrl, '_blank');
+  //      const link = document.createElement('a');
+  //   link.href = whatsappUrl;
+  //   link.target = '_blank';
+  //   link.rel = 'noopener noreferrer';
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+
+  //     this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
+
+  //   } catch (err) {
+  //     console.error(err);
+  //     this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
+  //   } finally {
+  //     this.loaderService.setLoader(false);
+  //   }
+  // }
+async sendWhatsAppMessage(order: any) {
+  if (!order?.selected) return;
+
+  if (!order?.mobileNumber) {
+    this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
+    return;
+  }
+
+  this.loaderService.setLoader(true);
+
+  try {
+
+    // ✅ Initialize Firebase
+    const app = initializeApp(environment.firebaseConfig);
+    const storage = getStorage(app);
+
+    // ✅ Format phone number
+    let phone = order.mobileNumber.toString().replace(/\D/g, '');
+    if (phone.length === 10) {
+      phone = '91' + phone; // India country code
     }
 
-    this.loaderService.setLoader(true);
+    // ✅ Generate PDF Blob
+    const pdfBlob = this.generatePDFBlob(order);
 
-    try {
-      // Prepare phone number
-      let phone = order.mobileNumber.toString().replace(/\D/g, '');
-      if (phone.length === 10) phone = '91' + phone;
+    // ✅ Create unique file name
+    const fileName = `invoice_${order.invoiceNo}_${Date.now()}.pdf`;
 
-      const pdfBlob = this.generatePDFBlob(order);
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const clickableText = "`" + pdfUrl + "`";
+    // ✅ Upload to Firebase Storage
+    const storageRef = ref(storage, `invoices/${fileName}`);
+    await uploadBytes(storageRef, pdfBlob);
 
-      const message = encodeURIComponent(
-        `*Hello ${order.customerName || ''}!*\n\n` +
-        `Thank you for your purchase.\n` +
-        `Here is your invoice:\n\n` +
-        `Bill No: *${order.billNumber}*\n` +
-        `Invoice No: *${order.invoiceNo}*\n` +
-        `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-        `Amount: *₹${order.grandTotal}*\n\n` +
+    // ✅ Get public download URL
+    const downloadURL = await getDownloadURL(storageRef);
 
-        `Click here : ${clickableText}\n\n` +
-        `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+    // ✅ Prepare WhatsApp message
+    const messageText =
+      `*Hello ${order.customerName || ''}!*\n\n` +
+      `Thank you for your purchase.\n\n` +
+      `Bill No: *${order.billNumber}*\n` +
+      `Invoice No: *${order.invoiceNo}*\n` +
+      `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+      `Amount: *₹${order.grandTotal}*\n\n` +
+      `Download your invoice here:\n${downloadURL}\n\n` +
+      `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`;
 
-      );
+    const encodedMessage = encodeURIComponent(messageText);
 
-      const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-      // window.open(whatsappUrl, '_blank');
-       const link = document.createElement('a');
+    // ✅ WhatsApp universal URL
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
+    console.log(whatsappUrl);
+    
+
+    // ✅ Open safely
+    const link = document.createElement('a');
     link.href = whatsappUrl;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
@@ -840,16 +914,15 @@ export class ShellComponent implements OnInit, AfterViewInit {
     link.click();
     document.body.removeChild(link);
 
-      this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
+    this._snackBar.open('WhatsApp Opened with Invoice Link!', 'OK', { duration: 3000 });
 
-    } catch (err) {
-      console.error(err);
-      this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
-    } finally {
-      this.loaderService.setLoader(false);
-    }
+  } catch (err) {
+    console.error(err);
+    this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
+  } finally {
+    this.loaderService.setLoader(false);
   }
-
+}
   generatePDFBlob(item: any): Blob {
     const doc = new jsPDF('p', 'mm', 'a4');
     const firm = this.firmList.find((f: any) => f.id === item.firmName);
