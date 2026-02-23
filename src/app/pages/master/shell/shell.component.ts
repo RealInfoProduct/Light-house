@@ -831,7 +831,14 @@ export class ShellComponent implements OnInit, AfterViewInit {
       );
 
       const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-      window.open(whatsappUrl, '_blank');
+      // window.open(whatsappUrl, '_blank');
+       const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
       this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
 
