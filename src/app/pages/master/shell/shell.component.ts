@@ -352,6 +352,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
           await updateStock(detail.category, -detail.qty);
         }
         const oldExpense = this.incomeExpenseList.find(
+          // (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
           (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber && el.notes === result.data.customerName
         );
 
@@ -825,7 +826,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
         `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
         `Amount: *₹${order.grandTotal}*\n\n` +
 
-        `Click here : ${clickableText}\n\n` +
+        `Click here : ${'blob:'+clickableText}\n\n` +
         `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
 
       );
