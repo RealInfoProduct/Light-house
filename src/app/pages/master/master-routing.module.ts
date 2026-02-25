@@ -9,6 +9,7 @@ import { ShellComponent } from './shell/shell.component';
 import { IncomeExpenseComponent } from './income-expense/income-expense.component';
 import { BalanceComponent } from './balance/balance.component';
 import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
+import { InvoiceViewComponent } from './shell/invoice-view/invoice-view.component';
 
 
 
@@ -105,6 +106,15 @@ export const MasterRoutes: Routes = [
           ],
         },
       },
+        {
+    path: '',
+    component: FullComponent,
+    children: [
+      // ... other child routes
+      { path: 'invoice/:id', component: InvoiceViewComponent },
+    ],
+  },
+  { path: '**', redirectTo: '', pathMatch: 'full' },
     ],
   }
 ];
