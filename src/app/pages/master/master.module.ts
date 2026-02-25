@@ -53,7 +53,7 @@ import { ViewWarrantyComponent } from './warranty-master/view-warranty/view-warr
     BalanceComponent,
     WarrantyMasterComponent,
     WarrantyDialogComponent,
-    ViewWarrantyComponent,
+    ViewWarrantyComponent
   ],
   imports: [
     CommonModule,
