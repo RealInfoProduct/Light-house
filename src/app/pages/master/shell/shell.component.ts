@@ -798,18 +798,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
-// async sendWhatsAppMessage(order: any) {
-//   if (!order.selected || !order.mobileNumber) return;
 
-//   const invoiceUrl = `https://lighthousedev-64439.web.app/invoice/${order.id}`;
-//   const message = `Hello,\nPlease view your invoice:\n${invoiceUrl}`;
-
-//   const phone = order.mobileNumber.toString().replace(/\D/g, '');
-//   const fullPhone = phone.length === 10 ? '91' + phone : phone;
-
-//   const whatsappUrl = `https://web.whatsapp.com/send?phone=${fullPhone}&text=${encodeURIComponent(message)}`;
-//   window.open(whatsappUrl, '_blank');
-// }
   async sendWhatsAppMessage(order: any) {
     if (!order.selected) return;
 

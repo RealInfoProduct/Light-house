@@ -106,7 +106,19 @@ export class InvoiceViewComponent implements OnInit {
       );
 
       // Pass filtered data to generatePDFBlob
-      this.generatePDFBlob(this.shellList);
+      // this.generatePDFBlob(this.shellList);
+       if (this.shellList.length > 0) {
+      const pdfBlob = this.generatePDFBlob(this.shellList);
+
+      // Open PDF in new tab
+      const url = URL.createObjectURL(pdfBlob);
+      window.open(url, '_blank');
+      
+      // Optionally revoke the object URL after a short delay
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } else {
+      console.warn('No shell items found for this order.');
+    }
 
       this.loaderService.setLoader(false);
     }
