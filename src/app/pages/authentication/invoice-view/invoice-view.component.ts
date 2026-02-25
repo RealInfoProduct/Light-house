@@ -110,12 +110,11 @@ export class InvoiceViewComponent implements OnInit {
        if (this.shellList.length > 0) {
       const pdfBlob = this.generatePDFBlob(this.shellList);
 
-      // Open PDF in new tab
       const url = URL.createObjectURL(pdfBlob);
       window.open(url, '_blank');
       
       // Optionally revoke the object URL after a short delay
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // setTimeout(() => URL.revokeObjectURL(url), 10);
     } else {
       console.warn('No shell items found for this order.');
     }
