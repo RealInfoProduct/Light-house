@@ -352,7 +352,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
           await updateStock(detail.category, -detail.qty);
         }
         const oldExpense = this.incomeExpenseList.find(
-          (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
+          (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber && el.notes === result.data.customerName
         );
 
         await this.firebaseService.deleteShell(result.data.id);
@@ -1002,7 +1002,5 @@ export class ShellComponent implements OnInit, AfterViewInit {
 
     return doc.output('blob');
   }
-
-
 
 }
