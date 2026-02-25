@@ -826,7 +826,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
         `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
         `Amount: *₹${order.grandTotal}*\n\n` +
 
-        `Click here : ${'blob:'+clickableText}\n\n` +
+        `Click here : ${clickableText}\n\n` +
         `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
 
       );
