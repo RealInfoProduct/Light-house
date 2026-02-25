@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
 import { AuthGuardGuard } from './services/auth.guard';
+import { InvoiceViewComponent } from './pages/authentication/invoice-view/invoice-view.component';
 
 const routes: Routes = [
   {
@@ -122,7 +123,8 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: 'authentication/error',
-  }
+  },
+  { path: 'invoice/:id', component: InvoiceViewComponent },
 ];
 
 @NgModule({

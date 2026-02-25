@@ -31,7 +31,6 @@ import { BalanceComponent } from './balance/balance.component';
 import { WarrantyMasterComponent } from './warranty-master/warranty-master.component';
 import { WarrantyDialogComponent } from './warranty-master/warranty-dialog/warranty-dialog.component';
 import { ViewWarrantyComponent } from './warranty-master/view-warranty/view-warranty.component';
-import { InvoiceViewComponent } from './shell/invoice-view/invoice-view.component';
 
 @NgModule({
   declarations: [
@@ -54,8 +53,7 @@ import { InvoiceViewComponent } from './shell/invoice-view/invoice-view.componen
     BalanceComponent,
     WarrantyMasterComponent,
     WarrantyDialogComponent,
-    ViewWarrantyComponent,
-    InvoiceViewComponent,
+    ViewWarrantyComponent
   ],
   imports: [
     CommonModule,

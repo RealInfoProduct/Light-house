@@ -798,222 +798,223 @@ export class ShellComponent implements OnInit, AfterViewInit {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
-async sendWhatsAppMessage(order: any) {
-  if (!order.selected || !order.mobileNumber) return;
+// async sendWhatsAppMessage(order: any) {
+//   if (!order.selected || !order.mobileNumber) return;
 
-  const invoiceUrl = `https://lighthousedev-64439.web.app/invoice/${order.id}`;
-  const message = `Hello,\nPlease view your invoice:\n${invoiceUrl}`;
+//   const invoiceUrl = `https://lighthousedev-64439.web.app/invoice/${order.id}`;
+//   const message = `Hello,\nPlease view your invoice:\n${invoiceUrl}`;
 
-  const phone = order.mobileNumber.toString().replace(/\D/g, '');
-  const fullPhone = phone.length === 10 ? '91' + phone : phone;
+//   const phone = order.mobileNumber.toString().replace(/\D/g, '');
+//   const fullPhone = phone.length === 10 ? '91' + phone : phone;
 
-  const whatsappUrl = `https://web.whatsapp.com/send?phone=${fullPhone}&text=${encodeURIComponent(message)}`;
-  window.open(whatsappUrl, '_blank');
-}
-  // async sendWhatsAppMessage(order: any) {
-  //   if (!order.selected) return;
+//   const whatsappUrl = `https://web.whatsapp.com/send?phone=${fullPhone}&text=${encodeURIComponent(message)}`;
+//   window.open(whatsappUrl, '_blank');
+// }
+  async sendWhatsAppMessage(order: any) {
+    if (!order.selected) return;
 
-  //   if (!order.mobileNumber) {
-  //     this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
-  //     return;
-  //   }
+    if (!order.mobileNumber) {
+      this._snackBar.open('Mobile number is missing!', 'OK', { duration: 3000 });
+      return;
+    }
 
-  //   this.loaderService.setLoader(true);
+    this.loaderService.setLoader(true);
 
-  //   try {
-  //     // Prepare phone number
-  //     let phone = order.mobileNumber.toString().replace(/\D/g, '');
-  //     if (phone.length === 10) phone = '91' + phone;
+    try {
+      // Prepare phone number
+      let phone = order.mobileNumber.toString().replace(/\D/g, '');
+      if (phone.length === 10) phone = '91' + phone;
 
-  //     const pdfBlob = this.generatePDFBlob(order);
-  //     const pdfUrl = URL.createObjectURL(pdfBlob);
-  //     const clickableText = "`" + pdfUrl + "`";
+      // const pdfBlob = this.generatePDFBlob(order);
+      // const pdfUrl = URL.createObjectURL(pdfBlob);
+      // const clickableText = "`" + pdfUrl + "`";
+      const invoiceUrl = `https://lighthousedev-64439.web.app/invoice/${order.id}`;
 
-  //     const message = encodeURIComponent(
-  //       `*Hello ${order.customerName || ''}!*\n\n` +
-  //       `Thank you for your purchase.\n` +
-  //       `Here is your invoice:\n\n` +
-  //       `Bill No: *${order.billNumber}*\n` +
-  //       `Invoice No: *${order.invoiceNo}*\n` +
-  //       `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
-  //       `Amount: *₹${order.grandTotal}*\n\n` +
+      const message = encodeURIComponent(
+        `*Hello ${order.customerName || ''}!*\n\n` +
+        `Thank you for your purchase.\n` +
+        `Here is your invoice:\n\n` +
+        `Bill No: *${order.billNumber}*\n` +
+        `Invoice No: *${order.invoiceNo}*\n` +
+        `Date: ${moment(order.date).format('DD/MM/YYYY')}\n` +
+        `Amount: *₹${order.grandTotal}*\n\n` +
 
-  //       `Click here : ${clickableText}\n\n` +
-  //       `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
+        `Click here : ${invoiceUrl}\n\n` +
+        `Regards,\n${this.getFinalfirm(order.firmName) || 'Team'}`
 
-  //     );
+      );
 
-  //     const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
-  //     window.open(whatsappUrl, '_blank');
+      const whatsappUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
+      window.open(whatsappUrl, '_blank');
 
-  //     this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
+      this._snackBar.open('PDF Generated & WhatsApp Opened!', 'OK', { duration: 3000 });
 
-  //   } catch (err) {
-  //     console.error(err);
-  //     this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
-  //   } finally {
-  //     this.loaderService.setLoader(false);
-  //   }
-  // }
-
-  generatePDFBlob(item: any): Blob {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const firm = this.firmList.find((f: any) => f.id === item.firmName);
-
-    const PAGE_WIDTH = 210;
-    let currentY = 10;
-
-    /* =========================
-       HEADER BAR
-    ========================= */
-    doc.setFillColor(41, 128, 185);
-    doc.rect(0, 0, PAGE_WIDTH, 35, 'F');
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    const firmTitle = `${this.getFinalfirm(item.firmName) || ''} ${this.getFinalsubHeaderfirm(item.firmName) || ''}`.toUpperCase();
-    doc.text(firmTitle || 'YOUR COMPANY NAME', 10, 15);
-    // doc.text( `${this.getFinalfirm(item.firmName)} ${this.getFinalsubHeaderfirm(item.firmName)}`|| 'YOUR COMPANY NAME', 10, 15);
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Address: ${firm.address || ''}`, 10, 22);
-    doc.text(`Phone: ${firm.mobileNo || ''}`, 10, 27);
-    doc.text(`GST: ${firm.gstNo || ''}`, 10, 32);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(26);
-    doc.text('INVOICE', PAGE_WIDTH - 10, 22, { align: 'right' });
-
-    currentY = 45;
-
-    /* =========================
-       INVOICE META BOX
-    ========================= */
-    doc.setDrawColor(200);
-    doc.setFillColor(245, 247, 250);
-    // doc.rect(130, currentY - 10, 70, 28, 'FD');
-
-    doc.setFontSize(10);
-    doc.setTextColor(0);
-    doc.text('Invoice No:', 155, currentY);
-    doc.text(`${item.invoiceNo}`, 195, currentY, { align: 'right' });
-
-    doc.text('Bill No:', 155, currentY + 6);
-    doc.text(` ${item.billNumber}`, 195, currentY + 6, { align: 'right' });
-
-    doc.text('Date:', 155, currentY + 12);
-    doc.text(moment(item.date).format('DD/MM/YYYY'), 195, currentY + 12, { align: 'right' });
-
-    /* =========================
-       BILL TO
-    ========================= */
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(41, 128, 185);
-    doc.text('BILL TO', 10, currentY);
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0);
-    doc.text(`Name: ${item.customerName}`, 10, currentY + 7);
-    doc.text(`Address: ${item.customerAddress || 'No address provided'}`, 10, currentY + 13);
-    doc.text(`Mobile: ${item.mobileNumber || 'N/A'}`, 10, currentY + 19);
-
-    /* =========================
-       TABLE
-    ========================= */
-    const headers = [
-      'Sr',
-      'Date',
-      'Company',
-      'Category',
-      'Warranty',
-      'Qty',
-      'Price',
-      'Disc %',
-      'Total'
-    ];
-
-    const body = item.shellDetails.map((row: any, i: number) => [
-      i + 1,
-      moment(row.date).format('DD/MM/YYYY'),
-      this.getCompanyName(row.companyName),
-      `${this.getCategoryName(row.category)} ${this.getkeySpecifiCations(row.category)}`,
-      row.warranty,
-      row.qty,
-      row.productPrice,
-      row.discount,
-      row.subTotal
-    ]);
-
-    (doc as any).autoTable({
-      head: [headers],
-      body,
-      startY: currentY + 30,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'center'
-      },
-      styles: {
-        fontSize: 8,
-        halign: 'center',
-        valign: 'middle'
-      },
-      columnStyles: {
-        3: { halign: 'left' }
-      }
-    });
-
-    const tableEndY = (doc as any).lastAutoTable.finalY + 10;
-
-    /* =========================
-       PAYMENT SUMMARY BOX
-    ========================= */
-    const receivedAmount =
-      item.paymentDetails?.reduce(
-        (sum: number, p: any) => sum + (Number(p.paymentR) || 0),
-        0
-      ) || 0;
-
-    const pendingAmount = (item.grandTotal || 0) - receivedAmount;
-
-    doc.setFillColor(245, 247, 250);
-    doc.rect(120, tableEndY, 80, 40, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('PAYMENT SUMMARY', 160, tableEndY + 8, { align: 'center' });
-
-    doc.setFont('helvetica', 'normal');
-    doc.text('Total:', 125, tableEndY + 16);
-    doc.text(String(item.total), 195, tableEndY + 16, { align: 'right' });
-
-    doc.text('Discount:', 125, tableEndY + 22);
-    doc.text(String(item.extraDiscount), 195, tableEndY + 22, { align: 'right' });
-
-    doc.text('Final Amount:', 125, tableEndY + 28);
-    doc.text(String(item.grandTotal), 195, tableEndY + 28, { align: 'right' });
-
-    doc.text('Pending:', 125, tableEndY + 34);
-    doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
-
-    /* =========================
-       FOOTER
-    ========================= */
-    doc.setFontSize(9);
-    doc.setTextColor(120);
-    doc.text(
-      'Thank you for your business!',
-      PAGE_WIDTH / 2,
-      290,
-      { align: 'center' }
-    );
-
-    return doc.output('blob');
+    } catch (err) {
+      console.error(err);
+      this._snackBar.open('Failed to send WhatsApp message', 'OK', { duration: 4000 });
+    } finally {
+      this.loaderService.setLoader(false);
+    }
   }
+
+  // generatePDFBlob(item: any): Blob {
+  //   const doc = new jsPDF('p', 'mm', 'a4');
+  //   const firm = this.firmList.find((f: any) => f.id === item.firmName);
+
+  //   const PAGE_WIDTH = 210;
+  //   let currentY = 10;
+
+  //   /* =========================
+  //      HEADER BAR
+  //   ========================= */
+  //   doc.setFillColor(41, 128, 185);
+  //   doc.rect(0, 0, PAGE_WIDTH, 35, 'F');
+
+  //   doc.setTextColor(255, 255, 255);
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.setFontSize(18);
+  //   const firmTitle = `${this.getFinalfirm(item.firmName) || ''} ${this.getFinalsubHeaderfirm(item.firmName) || ''}`.toUpperCase();
+  //   doc.text(firmTitle || 'YOUR COMPANY NAME', 10, 15);
+  //   // doc.text( `${this.getFinalfirm(item.firmName)} ${this.getFinalsubHeaderfirm(item.firmName)}`|| 'YOUR COMPANY NAME', 10, 15);
+
+  //   doc.setFontSize(9);
+  //   doc.setFont('helvetica', 'normal');
+  //   doc.text(`Address: ${firm.address || ''}`, 10, 22);
+  //   doc.text(`Phone: ${firm.mobileNo || ''}`, 10, 27);
+  //   doc.text(`GST: ${firm.gstNo || ''}`, 10, 32);
+
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.setFontSize(26);
+  //   doc.text('INVOICE', PAGE_WIDTH - 10, 22, { align: 'right' });
+
+  //   currentY = 45;
+
+  //   /* =========================
+  //      INVOICE META BOX
+  //   ========================= */
+  //   doc.setDrawColor(200);
+  //   doc.setFillColor(245, 247, 250);
+  //   // doc.rect(130, currentY - 10, 70, 28, 'FD');
+
+  //   doc.setFontSize(10);
+  //   doc.setTextColor(0);
+  //   doc.text('Invoice No:', 155, currentY);
+  //   doc.text(`${item.invoiceNo}`, 195, currentY, { align: 'right' });
+
+  //   doc.text('Bill No:', 155, currentY + 6);
+  //   doc.text(` ${item.billNumber}`, 195, currentY + 6, { align: 'right' });
+
+  //   doc.text('Date:', 155, currentY + 12);
+  //   doc.text(moment(item.date).format('DD/MM/YYYY'), 195, currentY + 12, { align: 'right' });
+
+  //   /* =========================
+  //      BILL TO
+  //   ========================= */
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.setFontSize(12);
+  //   doc.setTextColor(41, 128, 185);
+  //   doc.text('BILL TO', 10, currentY);
+
+  //   doc.setFontSize(10);
+  //   doc.setFont('helvetica', 'normal');
+  //   doc.setTextColor(0);
+  //   doc.text(`Name: ${item.customerName}`, 10, currentY + 7);
+  //   doc.text(`Address: ${item.customerAddress || 'No address provided'}`, 10, currentY + 13);
+  //   doc.text(`Mobile: ${item.mobileNumber || 'N/A'}`, 10, currentY + 19);
+
+  //   /* =========================
+  //      TABLE
+  //   ========================= */
+  //   const headers = [
+  //     'Sr',
+  //     'Date',
+  //     'Company',
+  //     'Category',
+  //     'Warranty',
+  //     'Qty',
+  //     'Price',
+  //     'Disc %',
+  //     'Total'
+  //   ];
+
+  //   const body = item.shellDetails.map((row: any, i: number) => [
+  //     i + 1,
+  //     moment(row.date).format('DD/MM/YYYY'),
+  //     this.getCompanyName(row.companyName),
+  //     `${this.getCategoryName(row.category)} ${this.getkeySpecifiCations(row.category)}`,
+  //     row.warranty,
+  //     row.qty,
+  //     row.productPrice,
+  //     row.discount,
+  //     row.subTotal
+  //   ]);
+
+  //   (doc as any).autoTable({
+  //     head: [headers],
+  //     body,
+  //     startY: currentY + 30,
+  //     theme: 'striped',
+  //     headStyles: {
+  //       fillColor: [41, 128, 185],
+  //       textColor: [255, 255, 255],
+  //       fontStyle: 'bold',
+  //       halign: 'center'
+  //     },
+  //     styles: {
+  //       fontSize: 8,
+  //       halign: 'center',
+  //       valign: 'middle'
+  //     },
+  //     columnStyles: {
+  //       3: { halign: 'left' }
+  //     }
+  //   });
+
+  //   const tableEndY = (doc as any).lastAutoTable.finalY + 10;
+
+  //   /* =========================
+  //      PAYMENT SUMMARY BOX
+  //   ========================= */
+  //   const receivedAmount =
+  //     item.paymentDetails?.reduce(
+  //       (sum: number, p: any) => sum + (Number(p.paymentR) || 0),
+  //       0
+  //     ) || 0;
+
+  //   const pendingAmount = (item.grandTotal || 0) - receivedAmount;
+
+  //   doc.setFillColor(245, 247, 250);
+  //   doc.rect(120, tableEndY, 80, 40, 'F');
+
+  //   doc.setFont('helvetica', 'bold');
+  //   doc.text('PAYMENT SUMMARY', 160, tableEndY + 8, { align: 'center' });
+
+  //   doc.setFont('helvetica', 'normal');
+  //   doc.text('Total:', 125, tableEndY + 16);
+  //   doc.text(String(item.total), 195, tableEndY + 16, { align: 'right' });
+
+  //   doc.text('Discount:', 125, tableEndY + 22);
+  //   doc.text(String(item.extraDiscount), 195, tableEndY + 22, { align: 'right' });
+
+  //   doc.text('Final Amount:', 125, tableEndY + 28);
+  //   doc.text(String(item.grandTotal), 195, tableEndY + 28, { align: 'right' });
+
+  //   doc.text('Pending:', 125, tableEndY + 34);
+  //   doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
+
+  //   /* =========================
+  //      FOOTER
+  //   ========================= */
+  //   doc.setFontSize(9);
+  //   doc.setTextColor(120);
+  //   doc.text(
+  //     'Thank you for your business!',
+  //     PAGE_WIDTH / 2,
+  //     290,
+  //     { align: 'center' }
+  //   );
+
+  //   return doc.output('blob');
+  // }
 
 }
