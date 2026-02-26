@@ -1,5 +1,7 @@
+import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import { doc, Firestore, getDoc } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -9,8 +11,10 @@ import { LoaderService } from 'src/app/services/loader.service';
 
 @Component({
   selector: 'app-invoice-view',
+  standalone: true,
   templateUrl: './invoice-view.component.html',
-  styleUrls: ['./invoice-view.component.scss']
+  styleUrls: ['./invoice-view.component.scss'],
+  imports:[NgIf]
 })
 export class InvoiceViewComponent implements OnInit {
 
@@ -19,17 +23,22 @@ export class InvoiceViewComponent implements OnInit {
   firmList: any = []
   categoryList: any[] = []
   shellList: any[] = []
-
+   pdfUrl!: SafeResourceUrl; 
+   
   constructor(
     private route: ActivatedRoute,
     private firebaseService: FirebaseService,
     private loaderService: LoaderService,
+     private sanitizer: DomSanitizer,
+     private router: Router,
   ) { }
 
   async ngOnInit() {
+    const userId:any = this.route.snapshot.paramMap.get('userId');
+    localStorage.setItem('userId', userId);
     this.getFirmList();
     this.getCategoryList();
-    this.getShellList();
+    this.getShellList()
   }
 
   getFinalfirm(firmId: any) {
@@ -77,8 +86,6 @@ export class InvoiceViewComponent implements OnInit {
     this.loaderService.setLoader(true);
     // Get the ID from route parameters
     const orderId = this.route.snapshot.paramMap.get('id');
-    console.log('Order ID:', orderId);
-
     // Fetch all shell data from Firebase
     this.firebaseService.getAllShell().subscribe((res: any) => {
       if (res) {
@@ -88,13 +95,20 @@ export class InvoiceViewComponent implements OnInit {
             item.id === orderId
         );
 
+        // if (this.shellList.length > 0) {
+        //   const pdfBlob = this.generatePDFBlob(this.shellList);
+
+        //   const url = URL.createObjectURL(pdfBlob);
+        //   window.open(url, '_blank');
+        // } else {
+        //   console.warn('No shell items found for this order.');
+        // }
         if (this.shellList.length > 0) {
           const pdfBlob = this.generatePDFBlob(this.shellList);
-
           const url = URL.createObjectURL(pdfBlob);
-          window.open(url, '_blank');
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         } else {
-          console.warn('No shell items found for this order.');
+          this.router.navigate(['/authentication/error']);
         }
 
         this.loaderService.setLoader(false);

@@ -418,7 +418,6 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit {
     ];
 
     const data = filteredData.map((item, i) => {
-      debugger
 
       const dateStr = moment.unix(item.date.seconds).format('DD/MM/YYYY');
       const notes = this.partyList.find((prod: any) => prod.id === item.notes)?.partyName || item.notes;
