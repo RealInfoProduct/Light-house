@@ -89,10 +89,7 @@ const routes: Routes = [
       },
     ],
   },
-  {
-    path: '**',
-    redirectTo: 'authentication/error',
-  },
+ 
 
 
    {
@@ -124,6 +121,7 @@ const routes: Routes = [
     path: '**',
     redirectTo: 'authentication/error',
   },
+  
 ];
 
 @NgModule({
