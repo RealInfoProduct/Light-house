@@ -124,7 +124,6 @@ const routes: Routes = [
     path: '**',
     redirectTo: 'authentication/error',
   },
-  { path: 'invoice/:id', component: InvoiceViewComponent },
 ];
 
 @NgModule({

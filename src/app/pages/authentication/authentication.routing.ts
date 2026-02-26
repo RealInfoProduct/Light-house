@@ -11,6 +11,7 @@ import { AppSideLoginComponent } from './side-login/side-login.component';
 import { AppSideRegisterComponent } from './side-register/side-register.component';
 import { AppSideTwoStepsComponent } from './side-two-steps/side-two-steps.component';
 import { BlankComponent } from 'src/app/layouts/blank/blank.component';
+import { InvoiceViewComponent } from './invoice-view/invoice-view.component';
 
 export const AuthenticationRoutes: Routes = [
   // {
@@ -32,10 +33,10 @@ export const AuthenticationRoutes: Routes = [
   //       path: 'boxed-two-steps',
   //       component: AppBoxedTwoStepsComponent,
   //     },
-  //     {
-  //       path: 'error',
-  //       component: AppErrorComponent,
-  //     },
+      {
+        path: 'error',
+        component: AppErrorComponent,
+      },
   //     {
   //       path: 'maintenance',
   //       component: AppMaintenanceComponent,
@@ -51,6 +52,10 @@ export const AuthenticationRoutes: Routes = [
       {
         path: 'side-register',
         component: AppSideRegisterComponent,
+      },
+      {
+        path: 'invoice-view/:userId/:id',
+        component: InvoiceViewComponent,
       },
   //     {
   //       path: 'side-two-steps',
