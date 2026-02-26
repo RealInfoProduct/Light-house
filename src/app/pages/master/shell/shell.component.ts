@@ -814,11 +814,8 @@ export class ShellComponent implements OnInit, AfterViewInit {
       let phone = order.mobileNumber.toString().replace(/\D/g, '');
       if (phone.length === 10) phone = '91' + phone;
 
-      // const pdfBlob = this.generatePDFBlob(order);
-      // const pdfUrl = URL.createObjectURL(pdfBlob);
-      // const clickableText = "`" + pdfUrl + "`";
-      const invoiceUrl = `https://lighthousedev-64439.web.app/invoice/${order.id}`;
-
+      const userId = localStorage.getItem("userId");
+      const invoiceUrl = `${window.location.origin}/authentication/invoice-view/${userId}/${order.id}`; 
       const message = encodeURIComponent(
         `*Hello ${order.customerName || ''}!*\n\n` +
         `Thank you for your purchase.\n` +

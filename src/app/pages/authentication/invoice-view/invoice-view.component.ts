@@ -1,5 +1,7 @@
+import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import { doc, Firestore, getDoc } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -9,43 +11,35 @@ import { LoaderService } from 'src/app/services/loader.service';
 
 @Component({
   selector: 'app-invoice-view',
+  standalone: true,
   templateUrl: './invoice-view.component.html',
-  styleUrls: ['./invoice-view.component.scss']
+  styleUrls: ['./invoice-view.component.scss'],
+  imports:[NgIf]
 })
 export class InvoiceViewComponent implements OnInit {
 
- order: any;
+  order: any;
   loading = true;
   firmList: any = []
   categoryList: any[] = []
   shellList: any[] = []
-
+   pdfUrl!: SafeResourceUrl; 
+   pdfUrlString!: string; 
+   
   constructor(
     private route: ActivatedRoute,
-     private firebaseService: FirebaseService,
-        private loaderService: LoaderService,
-    // private firestore: Firestore
-  ) {}
+    private firebaseService: FirebaseService,
+    private loaderService: LoaderService,
+     private sanitizer: DomSanitizer,
+     private router: Router,
+  ) { }
 
   async ngOnInit() {
+    const userId:any = this.route.snapshot.paramMap.get('userId');
+    localStorage.setItem('userId', userId);
     this.getFirmList();
-    this.getCategoryList(); 
-    this.getShellList(); 
-//     const orderId = this.route.snapshot.paramMap.get('id');
-// console.log(orderId);
-
-    // if (!orderId) return;
-
-    // const docRef = doc(this.firestore, `orders/${orderId}`);
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   this.order = docSnap.data();
-    // } else {
-    //   this.order = null;
-    // }
-
-    // this.loading = false;
+    this.getCategoryList();
+    this.getShellList()
   }
 
   getFinalfirm(firmId: any) {
@@ -56,7 +50,7 @@ export class InvoiceViewComponent implements OnInit {
     return this.firmList.find((c: any) => c.id === firmId)?.subHeader || '';
   }
 
-   getCompanyName(companyId: any) {
+  getCompanyName(companyId: any) {
     return this.categoryList.find((c: any) => c.id === companyId)?.companyName || '';
   }
 
@@ -68,7 +62,7 @@ export class InvoiceViewComponent implements OnInit {
     return this.categoryList.find((c: any) => c.id === categoryId)?.keySpecifiCations || '';
   }
 
-    getFirmList() {
+  getFirmList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllFirm().subscribe((res: any) => {
       if (res) {
@@ -78,7 +72,7 @@ export class InvoiceViewComponent implements OnInit {
     })
   }
 
-   getCategoryList() {
+  getCategoryList() {
     this.loaderService.setLoader(true)
     this.firebaseService.getAllCategory().subscribe((res: any) => {
       if (res) {
@@ -89,62 +83,61 @@ export class InvoiceViewComponent implements OnInit {
   }
 
 
- getShellList() {
-  this.loaderService.setLoader(true);
-  // Get the ID from route parameters
-  const orderId = this.route.snapshot.paramMap.get('id');
-  console.log('Order ID:', orderId);
+  getShellList() {
+    this.loaderService.setLoader(true);
+    // Get the ID from route parameters
+    const orderId = this.route.snapshot.paramMap.get('id');
+    // Fetch all shell data from Firebase
+    this.firebaseService.getAllShell().subscribe((res: any) => {
+      if (res) {
+        this.shellList = res.filter(
+          (item: any) =>
+            item.userId === localStorage.getItem('userId') &&
+            item.id === orderId
+        );
 
-  // Fetch all shell data from Firebase
-  this.firebaseService.getAllShell().subscribe((res: any) => {
-    if (res) {
-      // Filter by both userId and the specific orderId
-      this.shellList = res.filter(
-        (item: any) =>
-          item.userId === localStorage.getItem('userId') &&
-          item.id === orderId
-      );
+        // if (this.shellList.length > 0) {
+        //   const pdfBlob = this.generatePDFBlob(this.shellList);
 
-      // Pass filtered data to generatePDFBlob
-      // this.generatePDFBlob(this.shellList);
-       if (this.shellList.length > 0) {
-      const pdfBlob = this.generatePDFBlob(this.shellList);
+        //   const url = URL.createObjectURL(pdfBlob);
+        //   window.open(url, '_blank');
+        // } else {
+        //   console.warn('No shell items found for this order.');
+        // }
+        if (this.shellList.length > 0) {
+          const pdfBlob = this.generatePDFBlob(this.shellList);
+          const url = URL.createObjectURL(pdfBlob);
+          this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+           this.pdfUrlString = url; 
+        } else {
+          this.router.navigate(['/authentication/error']);
+        }
 
-      const url = URL.createObjectURL(pdfBlob);
-      window.open(url, '_blank');
-      
-      // Optionally revoke the object URL after a short delay
-      // setTimeout(() => URL.revokeObjectURL(url), 10);
-    } else {
-      console.warn('No shell items found for this order.');
-    }
+        this.loaderService.setLoader(false);
+      }
+    });
+  }
 
-      this.loaderService.setLoader(false);
-    }
-  });
-}
-
-    generatePDFBlob(item: any): Blob {
+  generatePDFBlob(item: any): Blob {
     const doc = new jsPDF('p', 'mm', 'a4');
     const firm = this.firmList.find((f: any) => f.id === item[0].firmName);
     console.log(firm);
-    
-    
+
+
     const PAGE_WIDTH = 210;
     let currentY = 10;
-    
+
     /* =========================
     HEADER BAR
     ========================= */
     doc.setFillColor(41, 128, 185);
     doc.rect(0, 0, PAGE_WIDTH, 35, 'F');
-    
+
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     const firmTitle = `${this.getFinalfirm(item[0].firmName) || ''} ${this.getFinalsubHeaderfirm(item[0].firmName) || ''}`.toUpperCase();
     doc.text(firmTitle || 'YOUR COMPANY NAME', 10, 15);
-    // doc.text( `${this.getFinalfirm(item.firmName)} ${this.getFinalsubHeaderfirm(item.firmName)}`|| 'YOUR COMPANY NAME', 10, 15);
 
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
@@ -284,4 +277,9 @@ export class InvoiceViewComponent implements OnInit {
 
     return doc.output('blob');
   }
+
+openPdfInNewTab() {
+  if (!this.pdfUrlString) return;
+  window.open(this.pdfUrlString, '_blank');
+}
 }
