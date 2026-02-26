@@ -24,6 +24,7 @@ export class InvoiceViewComponent implements OnInit {
   categoryList: any[] = []
   shellList: any[] = []
    pdfUrl!: SafeResourceUrl; 
+   pdfUrlString!: string; 
    
   constructor(
     private route: ActivatedRoute,
@@ -107,6 +108,7 @@ export class InvoiceViewComponent implements OnInit {
           const pdfBlob = this.generatePDFBlob(this.shellList);
           const url = URL.createObjectURL(pdfBlob);
           this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+           this.pdfUrlString = url; 
         } else {
           this.router.navigate(['/authentication/error']);
         }
@@ -275,4 +277,9 @@ export class InvoiceViewComponent implements OnInit {
 
     return doc.output('blob');
   }
+
+openPdfInNewTab() {
+  if (!this.pdfUrlString) return;
+  window.open(this.pdfUrlString, '_blank');
+}
 }
