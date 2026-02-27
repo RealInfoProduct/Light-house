@@ -164,9 +164,9 @@ export class InvoiceViewComponent implements OnInit {
 
     doc.text('Bill No:', 155, currentY + 6);
     doc.text(` ${item[0].billNumber}`, 195, currentY + 6, { align: 'right' });
-
+debugger
     doc.text('Date:', 155, currentY + 12);
-    doc.text(moment(item[0].date).format('DD/MM/YYYY'), 195, currentY + 12, { align: 'right' });
+    doc.text(moment(new Date(item[0].date.seconds * 1000)).format('DD/MM/YYYY'), 195, currentY + 12, { align: 'right' });
 
     /* =========================
        BILL TO
