@@ -247,7 +247,6 @@ export class ShellComponent implements OnInit, AfterViewInit {
         if (payload.selected) {
           await this.sendWhatsAppMessage(payload);
         }
-        console.log(expensePayload);
         this.getShellList()
         this.getBalanceList();
         this.getExpensesList();

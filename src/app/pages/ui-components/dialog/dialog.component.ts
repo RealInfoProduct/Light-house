@@ -71,7 +71,6 @@ export class AppDialogComponent {
     const dialogRef = this.dialog.open(AppDialogContentComponent);
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
     });
   }
 
