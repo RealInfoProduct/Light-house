@@ -239,7 +239,6 @@ export class PurchaseMasterComponent implements OnInit {
 
 
       //   await this.firebaseService.addExpenses(expensePayload);
-      //   console.log(expensePayload);
 
 
       //   this.getpurchaseList();
