@@ -522,9 +522,9 @@ export class PurchaseMasterComponent implements OnInit {
 
         this.setPaymentStatus(this.purchaseList)
       }
-      this.filterDate();
       this.productDataSource = new MatTableDataSource(this.purchaseList);
       this.productDataSource.paginator = this.paginator;
+      this.filterDate();
       this.loaderService.setLoader(false);
     });
   }
