@@ -391,6 +391,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
       this.shellDataSource = new MatTableDataSource(this.shellList);
       this.shellDataSource.paginator = this.paginator;
       this.shellDataSource.sort = this.sort;
+      this.filterDate()
       this.loaderService.setLoader(false)
 
     })

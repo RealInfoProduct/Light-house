@@ -132,9 +132,9 @@ export class WarrantyMasterComponent implements OnInit {
       if (res) {
         this.warrantyList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
       }
-      this.filterDate()
       this.warrantyDataSource = new MatTableDataSource(this.warrantyList);
       this.warrantyDataSource.paginator = this.paginator;
+      this.filterDate()
       this.loaderService.setLoader(false)
     })
   }
