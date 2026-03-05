@@ -41,7 +41,6 @@ export class AppContactComponent implements OnInit {
     private contactService: ContactService
   ) {
     this.contacts = this.contactService.getContacts();
-    //console.log(this.contacts);
   }
 
   openDialog(action: string, obj: any): void {
@@ -105,7 +104,6 @@ export class AppContactDialogContentComponent {
     // @Optional() is used to prevent error if no data is passed
     @Optional() @Inject(MAT_DIALOG_DATA) public data: ContactData
   ) {
-    // console.log(data);
     this.local_data = { ...data };
     this.action = this.local_data.action;
   }

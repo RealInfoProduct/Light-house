@@ -110,7 +110,6 @@ export class AppTopCardsComponent implements OnInit{
         if (res) {
           this.partyList = res.filter((id:any) => id.userId === localStorage.getItem("userId"))
           this.topcards[1].subtitle = this.partyList.length;
-          console.log(this.partyList.length)
             this.loaderService.setLoader(false)
           }
         })

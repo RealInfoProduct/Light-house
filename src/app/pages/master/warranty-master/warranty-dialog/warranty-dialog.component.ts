@@ -328,7 +328,6 @@ export class WarrantyDialogComponent implements OnInit {
       shellDetails: this.warrantyForm.value.shellDetails
     }
     this.dialogRef.close({ event: this.action, data: payload })
-    console.log(payload);
 
   }
 

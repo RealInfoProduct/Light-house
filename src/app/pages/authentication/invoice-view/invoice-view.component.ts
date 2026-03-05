@@ -120,7 +120,6 @@ export class InvoiceViewComponent implements OnInit {
   generatePDFBlob(item: any): Blob {
     const doc = new jsPDF('p', 'mm', 'a4');
     const firm = this.firmList.find((f: any) => f.id === item[0].firmName);
-    console.log(firm);
 
 
     const PAGE_WIDTH = 210;
