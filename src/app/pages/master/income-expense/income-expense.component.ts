@@ -324,6 +324,7 @@ export class IncomeExpenseComponent implements OnInit, AfterViewInit {
         this.incomeExpenseList = res.filter((id: any) => id.userId === localStorage.getItem("userId"))
         this.incomeExpenseDataSource = new MatTableDataSource(this.incomeExpenseList);
         this.incomeExpenseDataSource.paginator = this.paginator;
+        this.filterDate()
         this.loaderService.setLoader(false)
       }
     })
