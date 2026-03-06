@@ -18,7 +18,7 @@
                     <mat-label>Invoice No</mat-label>
                     <mat-select formControlName="invoiceNo" placeholder="Invoice No"
                         (selectionChange)="onWarrantyProductChange($event)">
-                        <input matInput class="search" type="text" placeholder="Search..."
+                        <input matInput class="select-search-input" type="text" placeholder="🔍 Search Invoice..."
                             (keyup)="filterWarrantyProducts($event)" style="width: 100%; outline: none;">
                         <mat-option [value]="item.invoiceNo"
                             *ngFor="let item of filteredWarrantyProducts">{{item.invoiceNo}}</mat-option>
@@ -81,7 +81,7 @@
 
                 <div class="in-width">
                     <mat-form-field appearance="outline" class="w-100 m-t-10">
-                        <mat-label>Date</mat-label>
+                        <mat-label>Purchase Date</mat-label>
                         <input matInput formControlName="saleDate" [matDatepicker]="saleDate" placeholder="Enter date">
                         <mat-datepicker-toggle matSuffix [for]="saleDate"></mat-datepicker-toggle>
                         <mat-datepicker #saleDate></mat-datepicker>

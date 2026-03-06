@@ -5,13 +5,23 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="text" matInput required formControlName="category" placeholder="Category" />
-        </mat-form-field>
+          <input type="text" matInput required formControlName="category" (blur)="checkedValue()" placeholder="Category"  [matAutocomplete]="categoryAuto"/>
+            <mat-autocomplete autoActiveFirstOption #categoryAuto="matAutocomplete">
+              <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                {{option}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="text" matInput required formControlName="companyName" placeholder="Company Name" />
+          <input type="text" matInput required formControlName="companyName" placeholder="Company Name" (blur)="checkedValueCompany()"   [matAutocomplete]="companyAuto"/>
+          <mat-autocomplete autoActiveFirstcompany #companyAuto="matAutocomplete">
+              <mat-option *ngFor="let company of filteredCompanyOptions  | async" [value]="company">
+                {{company }}
+              </mat-option>
+            </mat-autocomplete>
         </mat-form-field>
       </div>
 

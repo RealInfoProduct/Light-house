@@ -33,7 +33,7 @@ export const navItems: NavItem[] = [
     route: '/master/categorymaster',
   },
   {
-    displayName: 'Sale Master',
+    displayName: 'Sale',
     iconName: 'receipt-2',
     route: '/master/shellmaster',
   },
