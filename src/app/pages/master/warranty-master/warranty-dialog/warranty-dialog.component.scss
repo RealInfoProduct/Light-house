@@ -26,3 +26,18 @@
   width: 105px;
   margin-right: 10px;
 }
+
+.select-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+  background: #f8f9fa;
+}
+
+.select-search-input:focus {
+  border-color: #3f51b5;
+  background: #fff;
+}

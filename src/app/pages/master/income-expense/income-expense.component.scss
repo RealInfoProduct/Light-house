@@ -22,3 +22,34 @@
     color: red;
     font-weight: 600;
   }
+
+
+  .action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* 935px થી નાનું screen */
+@media (max-width: 935px) {
+  .action-buttons {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .action-buttons button {
+    flex: 1 1 auto;
+  }
+}
+
+/* Mobile screen */
+@media (max-width: 576px) {
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+}
