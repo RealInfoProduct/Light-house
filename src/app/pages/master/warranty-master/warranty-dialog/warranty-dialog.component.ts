@@ -218,7 +218,7 @@ export class WarrantyDialogComponent implements OnInit {
 
     this.warrantyForm.patchValue({
       billNumber: selectedInvoice.billNumber || 0,
-      date: this.convertToDate(selectedInvoice.date),
+      // date:selectedInvoice.date,
       customerName: selectedInvoice.customerName || '',
       customerAddress: selectedInvoice.customerAddress || '',
       mobileNumber: selectedInvoice.mobileNumber || ''
@@ -260,26 +260,37 @@ export class WarrantyDialogComponent implements OnInit {
     });
   }
 
-  filterWarrantyProducts(event: any) {
-    const search = (event.target.value || '').toLowerCase();
+  // filterWarrantyProducts(event: any) {
+  //   const search = (event.target.value || '').toLowerCase();
 
-    this.filteredWarrantyProducts = this.shellList.filter((item: any) =>
+  //   this.filteredWarrantyProducts = this.shellList.filter((item: any) =>
+  //     item.invoiceNo?.toLowerCase().includes(search)
+  //   );
+  // }
+
+  filterWarrantyProducts(event: any) {
+  const search = (event.target.value || '').toLowerCase();
+
+  this.filteredWarrantyProducts = (this.filteredWarrantyProducts || this.shellList).filter(
+    (item: any) =>
       item.invoiceNo?.toLowerCase().includes(search)
-    );
-  }
+  );
+}
+
 
   onFirmChange(event: any) {
     const firmId = event.value;
 
-    // Firm id par thi invoice filter
     this.filteredWarrantyProducts = this.shellList.filter(
       (item: any) => item.firmName === firmId
     );
 
-    // Invoice dropdown reset
-    this.warrantyForm.patchValue({
-      invoiceNo: null
-    });
+      this.warrantyForm.reset();
+
+  this.warrantyForm.patchValue({
+    firmName: firmId,
+     date: new Date() 
+  });
   }
 
 
