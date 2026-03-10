@@ -18,8 +18,8 @@
                     <mat-label>Invoice No</mat-label>
                     <mat-select formControlName="invoiceNo" placeholder="Invoice No"
                         (selectionChange)="onWarrantyProductChange($event)">
-                        <input matInput class="select-search-input" type="text" placeholder="🔍 Search Invoice..."
-                            (keyup)="filterWarrantyProducts($event)" style="width: 100%; outline: none;">
+                        <!-- <input matInput class="select-search-input" type="text" placeholder="🔍 Search Invoice..."
+                            (keyup)="filterWarrantyProducts($event)" style="width: 100%; outline: none;"> -->
                         <mat-option [value]="item.invoiceNo"
                             *ngFor="let item of filteredWarrantyProducts">{{item.invoiceNo}}</mat-option>
                     </mat-select>

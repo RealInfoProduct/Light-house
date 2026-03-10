@@ -5,7 +5,7 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="text" matInput required formControlName="category" (blur)="checkedValue()" placeholder="Category"  [matAutocomplete]="categoryAuto"/>
+          <input type="text" matInput required formControlName="category" (blur)="checkedValue()" placeholder="Category" [matAutocomplete]="categoryAuto"/>
             <mat-autocomplete autoActiveFirstOption #categoryAuto="matAutocomplete">
               <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
                 {{option}}
@@ -16,10 +16,10 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="text" matInput required formControlName="companyName" placeholder="Company Name" (blur)="checkedValueCompany()"   [matAutocomplete]="companyAuto"/>
+          <input type="text" matInput required formControlName="companyName" placeholder="Company Name" (blur)="checkedValueCompany()" [matAutocomplete]="companyAuto"/>
           <mat-autocomplete autoActiveFirstcompany #companyAuto="matAutocomplete">
               <mat-option *ngFor="let company of filteredCompanyOptions  | async" [value]="company">
-                {{company }}
+                {{company}}
               </mat-option>
             </mat-autocomplete>
         </mat-form-field>
@@ -33,23 +33,20 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <textarea matInput required formControlName="keySpecifiCations" placeholder="Key Specifications"
-            rows="2"></textarea>
+          <textarea matInput required formControlName="keySpecifiCations" placeholder="Key Specifications" rows="2"></textarea>
         </mat-form-field>
 
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="number" matInput required formControlName="warrantyPeriods" placeholder="Warranty Perids"
-            min="0" />
+          <input type="number" matInput required formControlName="warrantyPeriods" placeholder="Warranty Perids" min="0" />
         </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <input type="number" matInput required formControlName="stockCount" placeholder="Stock Count" min="0"
-            readonly />
+          <input type="number" matInput required formControlName="stockCount" placeholder="Stock Count" min="0" readonly />
         </mat-form-field>
       </div>
 
