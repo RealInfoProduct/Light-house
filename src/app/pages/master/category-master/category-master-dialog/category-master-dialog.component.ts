@@ -23,7 +23,6 @@ export class CategoryMasterDialogComponent implements OnInit {
 
   categoryList: any[] = []
 
-
   constructor(
     private fb: FormBuilder,
     private firebaseService: FirebaseService,
@@ -90,7 +89,6 @@ export class CategoryMasterDialogComponent implements OnInit {
       startWith(''),
       map(value => this.filterCompany(value || ''))
     );
-
   }
 
   private filterCategory(value: string): string[] {
@@ -98,7 +96,6 @@ export class CategoryMasterDialogComponent implements OnInit {
     return this.options.filter(option =>
       option.toLowerCase().includes(filterValue)
     );
-
   }
 
   private filterCompany(value: string): string[] {
@@ -106,7 +103,6 @@ export class CategoryMasterDialogComponent implements OnInit {
     return this.companyoptions.filter(option =>
       option.toLowerCase().includes(filterValue)
     );
-
   }
 
   checkedValue() {
@@ -114,7 +110,6 @@ export class CategoryMasterDialogComponent implements OnInit {
     if (categoryValue && !this.options.includes(categoryValue)) {
       this.options.push(categoryValue);
     }
-
   }
 
   checkedValueCompany() {
@@ -122,7 +117,6 @@ export class CategoryMasterDialogComponent implements OnInit {
     if (companyValue && !this.companyoptions.includes(companyValue)) {
       this.companyoptions.push(companyValue);
     }
-
   }
 
   getCategoryList() {
@@ -141,9 +135,7 @@ export class CategoryMasterDialogComponent implements OnInit {
         this.initializeAutocomplete();
         this.loaderService.setLoader(false);
       }
-
     });
-
   }
 
 
