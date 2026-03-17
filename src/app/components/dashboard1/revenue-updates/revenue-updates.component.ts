@@ -134,46 +134,99 @@ export class AppRevenueUpdatesComponent implements OnInit {
     });
   }
 
+  // calculateMonthWiseTotals() {
+  //   this.monthlyIncome.fill(0);
+  //   this.monthlyExpense.fill(0);
+
+  //   this.totalIncome = 0;
+  //   this.totalExpense = 0;
+
+  //   this.incomeExpenseList.forEach(item => {
+  //     const date: Date = item.date?.toDate
+  //       ? item.date.toDate()
+  //       : new Date(item.date);
+
+  //     const month = date.getMonth();
+  //     const year = date.getFullYear();
+  //     const amount = Number(item.amount);
+
+  //     if (year === this.currentYear) {
+  //       if (item.accounttype === 'Income') {
+  //         this.monthlyIncome[month] += amount;
+  //         if (month === this.currentMonthValue) {
+  //           this.totalIncome += amount;
+  //         }
+  //       } else if (item.accounttype === 'Expense') {
+  //         this.monthlyExpense[month] += amount;
+  //         if (month === this.currentMonthValue) {
+  //           this.totalExpense += amount;
+  //         }
+  //       }
+  //     }
+  //   });
+
+  //   // ✅ Final Earnings (MONTH WISE)
+  //   this.totalEarnings = this.totalIncome - this.totalExpense;
+
+  //   // update chart
+  //   this.revenueChart.series = [
+  //     { name: 'Income', data: [...this.monthlyIncome] },
+  //     { name: 'Expense', data: [...this.monthlyExpense] },
+  //   ];
+  // }
   calculateMonthWiseTotals() {
-    this.monthlyIncome.fill(0);
-    this.monthlyExpense.fill(0);
+
+  const systemYear = new Date().getFullYear();
+
+  // ✅ Year change detect
+  if (systemYear !== this.currentYear) {
+    this.currentYear = systemYear;
+
+    this.monthlyIncome = new Array(12).fill(0);
+    this.monthlyExpense = new Array(12).fill(0);
 
     this.totalIncome = 0;
     this.totalExpense = 0;
+    this.totalEarnings = 0;
+  }
 
-    this.incomeExpenseList.forEach(item => {
-      const date: Date = item.date?.toDate
-        ? item.date.toDate()
-        : new Date(item.date);
+  this.monthlyIncome.fill(0);
+  this.monthlyExpense.fill(0);
 
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const amount = Number(item.amount);
+  this.totalIncome = 0;
+  this.totalExpense = 0;
 
-      if (year === this.currentYear) {
-        if (item.accounttype === 'Income') {
-          this.monthlyIncome[month] += amount;
-          if (month === this.currentMonthValue) {
-            this.totalIncome += amount;
-          }
-        } else if (item.accounttype === 'Expense') {
-          this.monthlyExpense[month] += amount;
-          if (month === this.currentMonthValue) {
-            this.totalExpense += amount;
-          }
+  this.incomeExpenseList.forEach(item => {
+    const date: Date = item.date?.toDate
+      ? item.date.toDate()
+      : new Date(item.date);
+
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const amount = Number(item.amount);
+
+    if (year === this.currentYear) {
+      if (item.accounttype === 'Income') {
+        this.monthlyIncome[month] += amount;
+        if (month === this.currentMonthValue) {
+          this.totalIncome += amount;
+        }
+      } else if (item.accounttype === 'Expense') {
+        this.monthlyExpense[month] += amount;
+        if (month === this.currentMonthValue) {
+          this.totalExpense += amount;
         }
       }
-    });
+    }
+  });
 
-    // ✅ Final Earnings (MONTH WISE)
-    this.totalEarnings = this.totalIncome - this.totalExpense;
+  this.totalEarnings = this.totalIncome - this.totalExpense;
 
-    // update chart
-    this.revenueChart.series = [
-      { name: 'Income', data: [...this.monthlyIncome] },
-      { name: 'Expense', data: [...this.monthlyExpense] },
-    ];
-  }
+  this.revenueChart.series = [
+    { name: 'Income', data: [...this.monthlyIncome] },
+    { name: 'Expense', data: [...this.monthlyExpense] },
+  ];
+}
 
   updateChart() {
     if (!this.chart) return;
