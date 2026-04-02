@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import {  tap } from 'rxjs/operators';
-import { environment } from 'src/environments/environment.prod';
 import { AuthResponse } from '../interface/invoice';
 import { User } from '../model/user.model';
+import { environment } from 'src/environments/environments';
 
 @Injectable({
   providedIn: 'root'
