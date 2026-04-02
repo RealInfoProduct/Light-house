@@ -30,8 +30,8 @@ import { provideFirebaseApp,initializeApp} from '@angular/fire/app'
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from "@angular/fire/storage";
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { environment } from 'src/environments/environment.prod';
 import { LoaderPageComponent } from './loader-page/loader-page.component';
+import { environment } from 'src/environments/environments';
 
 
 export function HttpLoaderFactory(http: HttpClient): any {

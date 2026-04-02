@@ -25,7 +25,7 @@ export class AppComponent {
             const userData: any = res.find((id: any) => id.id === localStorage.getItem("userId"))
               if (!userData?.isActive) {
                   localStorage.clear()
-                  // this.router.navigate(['/authentication/side-login']);
+                  this.router.navigate(['/authentication/side-login']);
               }
           }
         }))
