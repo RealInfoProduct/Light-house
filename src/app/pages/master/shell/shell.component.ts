@@ -350,9 +350,9 @@ export class ShellComponent implements OnInit, AfterViewInit {
         for (const detail of oldPurchase.shellDetails) {
           await updateStock(detail.category, -detail.qty);
         }
+        debugger
         const oldExpense = this.incomeExpenseList.find(
-          // (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
-          (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber && el.notes === result.data.customerName
+          (el: any) => el.invoiceNo === oldPurchase.invoiceNo && el.billNo === oldPurchase.billNumber
         );
 
         await this.firebaseService.deleteShell(result.data.id);
