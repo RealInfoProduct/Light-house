@@ -5,6 +5,7 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+             <mat-label>Category</mat-label>
           <input type="text" matInput required formControlName="category" (blur)="checkedValue()" placeholder="Category" [matAutocomplete]="categoryAuto"/>
             <mat-autocomplete autoActiveFirstOption #categoryAuto="matAutocomplete">
               <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
@@ -16,6 +17,7 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+             <mat-label>Company Name</mat-label>
           <input type="text" matInput required formControlName="companyName" placeholder="Company Name" (blur)="checkedValueCompany()" [matAutocomplete]="companyAuto"/>
           <mat-autocomplete autoActiveFirstcompany #companyAuto="matAutocomplete">
               <mat-option *ngFor="let company of filteredCompanyOptions  | async" [value]="company">
@@ -27,12 +29,14 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+             <mat-label>Mode</mat-label>
           <input type="text" matInput required formControlName="mode" placeholder="Mode" />
         </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+             <mat-label>Key Specifications</mat-label>
           <textarea matInput required formControlName="keySpecifiCations" placeholder="Key Specifications" rows="2"></textarea>
         </mat-form-field>
 
@@ -40,12 +44,14 @@
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+           <mat-label>Warranty Perids</mat-label>
           <input type="number" matInput required formControlName="warrantyPeriods" placeholder="Warranty Perids" min="0" />
         </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="w-100 m-t-10">
+           <mat-label>Stock Count</mat-label>
           <input type="number" matInput required formControlName="stockCount" placeholder="Stock Count" min="0" readonly />
         </mat-form-field>
       </div>
