@@ -119,6 +119,24 @@ export class PartyMasterComponent implements OnInit {
       verticalPosition: 'top',
     });
   }
+
+    formatAddress(address: string): string {
+  if (!address) return '';
+
+  const words = address.split(' ');
+  let result = '';
+  let line = '';
+
+  words.forEach(word => {
+    if ((line + word).length > 50) {
+      result += line + '<br>';
+      line = '';
+    }
+    line += word + ' ';
+  });
+
+  return result + line;
+}
 }
 
 
