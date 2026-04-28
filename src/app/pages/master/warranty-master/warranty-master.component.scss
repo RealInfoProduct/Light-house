@@ -1,0 +1,16 @@
+.mat-mdc-card-content:last-child {
+    padding-bottom: 0px;
+}
+
+
+@media (max-width: 960px) {
+ .mat-mdc-card-content:last-child {
+    padding-bottom: 10px;
+}
+}
+
+@media (max-width: 1279px) {
+  .action-buttons{
+    margin-bottom: 20px;
+  }
+}

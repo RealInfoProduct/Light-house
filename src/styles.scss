@@ -18,3 +18,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .table-responsive td, .table-responsive mat-cell {
     padding: 6px !important;
 }
+
+.dashboard-wrapper {
+  overflow: hidden;
+}

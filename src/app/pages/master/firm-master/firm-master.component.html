@@ -1,5 +1,5 @@
 <mat-card class="cardWithShadow">
-  <mat-card-content class="p-24">
+  <mat-card-content>
     <div class="row justify-content-between">
       <div class="col-lg-4">
         <mat-form-field appearance="outline" class="w-100 hide-hint">
@@ -21,7 +21,7 @@
 <mat-card class="cardWithShadow">
   <mat-card-content class="p-24">
     <div class="table-responsive">
-      <table style="min-width: 215%;" mat-table [dataSource]="firmDataSource" class="w-100">
+      <table style="min-width: 140%;" mat-table [dataSource]="firmDataSource" class="w-100">
         <ng-container matColumnDef="#">
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Sr No.</th>
           <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
@@ -126,8 +126,7 @@
           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">
             {{'FirmMaster.Address' | translate}}
           </th>
-          <td mat-cell *matCellDef="let element" class="f-s-14">
-            {{ element.address }}
+          <td mat-cell *matCellDef="let element" class="f-s-14"    [innerHTML]="formatAddress(element.address)">
           </td>
         </ng-container>
 
