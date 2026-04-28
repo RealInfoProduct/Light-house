@@ -759,8 +759,12 @@ export class ShellComponent implements OnInit, AfterViewInit {
     doc.text('Final Amount:', 125, tableEndY + 28);
     doc.text(String(item.grandTotal), 195, tableEndY + 28, { align: 'right' });
 
-    doc.text('Pending:', 125, tableEndY + 34);
-    doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
+    // doc.text('Pending:', 125, tableEndY + 34);
+    // doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
+    if (pendingAmount > 0) {
+  doc.text('Pending:', 125, tableEndY + 34);
+  doc.text(String(pendingAmount), 195, tableEndY + 34, { align: 'right' });
+}
 
     /* =========================
        FOOTER

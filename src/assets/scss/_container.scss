@@ -30,6 +30,7 @@ html .mat-drawer-container {
   margin: 0 auto;
   &.maxWidth {
     // max-width: $boxedWidth;
+       max-width: 1340px;
   }
 }
 
@@ -75,7 +76,7 @@ html .mat-drawer-container {
   td,
   mat-cell {
     white-space: nowrap;
-    padding: 16px;
+    // padding: 16px;
   }
 }
 
