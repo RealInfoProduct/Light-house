@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, Optional } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { LoaderService } from 'src/app/services/loader.service';
@@ -33,7 +33,6 @@ export class PurchaseMasterDialogComponent implements OnInit {
     'Cash',
     'G-Pay'
   ]
-
   oldCompanyDetails: any[] = [];
   constructor(
     private fb: FormBuilder,
@@ -54,7 +53,6 @@ export class PurchaseMasterDialogComponent implements OnInit {
     this.calculatePending();
     this.paymentDaysChange();
     this.getBalanceList();
-
     if (this.action === 'Edit') {
       this.productForm.patchValue(this.local_data);
       this.local_data.companyDetails?.forEach((detail: any, index: number) => {
@@ -197,37 +195,78 @@ export class PurchaseMasterDialogComponent implements OnInit {
       paymentType: [''],
       bankName: ['']
     });
+
+    this.checkPaymentError(group);
     group.get('paymentR')?.valueChanges.subscribe(() => {
       this.checkPaymentLimit();
     });
     group.valueChanges.subscribe(() => {
-      this.checkPaymentError(group);
+       this.checkCAshPaymentError(group);
     });
-
-
     return group;
   }
 
-  checkPaymentError(group: FormGroup) {
-    const paymentType = group.get('paymentType')?.value;
-    const amount = Number(group.get('paymentR')?.value) || 0;
-    this.bank = group.get('bankName')?.value;
 
-    group.get('paymentR')?.setErrors(null);
-    if (paymentType === 'Cash') {
-      if (amount > this.balanceList?.cashBalance) {
-        group.get('paymentR')?.setErrors({ cashExceeded: true });
-      }
-    }
+checkPaymentError(group: FormGroup) {
+  const paymentType = group.get('paymentType')?.value;
+  const amount = Number(group.get('paymentR')?.value) || 0;
+  const bank = group.get('bankName')?.value;
 
-    if (paymentType === 'G-Pay' && this.bank?.balance !== undefined) {
-      if (amount > this.bank.balance) {
-        group.get('paymentR')?.setErrors({ insufficientBalance: true });
-      }
+
+  const control = group.get('paymentR');
+  if (!control) return;
+
+  let errors: any = {};
+
+  if (paymentType === 'G-Pay' && bank) {
+    if (amount > Number(bank.balance || 0)) {
+      errors.insufficientBalance = true;
     }
   }
 
+  const existingErrors = control.errors || {};
 
+  control.setErrors(
+    Object.keys(errors).length
+      ? { ...existingErrors, ...errors }
+      : null
+  );
+}
+
+checkCAshPaymentError(group: FormGroup) {
+  const paymentType = group.get('paymentType')?.value;
+  const amount = Number(group.get('paymentR')?.value) || 0;
+
+  const cashBalance = Number(this.balanceList?.cashBalance ?? 0);
+
+  const control = group.get('paymentR');
+  if (!control) return;
+
+  let errors: any = {};
+
+  if (paymentType === 'Cash') {
+    if (amount > cashBalance) {
+      errors.cashExceeded = true;
+    }
+  }
+
+  const existingErrors = control.errors || {};
+
+  control.setErrors(
+    Object.keys(errors).length
+      ? { ...existingErrors, ...errors }
+      : null
+  );
+
+  control.markAsTouched();
+}
+
+onBankChange(control: AbstractControl) {
+  const group = control as FormGroup;
+
+  group.get('paymentR')?.markAsTouched();
+  this.checkPaymentError(group);
+}
 
   getTotalPaymentReceived(): number {
     return this.paymentDetails.controls.reduce((sum, ctrl) => {
