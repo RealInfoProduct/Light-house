@@ -53,3 +53,86 @@
 .bank-width {
   margin-right: 10px;
 }
+
+
+.footer-container {
+  min-height: 80px;
+}
+
+.payment-card-mini {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  border-radius: 12px;
+  padding: 8px 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+
+ 
+
+  .icon-bubble {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .payment-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .payment-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .date-text {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+
+  button {
+    padding: 0 24px;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+  
+  .m-r-12 {
+    margin-right: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch !important;
+    padding: 16px !important;
+    
+    .payment-card-mini {
+        justify-content: center;
+    }
+    
+    .button-group {
+        justify-content: space-between;
+        button { flex: 1; }
+    }
+  }
+}
