@@ -82,10 +82,25 @@
             placeholder="Enter Payment Day's" min="0" (input)="limitDigits($event)">
         </mat-form-field>
       </div>
-      <div class="col-12 col-md-4 payment-date">
+      <!-- <div class="col-12 col-md-4 payment-date">
         Payment due date is &nbsp;<b>{{ paymentDays | date : "dd-MM-yyyy" }}</b>
+      </div> -->
+  <div class="payment-card-container">
+    <div class="payment-card-mini" *ngIf="paymentDays">
+      <div class="icon-bubble">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
       </div>
-
+      <div class="payment-content">
+        <div class="payment-label">Next payment due</div>
+        <div class="date-text">{{ paymentDays | date: 'dd-MM-yyyy' }}</div>
+      </div>
+    </div>
+  </div>
     </div>
     <mat-divider></mat-divider>
     <div formArrayName="shellDetails" class="m-t-10">
@@ -174,10 +189,10 @@
     <mat-divider></mat-divider>
     <div class="row">
       <div class="col-12 col-md-6"></div>
-      <div class="col-12 col-md-1"></div>
-      <div class="col-12 col-sm-5 total-align">
+      <div class="col-12 col-md-2"></div>
+      <div class="col-12 col-sm-4  total-align">
         <mat-label class="f-w-600">Total : </mat-label>
-        <mat-form-field appearance="outline" class="w-20 m-t-10  m-l-42">
+        <mat-form-field appearance="outline" class="w-20 m-t-10 total">
           <input matInput [value]="saleForm.get('total')?.value | number:'1.2-2'" readonly />
         </mat-form-field>
       </div>
@@ -185,10 +200,10 @@
 
     <div class="row">
       <div class="col-12 col-md-6"></div>
-      <div class="col-12 col-md-1"></div>
-      <div class="col-12 col-sm-5 discount-align">
+      <div class="col-12 col-md-2"></div>
+      <div class="col-12 col-sm-4  discount-align">
         <mat-label class="f-w-600">Discount ₹ : </mat-label>
-        <mat-form-field appearance="outline" class="w-20">
+        <mat-form-field appearance="outline" class="w-20 discount">
           <input type="number" matInput formControlName="extraDiscount" min="0" />
         </mat-form-field>
       </div>
@@ -196,10 +211,10 @@
 
     <div class="row">
       <div class="col-12 col-md-6"></div>
-      <div class="col-12 col-md-1"></div>
-      <div class="col-12 col-md-5">
+      <div class="col-12 col-md-2"></div>
+      <div class="col-12 col-sm-4 ">
         <mat-label class="font-family">Grand Total : </mat-label>
-        <mat-form-field appearance="outline" class="w-20 m-t-10">
+        <mat-form-field appearance="outline" class="w-20 grandtotal">
           <input matInput class="font-family" [value]="saleForm.get('grandTotal')?.value | number:'1.2-2'" readonly />
         </mat-form-field>
       </div>
@@ -280,7 +295,7 @@
           </mat-form-field>
         </div>
 
-        <div class="paymenttype-width">
+        <div  class="pe-width">
           <mat-radio-group formControlName="paymentType" required>
             <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
               {{ item }}
@@ -298,7 +313,7 @@
           </mat-form-field>
         </div>
 
-        <div class=" d-flex align-items-center m-b-10">
+        <div class=" d-flex align-items-center m-b-10 add-remove">
           <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
             <i-tabler name="trash" (click)="removepaymentDetail(i)" class="icon-18"></i-tabler>
           </a>
@@ -312,23 +327,46 @@
       </div>
     </div>
 
-    <mat-divider></mat-divider>
-    <mat-dialog-actions class="p-24 justify-content-end">
-      <div class="d-flex align-items-center m-r-56">
-        <section class="example-section">
-          <mat-checkbox formControlName="selected" class="example-margin"></mat-checkbox>
-          <mat-label>Send Message In WhatsApp</mat-label>
-        </section>
-      </div>
-      <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
-      <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
-        [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
-        (click)="shellPayload();">
-        {{'actions.' + action | translate}}
-      </button>
-    </mat-dialog-actions>
   </form>
 </mat-dialog-content>
+<mat-divider></mat-divider>
+<!-- <mat-dialog-actions class="p-24 justify-content-end">
+  <div class="d-flex align-items-center m-r-56">
+    <section class="example-section">
+      <mat-checkbox formControlName="selected" class="example-margin"></mat-checkbox>
+      <mat-label>Send Message In WhatsApp</mat-label>
+    </section>
+  </div>
+  <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+  <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
+    [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
+    (click)="shellPayload();">
+    {{'actions.' + action | translate}}
+  </button>
+</mat-dialog-actions> -->
+<mat-dialog-actions class="p-24 justify-content-end">
+  
+  <!-- Checkbox alinhado à esquerda -->
+  <div style="margin-right: auto;">
+    <mat-checkbox formControlName="selected">
+      Send Message In WhatsApp
+    </mat-checkbox>
+  </div>
+
+  <!-- Botões alinhados à direita -->
+  <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
+  <button 
+    mat-flat-button 
+    [mat-dialog-close]="true" 
+    [disabled]="!saleForm.valid" 
+    color="primary"
+    [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" 
+    [style.opacity]="paymentExceeded ? 0.4 : 1"
+    (click)="shellPayload();">
+    {{'actions.' + action | translate}}
+  </button>
+
+</mat-dialog-actions>
 <ng-template #elseTemplate>
   <div class="p-x-24">
     <p>Sure to delete <span class="f-w-600">{{local_data.Name}}</span> ?</p>

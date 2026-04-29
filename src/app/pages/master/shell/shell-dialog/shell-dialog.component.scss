@@ -1,15 +1,17 @@
+
 .font-family {
   font-weight: 600;
   font-family: sans-serif;
 }
 
-.w-20 {
-  width: 60%;
+.text-danger {
+  color: red;
 }
 
-.m-l-42 {
-  margin-left: 42px;
+.flex-grow-1 {
+  flex-grow: 1;
 }
+
 
 ::ng-deep .status-paid {
   color: green !important;
@@ -26,15 +28,104 @@
   font-weight: 600;
 }
 
-.text-danger,
-.error-message {
-  color: red;
+
+.product-row {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
 }
 
-.payment {
+/* On extra small screens, add some space below action buttons */
+@media (max-width: 1200px) {
+    .product-row .justify-content-lg-start {
+        margin-top: -16px; /* Pull buttons up a bit */
+    }
+}
+
+
+/* =========================================
+   Totals Section Styles
+   ========================================= */
+.total-row {
+  margin-bottom: 8px;
+}
+
+.grand-total {
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.12);
+}
+
+.total-field {
+  width: 180px;
+  /* Make the input text bold and right-aligned for better visibility */
+  ::ng-deep .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  ::ng-deep input {
+    text-align: right;
+    font-weight: 600;
+  }
+}
+
+/* =========================================
+   Payment Component Styles
+   ========================================= */
+.payment-info {
   font-weight: 900;
-  font-family: 'Plus Jakarta Sans';
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-style: initial;
+  margin-top: 8px;
+}
+
+.payment-card-mini {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  border-radius: 12px;
+  padding: 8px 16px;
+  color: #fff;
+  display: inline-flex; // Use inline-flex to shrink-wrap
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  margin-top: 10px; // Align with form field
+
+  .icon-bubble {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .payment-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .payment-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .date-text {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
 }
 
 .in-width {
@@ -56,44 +147,27 @@
   width: 50px;
 }
 
-.payment-width {
-  width: 260px;
-  margin-right: 10px;
+.payment-width,
+.pe-width,
+.bank-width,
+.add-remove{
+      margin-left: 20px;
 }
 
-.paymenttype-width {
-  width: 190px;
-  margin-right: 10px;
+.pe-width{
   display: flex;
-  align-items: center;
+    justify-content: center;
+    align-items: center;
 }
 
-.bank-width {
-  margin-right: 10px;
+.total{
+      margin-left: 55px;
 }
 
-@media (max-width: 750px) {
-
-  .discount-align,
-  .total-align {
-    display: flex;
-    align-items: baseline;
-  }
+.discount{
+    margin-left: 16px;
 }
 
-.m-r-56 {
-  margin-right: 63%;
-}
-
-.payment-date {
-  background-color: green;
-  color: #fff;
-  padding: 5px;
-  border-radius: 5px;
-  padding-left: 10px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  height: 56px;
-  margin-top: 8px;
+.grandtotal{
+      margin-left: 11px;
 }
