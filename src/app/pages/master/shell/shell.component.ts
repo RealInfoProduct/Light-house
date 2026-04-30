@@ -84,31 +84,6 @@ export class ShellComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // filterDate() {
-  //   if (!this.shellList) return;
-  //   const startDate = this.dateSaleListForm.value.start ? new Date(this.dateSaleListForm.value.start) : null;
-  //   const endDate = this.dateSaleListForm.value.end ? new Date(this.dateSaleListForm.value.end) : null;
-
-  //   if (startDate && endDate) {
-  //     this.shellDataSource.data = this.shellList.filter((invoice: any) => {
-  //       if (!invoice.date) return false;
-
-  //       let invoiceDate;
-  //       if (invoice.date.toDate) {
-  //         invoiceDate = invoice.date.toDate();
-  //       } else if (invoice.date instanceof Date) {
-  //         invoiceDate = invoice.date;
-  //       } else {
-  //         return false;
-  //       }
-
-  //       return invoiceDate >= startDate && invoiceDate <= endDate;
-  //     });
-  //   } else {
-  //     this.shellDataSource.data = this.shellList;
-  //   }
-  // }
-
   filterDate() {
     if (!this.shellList) return;
 

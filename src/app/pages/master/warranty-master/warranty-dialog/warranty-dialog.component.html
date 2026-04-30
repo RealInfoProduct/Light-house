@@ -18,8 +18,6 @@
                     <mat-label>Invoice No</mat-label>
                     <mat-select formControlName="invoiceNo" placeholder="Invoice No"
                         (selectionChange)="onWarrantyProductChange($event)">
-                        <!-- <input matInput class="select-search-input" type="text" placeholder="🔍 Search Invoice..."
-                            (keyup)="filterWarrantyProducts($event)" style="width: 100%; outline: none;"> -->
                         <mat-option [value]="item.invoiceNo"
                             *ngFor="let item of filteredWarrantyProducts">{{item.invoiceNo}}</mat-option>
                     </mat-select>
@@ -87,28 +85,6 @@
                         <mat-datepicker #saleDate></mat-datepicker>
                     </mat-form-field>
                 </div>
-
-                <!-- <div class="in-width">
-                    <mat-form-field appearance="outline" class="w-100 m-t-10">
-                        <mat-label>Company Name</mat-label>
-                        <mat-select formControlName="companyName" placeholder="Company Name"
-                            (selectionChange)="onCompanyChange(i)">
-                            <mat-option [value]="item.id"
-                                *ngFor="let item of companyList">{{item.companyName}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-
-                <div class="in-width">
-                    <mat-form-field appearance="outline" class="w-100 m-t-10">
-                        <mat-label>Category Name</mat-label>
-                        <mat-select formControlName="category" placeholder="Category Name">
-                            <mat-option [value]="item.id" *ngFor="let item of filteredCategoryList[i]">
-                                {{item.category}} - {{item.keySpecifiCations}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div> -->
-
 
                 <div class="in-width">
                     <mat-form-field appearance="outline" class="w-100 m-t-10">
