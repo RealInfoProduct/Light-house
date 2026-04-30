@@ -245,28 +245,10 @@ export class WarrantyDialogComponent implements OnInit {
 
       this.shellDetails.push(group);
 
-      // if (item.companyName) {
-      //   this.filteredCategoryList[index] = this.categoryList.find(
-      //     (cat: any) => cat.id === item.companyName
-      //   );
-      // }
-
-      // if (item.category) {
-      //   this.filteredCategoryList[index] = this.categoryList.find(
-      //     (cat: any) => cat.id === item.category
-      //   );
-      // }
       this.updateWarrantyDate(group, item.saleDate, item.warranty);
     });
   }
 
-  // filterWarrantyProducts(event: any) {
-  //   const search = (event.target.value || '').toLowerCase();
-
-  //   this.filteredWarrantyProducts = this.shellList.filter((item: any) =>
-  //     item.invoiceNo?.toLowerCase().includes(search)
-  //   );
-  // }
 
   filterWarrantyProducts(event: any) {
   const search = (event.target.value || '').toLowerCase();

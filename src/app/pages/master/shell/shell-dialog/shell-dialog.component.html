@@ -238,39 +238,6 @@
 
     <div formArrayName="paymentDetails" class="m-t-10" *ngIf="saleForm.get('paymentReceived')?.value">
       <div class="row" *ngFor="let bankGroup of paymentDetails.controls; let i = index" [formGroupName]="i">
-        <!-- <div class="col-12 col-md-5">
-          <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Payment Received </mat-label>
-            <input type="number" matInput required formControlName="paymentR" placeholder="Total" min="0" />
-          </mat-form-field>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <mat-form-field appearance="outline" class="w-100 m-t-10">
-            <mat-label>Payment Received Date</mat-label>
-            <input matInput formControlName="paymentReceivedDate" [matDatepicker]="PaymentReceivedDate"
-              placeholder="Enter date">
-            <mat-datepicker-toggle matSuffix [for]="PaymentReceivedDate"></mat-datepicker-toggle>
-            <mat-datepicker #PaymentReceivedDate></mat-datepicker>
-          </mat-form-field>
-        </div>
-
-        <div class="col-12 col-md-2">
-            <mat-radio-group formControlName="paymentType" >
-              <mat-radio-button *ngFor="let item of paymenttype" [value]="item">
-                {{ item }}
-              </mat-radio-button>
-            </mat-radio-group>
-         </div>
-
-        <div class="col-lg-2 d-flex align-items-center m-b-10">
-          <a class="m-r-10 cursor-pointer" *ngIf="paymentDetails.length > 1">
-            <i-tabler name="trash" (click)="removepaymentDetail(i)" class="icon-18"></i-tabler>
-          </a>
-          <a class="m-r-10 cursor-pointer" *ngIf="action !== 'Add'">
-            <i-tabler name="plus" (click)="addpaymentDetail()" class="icon-18"></i-tabler>
-          </a>
-        </div> -->
 
         <div class="payment-width">
           <mat-form-field appearance="outline" class="w-100 m-t-10">
@@ -324,20 +291,6 @@
   </form>
 </mat-dialog-content>
 <mat-divider></mat-divider>
-<!-- <mat-dialog-actions class="p-24 justify-content-end">
-  <div class="d-flex align-items-center m-r-56">
-    <section class="example-section">
-      <mat-checkbox formControlName="selected" class="example-margin"></mat-checkbox>
-      <mat-label>Send Message In WhatsApp</mat-label>
-    </section>
-  </div>
-  <button mat-stroked-button color="warn" mat-dialog-close>Cancel</button>
-  <button mat-flat-button [mat-dialog-close]="true" [disabled]="!saleForm.valid" color="primary"
-    [style.pointerEvents]="paymentExceeded ? 'none' : 'auto'" [style.opacity]="paymentExceeded ? 0.4 : 1"
-    (click)="shellPayload();">
-    {{'actions.' + action | translate}}
-  </button>
-</mat-dialog-actions> -->
 <mat-dialog-actions  [formGroup]="saleForm" class="p-24 justify-content-end">
   
   <!-- Checkbox alinhado à esquerda -->
