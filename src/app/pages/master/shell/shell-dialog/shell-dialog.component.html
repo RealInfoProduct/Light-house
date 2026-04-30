@@ -188,8 +188,14 @@
     </div>
     <mat-divider></mat-divider>
     <div class="row">
-      <div class="col-12 col-md-6"></div>
-      <div class="col-12 col-md-2"></div>
+      <div class="col-12 col-md-4">
+        <mat-label class="f-w-600">Other Kharch : </mat-label>
+         <mat-form-field appearance="outline" class="w-50 m-t-10">
+          <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"
+            (input)="onOtherKharchInput($event)" />
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-4"></div>
       <div class="col-12 col-sm-4  total-align">
         <mat-label class="f-w-600">Total : </mat-label>
         <mat-form-field appearance="outline" class="w-20 m-t-10 total">
@@ -199,8 +205,18 @@
     </div>
 
     <div class="row">
-      <div class="col-12 col-md-6"></div>
-      <div class="col-12 col-md-2"></div>
+      <div class="col-12 col-md-4">
+          <section class="example-section">
+            <mat-checkbox formControlName="paymentReceived">
+              Pending Payment
+            </mat-checkbox>
+          </section>
+    
+          <div *ngIf="saleForm.get('paymentReceived')?.value" class="payment">
+            Pending Payment: {{ pendingAmount | number:'1.2-2' }}
+          </div>
+      </div>
+        <div class="col-12 col-md-4"></div>
       <div class="col-12 col-sm-4  discount-align">
         <mat-label class="f-w-600">Discount ₹ : </mat-label>
         <mat-form-field appearance="outline" class="w-20 discount">
@@ -217,28 +233,6 @@
         <mat-form-field appearance="outline" class="w-20 grandtotal">
           <input matInput class="font-family" [value]="saleForm.get('grandTotal')?.value | number:'1.2-2'" readonly />
         </mat-form-field>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-12 col-md-3">
-        <mat-form-field appearance="outline" class="w-100 m-t-10">
-          <mat-label>Other Kharch</mat-label>
-          <input type="number" matInput formControlName="otherKharch" placeholder="Enter Other Kharch" min="0"
-            (input)="onOtherKharchInput($event)" />
-        </mat-form-field>
-      </div>
-    </div>
-
-    <div>
-      <section class="example-section">
-        <mat-checkbox formControlName="paymentReceived">
-          Pending Payment
-        </mat-checkbox>
-      </section>
-
-      <div *ngIf="saleForm.get('paymentReceived')?.value" class="payment">
-        Pending Payment: {{ pendingAmount | number:'1.2-2' }}
       </div>
     </div>
 

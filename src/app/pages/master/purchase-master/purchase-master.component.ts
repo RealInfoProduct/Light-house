@@ -643,7 +643,7 @@ export class PurchaseMasterComponent implements OnInit {
     const filteredData: any[] = this.productDataSource.data;
 
     if (!filteredData || filteredData.length === 0) {
-      window.alert("No Shell data available for the selected filters.");
+      window.alert("No Purchase data available for the selected filters.");
       return;
     }
 

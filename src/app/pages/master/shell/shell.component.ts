@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ShellDialogComponent } from './shell-dialog/shell-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -43,10 +43,15 @@ export class ShellComponent implements OnInit, AfterViewInit {
   balanceList: any = []
   firmList: any = []
 
+   firms: any[] = [];
+  firmWisesale: any = {};
+
   shellDataSource = new MatTableDataSource(this.shellList);
   @ViewChild(MatTable, { static: true }) table: MatTable<any> = Object.create(null);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChildren(MatPaginator) paginators!: QueryList<MatPaginator>;
+  @ViewChild('tabGroup') tabGroup: any;
 
   constructor(
     private dialog: MatDialog,
@@ -79,34 +84,117 @@ export class ShellComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // filterDate() {
+  //   if (!this.shellList) return;
+  //   const startDate = this.dateSaleListForm.value.start ? new Date(this.dateSaleListForm.value.start) : null;
+  //   const endDate = this.dateSaleListForm.value.end ? new Date(this.dateSaleListForm.value.end) : null;
+
+  //   if (startDate && endDate) {
+  //     this.shellDataSource.data = this.shellList.filter((invoice: any) => {
+  //       if (!invoice.date) return false;
+
+  //       let invoiceDate;
+  //       if (invoice.date.toDate) {
+  //         invoiceDate = invoice.date.toDate();
+  //       } else if (invoice.date instanceof Date) {
+  //         invoiceDate = invoice.date;
+  //       } else {
+  //         return false;
+  //       }
+
+  //       return invoiceDate >= startDate && invoiceDate <= endDate;
+  //     });
+  //   } else {
+  //     this.shellDataSource.data = this.shellList;
+  //   }
+  // }
+
   filterDate() {
     if (!this.shellList) return;
-    const startDate = this.dateSaleListForm.value.start ? new Date(this.dateSaleListForm.value.start) : null;
-    const endDate = this.dateSaleListForm.value.end ? new Date(this.dateSaleListForm.value.end) : null;
 
-    if (startDate && endDate) {
-      this.shellDataSource.data = this.shellList.filter((invoice: any) => {
+    const start = this.dateSaleListForm.value.start;
+    const end = this.dateSaleListForm.value.end;
+
+    if (!start || !end) {
+      this.getShellList(); // reset
+      return;
+    }
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    Object.keys(this.firmWisesale).forEach((firmId: string) => {
+
+      const originalData = this.shellList.filter((x: any) => x.firmName === firmId);
+      const filteredData = originalData.filter((invoice: any) => {
+
         if (!invoice.date) return false;
 
-        let invoiceDate;
-        if (invoice.date.toDate) {
-          invoiceDate = invoice.date.toDate();
-        } else if (invoice.date instanceof Date) {
+        let invoiceDate: Date;
+
+        // ✅ IMPORTANT: Your HTML uses Angular date pipe → means it's already a Date
+        if (invoice.date instanceof Date) {
           invoiceDate = invoice.date;
         } else {
-          return false;
+          invoiceDate = new Date(invoice.date);
         }
+
+        if (isNaN(invoiceDate.getTime())) return false;
+
+        invoiceDate.setHours(0, 0, 0, 0);
 
         return invoiceDate >= startDate && invoiceDate <= endDate;
       });
-    } else {
-      this.shellDataSource.data = this.shellList;
-    }
+
+      this.firmWisesale[firmId].data = filteredData;
+
+      // 🔥 Force table refresh (VERY IMPORTANT)
+      this.firmWisesale[firmId]._updateChangeSubscription();
+    });
   }
 
+  // applyFilter(filterValue: string): void {
+  //   this.shellDataSource.filter = filterValue.trim().toLowerCase();
+  // }
+
   applyFilter(filterValue: string): void {
-    this.shellDataSource.filter = filterValue.trim().toLowerCase();
-  }
+  const filter = filterValue.trim().toLowerCase();
+
+  Object.keys(this.firmWisesale).forEach((key: string) => {
+
+    const dataSource = this.firmWisesale[key];
+
+    // ✅ Set predicate for EACH table
+    dataSource.filterPredicate = (data: any, filter: string) => {
+
+      const searchText = filter.trim().toLowerCase();
+      const invoiceNumber = data.invoiceNo?.toString().toLowerCase() || '';
+      const billNumber = data.billNumber?.toString().toLowerCase() || '';
+      const Customer = data.customerName?.toString().toLowerCase() || '';
+      const CustomerNumber = data.mobileNumber?.toString().toLowerCase() || '';
+      const partyName =
+        this.firmList.find((p: any) => p.id === data.firmName)?.header
+          ?.toLowerCase() || '';
+
+      return (
+        invoiceNumber.includes(searchText) ||
+        billNumber.includes(searchText) ||
+        Customer.includes(searchText) ||
+        CustomerNumber.includes(searchText) ||
+        partyName.includes(searchText)
+      );
+    };
+
+    // ✅ Apply filter
+    dataSource.filter = filter;
+
+    // 🔥 Force refresh (important)
+    dataSource._updateChangeSubscription();
+  });
+}
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -386,13 +474,42 @@ export class ShellComponent implements OnInit, AfterViewInit {
           return numB - numA;
         });
       }
-      this.shellDataSource = new MatTableDataSource(this.shellList);
-      this.shellDataSource.paginator = this.paginator;
-      this.shellDataSource.sort = this.sort;
-      this.filterDate()
-      this.loaderService.setLoader(false)
+      // this.shellDataSource = new MatTableDataSource(this.shellList);
+      // this.shellDataSource.paginator = this.paginator;
+      // this.shellDataSource.sort = this.sort;
+      // this.filterDate()
+         const uniqueFirmIds = [...new Set(this.shellList.map((x: any) => x.firmName))] as string[];
+        // Tabs
+        this.firms = uniqueFirmIds.map((id: string) => {
+          const firm = this.getFinalfirm(id);
+          return {
+            firmId: id,
+            name: firm?.header || 'Firm ' + id
+          };
+        });
+
+        // Group data
+        this.firmWisesale = {};
+        uniqueFirmIds.forEach((id: string) => {
+          const data = this.shellList.filter((x: any) => x.firmName === id)
+          .sort((a: any, b: any) => b.invoiceNumber - a.invoiceNumber); 
+          this.firmWisesale[id] = new MatTableDataSource(data);
+        });
+        this.loaderService.setLoader(false)
+         setTimeout(() => this.assignPaginators());
 
     })
+  }
+
+  assignPaginators() {
+    const paginatorArray = this.paginators.toArray();
+
+    this.firms.forEach((firm, index) => {
+      const ds = this.firmWisesale[firm.firmId];
+      if (ds) {
+        ds.paginator = paginatorArray[index];
+      }
+    });
   }
 
   getExpensesList() {
@@ -475,31 +592,66 @@ export class ShellComponent implements OnInit, AfterViewInit {
   }
 
   filedownload() {
-    const doc: any = new jsPDF();
-    doc.setFontSize(13);
-    const filteredData: any[] = this.shellDataSource.data;
 
-    if (!filteredData || filteredData.length === 0) {
-      window.alert("No Shell data available for the selected filters.");
-      return;
-    }
+  if (!this.tabGroup) {
+    this.openConfigSnackBar('Tab not initialized');
+    return;
+  }
 
-    const startDate = this.dateSaleListForm.value.start;
-    const endDate = this.dateSaleListForm.value.end;
+  const selectedIndex = this.tabGroup.selectedIndex;
 
-    const formattedStart = new Date(startDate).toLocaleDateString('en-GB');
-    const formattedEnd = new Date(endDate).toLocaleDateString('en-GB');
+  if (selectedIndex === null || selectedIndex === undefined) {
+    this.openConfigSnackBar('No tab selected');
+    return;
+  }
 
-    doc.text(`Report Date: ${formattedStart} To ${formattedEnd}`, 14, 15);
+  const firm = this.firms[selectedIndex];
 
-    const TotalAmounttotal = filteredData.reduce((sum, item) => sum + parseFloat(item.grandTotal), 0);
+  if (!firm) {
+    this.openConfigSnackBar('Firm not found');
+    return;
+  }
+
+  const ds = this.firmWisesale[firm.firmId];
+
+  if (!ds) {
+    this.openConfigSnackBar('No data source found');
+    return;
+  }
+
+  // ✅ IMPORTANT: filteredData sometimes undefined
+  const invoices = ds.filteredData && ds.filteredData.length
+    ? ds.filteredData
+    : ds.data;
+
+  if (!invoices || invoices.length === 0) {
+    window.alert("No Sale data available for the selected filters.");
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  // ✅ Dates
+  const startDate = new Date(this.dateSaleListForm.value.start);
+  const endDate = new Date(this.dateSaleListForm.value.end);
+
+  const formattedStart = startDate.toLocaleDateString('en-GB');
+  const formattedEnd = endDate.toLocaleDateString('en-GB');
+
+  const firmName = this.getFinalfirm(firm.firmId) || '';
+  // ✅ Title
+  doc.setFontSize(12);
+  doc.text(`Firm Name: ${firmName}`, 14, 12);
+  doc.text(`Invoice Report Date: ${formattedStart} to ${formattedEnd}`, 14, 18);
+
+   const TotalAmounttotal = invoices.reduce((sum:any, item:any) => sum + parseFloat(item.grandTotal), 0);
     const FinalTotalAmount = Math.round(TotalAmounttotal).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
     doc.text(`Final Total: ${(FinalTotalAmount)}`, 135, 11);
 
-    const RecivedtotalAmount = filteredData.reduce((sum: number, item: any) => {
+    const RecivedtotalAmount = invoices.reduce((sum: number, item: any) => {
       if (item.paymentDetails && Array.isArray(item.paymentDetails)) {
         return sum + item.paymentDetails.reduce((innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0), 0);
       }
@@ -511,7 +663,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
     });
     doc.text(`Spent Total: ${(RecivedAmount)}`, 135, 19);
 
-    const PendingtotalAmount = filteredData.reduce((sum: number, item: any) => {
+    const PendingtotalAmount = invoices.reduce((sum: number, item: any) => {
       const paymentReceived = item.paymentDetails?.reduce(
         (innerSum: number, pd: any) => innerSum + (parseFloat(pd.paymentR) || 0),
         0
@@ -540,7 +692,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
       "Pending Amount"
     ];
 
-    const data = filteredData.map((item, i) => {
+    const data = invoices.map((item:any, i:any) => {
 
       const dateStr = moment(item.date).format('DD/MM/YYYY');
 
@@ -599,7 +751,7 @@ export class ShellComponent implements OnInit, AfterViewInit {
     });
 
     doc.save(`Shell Report.pdf`);
-  }
+}
 
   setPaymentStatusColor(doc: jsPDF, status: string) {
     switch (status) {
