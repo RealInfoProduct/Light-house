@@ -38,7 +38,7 @@
 </mat-card>
 
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" #tabGroup>
-  <mat-tab *ngFor="let firm of firms"   [label]="getFinalfirm(firm.firmId) + ' ' + getFinalsubHeaderfirm(firm.firmId)">
+  <mat-tab *ngFor="let firm of firms" [label]="getFinalfirm(firm.firmId) + ' ' + getFinalsubHeaderfirm(firm.firmId)">
     <mat-card class="cardWithShadow">
       <mat-card-content class="p-24">
         <div class="table-responsive">

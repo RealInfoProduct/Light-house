@@ -452,28 +452,28 @@ export class ShellComponent implements OnInit, AfterViewInit {
       // this.shellDataSource = new MatTableDataSource(this.shellList);
       // this.shellDataSource.paginator = this.paginator;
       // this.shellDataSource.sort = this.sort;
-      // this.filterDate()
-         const uniqueFirmIds = [...new Set(this.shellList.map((x: any) => x.firmName))] as string[];
-        // Tabs
-        this.firms = uniqueFirmIds.map((id: string) => {
-          const firm = this.getFinalfirm(id);
-          return {
-            firmId: id,
-            name: firm?.header || 'Firm ' + id
-          };
-        });
-
-        // Group data
-        this.firmWisesale = {};
+      const uniqueFirmIds = [...new Set(this.shellList.map((x: any) => x.firmName))] as string[];
+      // Tabs
+      this.firms = uniqueFirmIds.map((id: string) => {
+        const firm = this.getFinalfirm(id);
+        return {
+          firmId: id,
+          name: firm?.header || 'Firm ' + id
+        };
+      });
+      
+      // Group data
+      this.firmWisesale = {};
         uniqueFirmIds.forEach((id: string) => {
           const data = this.shellList.filter((x: any) => x.firmName === id)
           .sort((a: any, b: any) => b.invoiceNumber - a.invoiceNumber); 
           this.firmWisesale[id] = new MatTableDataSource(data);
         });
         this.loaderService.setLoader(false)
-         setTimeout(() => this.assignPaginators());
-
-    })
+        setTimeout(() => this.assignPaginators());
+        
+        this.filterDate()
+      })
   }
 
   assignPaginators() {
