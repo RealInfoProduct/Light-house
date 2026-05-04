@@ -198,7 +198,7 @@
 </mat-dialog-content>
 <mat-divider></mat-divider>
 
-<mat-dialog-actions class="p-24 d-flex align-items-center justify-content-between footer-container">
+<mat-dialog-actions class="p-24 d-flex align-items-center justify-content-between footer-container" *ngIf="action !== 'Delete'">
   
   <div class="payment-card-container">
     <div class="payment-card-mini" *ngIf="paymentDays">
