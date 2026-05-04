@@ -291,7 +291,7 @@
   </form>
 </mat-dialog-content>
 <mat-divider></mat-divider>
-<mat-dialog-actions  [formGroup]="saleForm" class="p-24 justify-content-end">
+<mat-dialog-actions  [formGroup]="saleForm" class="p-24 justify-content-end" *ngIf="action !== 'Delete'">
   
   <!-- Checkbox alinhado à esquerda -->
   <div style="margin-right: auto;">
