@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="m-b-24 b-b-1 p-b-20">{{'actions.' + action | translate}} Purchase</h2>
-<mat-dialog-content class="mat-typography" style="max-width: 950px" *ngIf="action !== 'Delete'; else elseTemplate">
+<mat-dialog-content id ="status" class="mat-typography" style="max-width: 950px" *ngIf="action !== 'Delete'; else elseTemplate">
   <form [formGroup]="productForm">
     <div class="row">
 
