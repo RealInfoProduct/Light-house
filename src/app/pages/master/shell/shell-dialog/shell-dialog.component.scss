@@ -17,7 +17,8 @@
 }
 
 
-::ng-deep .status-paid {
+#statuss{
+  ::ng-deep .status-paid {
   color: green !important;
   font-weight: 600;
 }
@@ -30,6 +31,7 @@
 ::ng-deep .status-pending {
   color: #ffc300 !important;
   font-weight: 600;
+}
 }
 
 
@@ -69,6 +71,7 @@
 .total-field {
   width: 180px;
   /* Make the input text bold and right-aligned for better visibility */
+  #statuss{
   ::ng-deep .mat-form-field-wrapper {
     margin: 0 !important;
     padding: 0 !important;
@@ -77,6 +80,7 @@
     text-align: right;
     font-weight: 600;
   }
+} 
 }
 
 /* =========================================
